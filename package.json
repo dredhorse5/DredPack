@@ -1,22 +1,12 @@
 {
-  "name": "com.Dredhorse5.DredPack",
+  "name": "com.dredhorse5.dredPack",
   "version": "1.2.3",
-  "displayName": "Package Example",
-  "description": "This is an example package",
+  "displayName": "Starter pack - DredPack ",
+  "description": "Everything in this package will make your work with unity easier!",
   "unity": "2019.1",
-  "unityRelease": "0b5",
-  "dependencies": {
-    "com.unity.some-package": "1.0.0",
-    "com.unity.other-package": "2.0.0"
-  },
-  "keywords": [
-    "keyword1",
-    "keyword2",
-    "keyword3"
-  ],
   "author": {
-    "name": "Dredhorse5",
-    "email": "Dima.titov18@example.com",
+    "name": "dredhorse5",
+    "email": "dima.titov18@gmail.com",
     "url": ""
   }
 }
