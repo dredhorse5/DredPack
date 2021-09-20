@@ -38,8 +38,8 @@ public class Window : MonoBehaviour
     [Space]
     [SerializeField]
     public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
-    
-    
+    [Button("SwitchState")]
+    public bool btn;
     [NonSerialized]
     public float ShowingSpeed = 1f;
 
@@ -128,6 +128,29 @@ public class Window : MonoBehaviour
         }
     }
 
+    public void SwitchState()
+    {
+        if (CurrentWindowState == WindowStatesRead.Opened || CurrentWindowState == WindowStatesRead.Opening)
+        {
+            Close_Instantly();
+        }
+        else
+        {
+            Open_Instantly();
+        }
+    }
+
+    public void Switch()
+    {
+        if(CurrentWindowState == WindowStatesRead.Opened || CurrentWindowState == WindowStatesRead.Opening)
+        {
+            Close();
+        }
+        else
+        {
+            Open();
+        }
+    }
 
 
     #region Open or close visual methods:  Animator
