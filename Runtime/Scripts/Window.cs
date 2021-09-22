@@ -8,11 +8,22 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class Window : MonoBehaviour
 {
+    #region Enums
+
+    public enum SideAppearType
+    {
+        FromLeft,
+        FromRight,
+        FromUp,
+        FromDown
+    }
+    
     public enum PanelOpenCloseMethods
     {
         Animator,
         Instantly,
-        Slowly
+        Slowly,
+        SideAppear
     }
     public enum WindowStatesRead
     {
@@ -27,6 +38,9 @@ public class Window : MonoBehaviour
         Close
     }
 
+    #endregion
+   
+
     
     
     
@@ -35,25 +49,39 @@ public class Window : MonoBehaviour
     [ReadOnly]
     [SerializeField]
     public WindowStatesRead CurrentWindowState = WindowStatesRead.Opened;
+    [Button("SwitchState")]
+    public bool btn;
     [Space]
     [SerializeField]
     public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
-    [Button("SwitchState")]
-    public bool btn;
+    
+    
+    
+
+    #region Slowly Fields
+    
     [NonSerialized]
     public float ShowingSpeed = 1f;
-
-    [NonSerialized] public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-
     
+    [NonSerialized] 
+    public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+    #endregion
+    
+    
+    
+
+    #region Animator Fields
+
     [NonSerialized]
     public Animator Animator;
     [NonSerialized]
     public string OpenTriggerAnimatorParameter = "Open";
     [NonSerialized]
     public string CLoseTriggerAnimatorParameter = "Close";
-
-
+    
+    #endregion
+    
     protected Coroutine openingCoroutine;
     protected Coroutine closingCoroutine;
     protected CanvasGroup m_canvasGroup
@@ -139,7 +167,6 @@ public class Window : MonoBehaviour
             Open_Instantly();
         }
     }
-
     public void Switch()
     {
         if(CurrentWindowState == WindowStatesRead.Opened || CurrentWindowState == WindowStatesRead.Opening)
@@ -252,6 +279,12 @@ public class Window : MonoBehaviour
         CurrentWindowState = WindowStatesRead.Closed;
         closingCoroutine = null;
     }
+
+    #endregion
+
+    #region Open or close visual methods: Appear from side
+
+    
 
     #endregion
 
