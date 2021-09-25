@@ -7,11 +7,12 @@ using UnityEngine.UI;
 public class MenuItemEditor : MonoBehaviour
 {
     private static string fontPath = "Fonts/Troika_Regular_Font";
-    
     private static string btnSpritePath = "Sprites/Btn_MainButton_White";
+
+
     
     [MenuItem("GameObject/DredPackUI/Window", false, 10)]
-    static void CreateComponentWindow(MenuCommand menuCommand)
+    public static void CreateObject_Window(MenuCommand menuCommand)
     {
         GameObject go = new GameObject("Window");
         go.layer = 5;
@@ -42,47 +43,88 @@ public class MenuItemEditor : MonoBehaviour
         Selection.activeObject = go;
     }
 
+    #region Text Creator
+    
+    [MenuItem("GameObject/DredPackUI/Text/White", false, 10)]
+    public static void CreateObject_WhiteText(MenuCommand menuCommand)
+    {
+        CreateObject_Text(menuCommand, Color.white);
+    }
+    [MenuItem("GameObject/DredPackUI/Text/Black", false, 10)]
+    public static void CreateObject_BlackText(MenuCommand menuCommand)
+    {
+        CreateObject_Text(menuCommand, Color.black);
+    }
+    
+    public static void CreateObject_Text(MenuCommand menuCommand, Color color)
+    {
+        var rectTransform = CreateUiElement("Text");
+        
+        //rect transform settings
+        rectTransform.sizeDelta = new Vector2(360, 60);
+        
+        rectTransform.anchorMin = Vector2.one/2;
+        rectTransform.anchorMax = Vector2.one/2;
+        
+        
+        //text settings
+        var text = rectTransform.gameObject.AddComponent<Text>();
+        text.font = Resources.Load<Font>(fontPath);
+        text.text = "New Text";
+        text.fontSize = 50;
+        text.color = color;
+        text.alignment = TextAnchor.MiddleCenter;
+        
+        
+        GameObjectUtility.SetParentAndAlign(rectTransform.gameObject, menuCommand.context as GameObject);
+        Undo.RegisterCreatedObjectUndo(rectTransform.gameObject, "Create " + rectTransform.gameObject.name);
+        Selection.activeObject = rectTransform.gameObject;
+    }
+
+
+    #endregion
+    
     #region Buttons Creator
 
     
     [MenuItem("GameObject/DredPackUI/Button/White", false, 10)]
-    static void CreateComponentButtonWhite(MenuCommand menuCommand)
+    static void CreateObjectButtonWhite(MenuCommand menuCommand)
     {
-        CreateComponentButton(menuCommand, Color.white,Color.black, "Button");
+        CreateObejctButton(menuCommand, Color.white,Color.black, "Button");
     }
     [MenuItem("GameObject/DredPackUI/Button/Red", false, 10)]
-    static void CreateComponentButtonRed(MenuCommand menuCommand)
+    static void CreateObejctButtonRed(MenuCommand menuCommand)
     {
-        CreateComponentButton(menuCommand, Color.red,Color.white,"RedButton");
+        CreateObejctButton(menuCommand, Color.red,Color.white,"RedButton");
     }
     [MenuItem("GameObject/DredPackUI/Button/Green", false, 10)]
-    static void CreateComponentButtonGreen(MenuCommand menuCommand)
+    static void CreateObejctButtonGreen(MenuCommand menuCommand)
     {
-        CreateComponentButton(menuCommand, Color.green,Color.white, "GreenButton");
+        CreateObejctButton(menuCommand, Color.green,Color.white, "GreenButton");
     }
     [MenuItem("GameObject/DredPackUI/Button/Blue", false, 10)]
-    static void CreateComponentButtonBlue(MenuCommand menuCommand)
+    static void CreateObejctButtonBlue(MenuCommand menuCommand)
     {
-        CreateComponentButton(menuCommand, Color.blue,Color.white, "BlueButton");
+        CreateObejctButton(menuCommand, Color.blue,Color.white, "BlueButton");
     }
     [MenuItem("GameObject/DredPackUI/Button/Light Blue", false, 10)]
-    static void CreateComponentButtonLightBlue(MenuCommand menuCommand)
+    static void CreateObejctButtonLightBlue(MenuCommand menuCommand)
     {
-        CreateComponentButton(menuCommand, new Color(0,255,255,255),Color.white, "LightBlueButton");
+        CreateObejctButton(menuCommand, new Color(0,255,255,255),Color.white, "LightBlueButton");
     }
     [MenuItem("GameObject/DredPackUI/Button/Yellow", false, 10)]
-    static void CreateComponentButtonYellow(MenuCommand menuCommand)
+    static void CreateObejctButtonYellow(MenuCommand menuCommand)
     {
-        CreateComponentButton(menuCommand, Color.yellow,Color.white,"YellowButton");
+        CreateObejctButton(menuCommand, Color.yellow,Color.white,"YellowButton");
     }
     [MenuItem("GameObject/DredPackUI/Button/Purple", false, 10)]
-    static void CreateComponentButtonPurple(MenuCommand menuCommand)
+    static void CreateObejctButtonPurple(MenuCommand menuCommand)
     {
-        CreateComponentButton(menuCommand, new Color(255,0,255,255),Color.white, "PurpleButton");
+        CreateObejctButton(menuCommand, new Color(255,0,255,255),Color.white, "PurpleButton");
     }
     
     
-    static void CreateComponentButton(MenuCommand menuCommand, Color btnColor, Color textColor, string name)
+    static void CreateObejctButton(MenuCommand menuCommand, Color btnColor, Color textColor, string name)
     {
         var rectTransform = CreateUiElement(name);
         
@@ -159,8 +201,11 @@ public class MenuItemEditor : MonoBehaviour
         
         return rectTransform;
     }
-    /*
-    [MenuItem("MyMenu/Do Something with a Shortcut Key %g")]
+    
+    
+    
+    
+    /*[MenuItem("MyMenu/Do Something with a Shortcut Key %g")]
     static void DoSomethingWithAShortcutKey()
     {
         Debug.Log("Doing something with a Shortcut Key...");
