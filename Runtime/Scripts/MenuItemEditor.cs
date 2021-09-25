@@ -14,33 +14,31 @@ public class MenuItemEditor : MonoBehaviour
     [MenuItem("GameObject/DredPackUI/Window", false, 10)]
     public static void CreateObject_Window(MenuCommand menuCommand)
     {
-        GameObject go = new GameObject("Window");
-        go.layer = 5;
-        go.AddComponent<Window>();
+        var rectTransform = CreateUiElement("Window");
         
-        var rectTransform = go.AddComponent<RectTransform>();
+        
         rectTransform.anchorMin = Vector2.zero;
         rectTransform.anchorMax = Vector2.one;
-
+        
         rectTransform.offsetMin = Vector2.zero;
         rectTransform.offsetMax = Vector2.zero;
+        
+        rectTransform.sizeDelta = Vector2.zero;
+        
+        rectTransform.anchoredPosition = Vector2.zero;
 
-        var canvas = FindObjectOfType<Canvas>();
-        if (!canvas)
-        {
-            GameObject canvasGO = new GameObject("Canvas");
-            canvasGO.layer = 5;
-            canvas = canvasGO.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasGO.AddComponent<CanvasScaler>();
-            canvasGO.AddComponent<GraphicRaycaster>();
-        }
         
-        go.transform.parent = canvas.transform;
+        rectTransform.gameObject.AddComponent<Window>();
+
+
+        var image = rectTransform.gameObject.AddComponent<Image>();
+        image.color = new Color(0, 0, 0, 0.5f);
         
-        GameObjectUtility.SetParentAndAlign(go, menuCommand.context as GameObject);
-        Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
-        Selection.activeObject = go;
+
+        GameObjectUtility.SetParentAndAlign(rectTransform.gameObject, menuCommand.context as GameObject);
+        Undo.RegisterCreatedObjectUndo(rectTransform.gameObject, "Create " + rectTransform.gameObject.name);
+        
+        Selection.activeObject = rectTransform.gameObject;
     }
 
     #region Text Creator
@@ -48,7 +46,7 @@ public class MenuItemEditor : MonoBehaviour
     [MenuItem("GameObject/DredPackUI/Text/White", false, 10)]
     public static void CreateObject_WhiteText(MenuCommand menuCommand)
     {
-        CreateObject_Text(menuCommand, Color.white);
+        CreateObject_Text(menuCommand, Color.white);//
     }
     [MenuItem("GameObject/DredPackUI/Text/Black", false, 10)]
     public static void CreateObject_BlackText(MenuCommand menuCommand)
