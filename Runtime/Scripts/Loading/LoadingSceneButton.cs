@@ -13,15 +13,25 @@ public class LoadingSceneButton : MonoBehaviour
     }
     public string SceneName = "";
     public SceneTypes SceneType;
+    
+    
     private void Start()
     {
         var button = GetComponent<Button>();
         button.onClick.AddListener(() =>
         {
-            if(SceneName != null && SceneName != "")
-                SceneLoader.LoadNewScene(SceneName);
-            else
-                Debug.LogError("No scene selected in the button : " + gameObject.name);
+            switch (SceneType)
+            {
+                case SceneTypes.LoadNewScene:
+                    if(SceneName != null && SceneName != "")
+                        SceneLoader.LoadNewScene(SceneName);
+                    else
+                        Debug.LogError("No scene selected in the button : " + gameObject.name);
+                    break;
+                case SceneTypes.ReloadThisScene:
+                    SceneLoader.ReloadScene();
+                    break;
+            }
         });
     }
 }
