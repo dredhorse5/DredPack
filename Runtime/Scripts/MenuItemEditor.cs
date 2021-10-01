@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if  UNITY_EDITOR
+
 public class MenuItemEditor : MonoBehaviour
 {
     private static string fontPath = "Fonts/Troika_Regular_Font";
@@ -209,3 +211,4 @@ public class MenuItemEditor : MonoBehaviour
         Debug.Log("Doing something with a Shortcut Key...");
     }*/
 }
+#endif
