@@ -16,6 +16,8 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
     
     public void OnDrag(PointerEventData eventData)
     {
+        MoveDeltaEvent?.Invoke(eventData.delta);
+        
         if(!canEvent)
             return;
         
@@ -41,7 +43,6 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
             SwipeEven?.Invoke(Vector2.down);
             canEvent = false;
         }
-        MoveDeltaEvent?.Invoke(eventData.delta);
         
     }
 
