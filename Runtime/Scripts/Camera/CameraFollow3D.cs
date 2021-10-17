@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraFollow3D : MonoBehaviour
+public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
 {
     public enum FollowTypes
     {
