@@ -47,6 +47,7 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
 
     public void SetTarget(Transform _target) => target = _target;
     public void SetTarget(MonoBehaviour _target) => target = _target.transform;
+    public void ResetTarget() => target = null;
 
     public void SetCameraToTarget()
     {
