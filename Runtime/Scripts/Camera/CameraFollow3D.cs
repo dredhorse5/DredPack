@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
@@ -14,10 +15,14 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
     public FollowTypes FollowType = FollowTypes.LocatedAtTarget;
     
     // Located at target (LT)
-    [Range(0,100)] public float LT_MoveSpeed;
+    public float LT_MoveSpeed;
     public bool LT_Rotating = true;
-    [Range(0,100)] public float LT_RotateSpeed;
-
+    public float LT_RotateSpeed;
+    
+    // Follow For Target (FT)
+    
+    
+    
 
     private Transform target;
 
@@ -57,5 +62,64 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
 
     #endregion
     
+    
+    #region EDITOR
+    
+#if UNITY_EDITOR
+    [CustomEditor(typeof(CameraFollow3D))]
+    public class CameraFollow3DEditor : Editor
+    {
+        private CameraFollow3D T
+        {
+            get
+            {
+                if (_t == null)
+                    _t = (CameraFollow3D)target;
+                return _t;
+            }
+        }
+        private CameraFollow3D _t;
 
+
+        public override void OnInspectorGUI()
+        {
+            T.FollowType = (FollowTypes) EditorGUILayout.EnumPopup("Follow Type", T.FollowType);
+            EditorGUI.indentLevel++;
+            switch (T.FollowType)
+            {
+                case FollowTypes.LocatedAtTarget:
+                    T.LT_MoveSpeed = EditorGUILayout.Slider("Move Speed", T.LT_MoveSpeed,0f,100f);
+                    T.LT_Rotating = EditorGUILayout.Toggle("Rotating", T.LT_Rotating);
+                    if(T.LT_Rotating)
+                        T.LT_RotateSpeed = EditorGUILayout.Slider("Rotate Speed", T.LT_RotateSpeed,0f,100f);
+                    
+                    break;
+                case FollowTypes.FollowForTarget:
+                    break;
+                /*case PanelOpenCloseMethods.Instantly:
+                    break;
+                    
+                case PanelOpenCloseMethods.Animator:
+                    EditorGUI.indentLevel++;
+                    T.Animator = (Animator)EditorGUILayout.ObjectField("Animator", T.Animator, typeof(Animator));
+                    T.OpenTriggerAnimatorParameter = EditorGUILayout.TextField("Open", T.OpenTriggerAnimatorParameter);
+                    T.CLoseTriggerAnimatorParameter = EditorGUILayout.TextField("Close", T.CLoseTriggerAnimatorParameter);
+                    EditorGUI.indentLevel--;
+                    break;
+                
+                case PanelOpenCloseMethods.Slowly:
+                    EditorGUI.indentLevel++;
+                    T.ShowingSpeed = EditorGUILayout.FloatField("Showing Speed", T.ShowingSpeed);
+                    T.Curve = EditorGUILayout.CurveField("Curve", T.Curve);
+                    EditorGUI.indentLevel--;
+                    break;*/
+            }        
+            EditorGUI.indentLevel--;
+            serializedObject.ApplyModifiedProperties();
+
+        }
+    }
+#endif
+    
+    #endregion
 }

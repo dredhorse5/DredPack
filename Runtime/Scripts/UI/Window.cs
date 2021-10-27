@@ -60,7 +60,7 @@ public class Window : MonoBehaviour
 
     #region Slowly Fields
     
-    [NonSerialized]
+    [HideInInspector]
     public float ShowingSpeed = 1f;
     
     [NonSerialized] 
@@ -329,7 +329,9 @@ public class Window : MonoBehaviour
                     T.Curve = EditorGUILayout.CurveField("Curve", T.Curve);
                     EditorGUI.indentLevel--;
                     break;
-            }
+            }        
+            serializedObject.ApplyModifiedProperties();
+
         }
     }
 #endif
