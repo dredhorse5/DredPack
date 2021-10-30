@@ -17,6 +17,8 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
     public UnityEvent<Vector2> MoveDeltaEvent= new UnityEvent<Vector2>();
     public UnityEvent<float> ZoomEvent = new UnityEvent<float>();
 
+    public Vector2 movedDelta;
+
     private Vector2 startPoint;
     private bool canSwipe;
 
@@ -40,8 +42,10 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
     
     public void MoveDelta(PointerEventData eventData)
     {
-        if(Input.touchCount == 1)
-            MoveDeltaEvent?.Invoke(eventData.delta * MoveDeltaSensitivity);
+        if(Input.touchCount != 1)
+            return;
+        movedDelta = eventData.delta * MoveDeltaSensitivity; 
+        MoveDeltaEvent?.Invoke(movedDelta);
     }
     public void Swipe(PointerEventData eventData)
     {
