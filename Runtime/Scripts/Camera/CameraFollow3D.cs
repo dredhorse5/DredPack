@@ -12,6 +12,8 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
         FollowForTarget  // FT
     }
 
+    public Transform Target;
+    
     public FollowTypes FollowType = FollowTypes.LocatedAtTarget;
     
     // Located at target (LT)
@@ -20,15 +22,17 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
     public float LT_RotateSpeed;
     
     // Follow For Target (FT)
-    
+    public Vector3 FT_MoveAxis;
+    public float FT_MoveSpeed;
+    public float FT_MinDistanceToTarget;
+    public float FT_RotateSpeed;
     
     
 
-    private Transform target;
 
     private void Update()
     {
-        if(!target)
+        if(!Target)
             return;
         
         switch (FollowType)
@@ -37,27 +41,48 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
                 LT_UpdatePosition();
                 break;
             case FollowTypes.FollowForTarget:
+                UpdateLT();
                 break;
         }
     }
 
     public void LT_UpdatePosition()
     {
-        transform.position = Vector3.Lerp(transform.position, target.position, LT_MoveSpeed * Time.deltaTime / 2f );
+        transform.position = Vector3.Lerp(transform.position, Target.position, LT_MoveSpeed * Time.deltaTime / 2f );
         if(LT_Rotating)
-            transform.rotation = Quaternion.Lerp(transform.rotation, target.rotation, LT_RotateSpeed* Time.deltaTime / 2f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, Target.rotation, LT_RotateSpeed* Time.deltaTime / 2f);
+    }
+
+    public void UpdateLT()
+    {
+        var direction = (Target.transform.position - transform.position).normalized;
+        var lookRotation = Quaternion.LookRotation(direction, Vector3.up);
+        transform.rotation = Quaternion.Lerp(transform.rotation,lookRotation,FT_MoveSpeed * Time.deltaTime / 2f);
+        
+        
+        var distanceToTarget = (transform.position - Target.transform.position).magnitude;
+        if (distanceToTarget > FT_MinDistanceToTarget)
+        {
+            transform.position += new Vector3(direction.x * FT_MoveAxis.x,direction.y* FT_MoveAxis.y,direction.z* FT_MoveAxis.z)  *//Vector3.Cross(direction , FT_MoveAxis) *
+                                  FT_MoveSpeed  *
+                                  (distanceToTarget - FT_MinDistanceToTarget) *
+                                  Time.deltaTime;
+        }
     }
 
     #region Target
 
-    public void SetTarget(Transform _target) => target = _target;
-    public void SetTarget(MonoBehaviour _target) => target = _target.transform;
-    public void ResetTarget() => target = null;
+    public void SetTarget(Transform _target) => Target = _target;
+    public void SetTarget(MonoBehaviour _target) => Target = _target.transform;
+    public void ResetTarget() => Target = null;
 
     public void SetCameraToTarget()
     {
-        transform.position = target.position;
-        transform.rotation = target.rotation;
+        if(FollowType != FollowTypes.LocatedAtTarget)
+            return;
+        
+        transform.position = Target.position;
+        transform.rotation = Target.rotation;
     }
 
     #endregion
@@ -83,6 +108,8 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
 
         public override void OnInspectorGUI()
         {
+            T.Target = (Transform)EditorGUILayout.ObjectField("Target", T.Target, typeof(Transform));
+            EditorGUILayout.Space();
             T.FollowType = (FollowTypes) EditorGUILayout.EnumPopup("Follow Type", T.FollowType);
             EditorGUI.indentLevel++;
             switch (T.FollowType)
@@ -95,24 +122,13 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
                     
                     break;
                 case FollowTypes.FollowForTarget:
+                    T.FT_MoveAxis = EditorGUILayout.Vector3Field("Move Axis", T.FT_MoveAxis);
+                    T.FT_MoveSpeed = EditorGUILayout.Slider("Move Speed", T.FT_MoveSpeed,0f,100f);
+                    T.FT_MinDistanceToTarget =
+                        EditorGUILayout.FloatField("Min Distance To Target", T.FT_MinDistanceToTarget);
+                    EditorGUILayout.Space();
+                    T.FT_RotateSpeed = EditorGUILayout.Slider("Rotate Speed", T.FT_RotateSpeed,0f,100f);
                     break;
-                /*case PanelOpenCloseMethods.Instantly:
-                    break;
-                    
-                case PanelOpenCloseMethods.Animator:
-                    EditorGUI.indentLevel++;
-                    T.Animator = (Animator)EditorGUILayout.ObjectField("Animator", T.Animator, typeof(Animator));
-                    T.OpenTriggerAnimatorParameter = EditorGUILayout.TextField("Open", T.OpenTriggerAnimatorParameter);
-                    T.CLoseTriggerAnimatorParameter = EditorGUILayout.TextField("Close", T.CLoseTriggerAnimatorParameter);
-                    EditorGUI.indentLevel--;
-                    break;
-                
-                case PanelOpenCloseMethods.Slowly:
-                    EditorGUI.indentLevel++;
-                    T.ShowingSpeed = EditorGUILayout.FloatField("Showing Speed", T.ShowingSpeed);
-                    T.Curve = EditorGUILayout.CurveField("Curve", T.Curve);
-                    EditorGUI.indentLevel--;
-                    break;*/
             }        
             EditorGUI.indentLevel--;
             serializedObject.ApplyModifiedProperties();
