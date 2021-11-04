@@ -26,6 +26,7 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
     public bool FT_LockY;
     public bool FT_SetHeightByTarget;
     public float FT_HeightByTarget;
+    public float FT_SpeedChangeHeight = 1f;
     
     public float FT_MoveSpeed;
     public float FT_MinDistanceToTarget;
@@ -63,9 +64,9 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
         var lookRotation = Quaternion.LookRotation(direction, Vector3.up);
         transform.rotation = Quaternion.Lerp(transform.rotation,lookRotation,FT_MoveSpeed * Time.deltaTime / 2f);
 
-        if (!FT_LockY && FT_SetHeightByTarget)
+        if (FT_LockY && FT_SetHeightByTarget)
         {
-            transform.position += Vector3.up * (Target.position.y - transform.position.y + FT_HeightByTarget);
+            transform.position += Vector3.up * (Target.position.y - transform.position.y + FT_HeightByTarget) * Time.deltaTime * FT_SpeedChangeHeight;
         }
         
         var distanceToTarget = (transform.position - Target.transform.position).magnitude;
@@ -118,6 +119,7 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
 
         public override void OnInspectorGUI()
         {
+            EditorGUI.BeginChangeCheck();
             T.Target = (Transform)EditorGUILayout.ObjectField("Target", T.Target, typeof(Transform));
             EditorGUILayout.Space();
             T.FollowType = (FollowTypes) EditorGUILayout.EnumPopup("Follow Type", T.FollowType);
@@ -133,15 +135,31 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
                     break;
                 case FollowTypes.FollowForTarget:
                     T.FT_MoveAxis = EditorGUILayout.Vector3Field("Move Axis", T.FT_MoveAxis);
+                    T.FT_LockY = EditorGUILayout.Toggle("Lock Y", T.FT_LockY);
+                    if (T.FT_LockY)
+                    {
+                        EditorGUI.indentLevel++;
+                        T.FT_SetHeightByTarget = EditorGUILayout.Toggle("Height By Target", T.FT_SetHeightByTarget);
+                        if (T.FT_SetHeightByTarget)
+                        {
+                            EditorGUI.indentLevel++;
+                            T.FT_HeightByTarget = EditorGUILayout.FloatField("Height",T.FT_HeightByTarget);
+                            T.FT_SpeedChangeHeight = EditorGUILayout.FloatField("Speed",T.FT_SpeedChangeHeight);
+                            EditorGUI.indentLevel--;
+                        }
+                        EditorGUI.indentLevel--;
+                    }
                     T.FT_MoveSpeed = EditorGUILayout.Slider("Move Speed", T.FT_MoveSpeed,0f,100f);
-                    T.FT_MinDistanceToTarget =
-                        EditorGUILayout.FloatField("Min Distance To Target", T.FT_MinDistanceToTarget);
+                    T.FT_MinDistanceToTarget = EditorGUILayout.FloatField("Min Distance To Target", T.FT_MinDistanceToTarget);
                     EditorGUILayout.Space();
                     T.FT_RotateSpeed = EditorGUILayout.Slider("Rotate Speed", T.FT_RotateSpeed,0f,100f);
                     break;
             }        
             EditorGUI.indentLevel--;
-            serializedObject.ApplyModifiedProperties();
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorUtility.SetDirty(T);
+            }
 
         }
     }

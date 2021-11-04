@@ -310,6 +310,7 @@ public class Window : MonoBehaviour
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+            EditorGUI.BeginChangeCheck();
             switch (T.Close_OpenMethod)
             {
                 case PanelOpenCloseMethods.Instantly:
@@ -330,7 +331,10 @@ public class Window : MonoBehaviour
                     EditorGUI.indentLevel--;
                     break;
             }        
-            serializedObject.ApplyModifiedProperties();
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorUtility.SetDirty(T);
+            }
 
         }
     }
