@@ -23,6 +23,10 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
     
     // Follow For Target (FT)
     public Vector3 FT_MoveAxis;
+    public bool FT_LockY;
+    public bool FT_SetHeightByTarget;
+    public float FT_HeightByTarget;
+    
     public float FT_MoveSpeed;
     public float FT_MinDistanceToTarget;
     public float FT_RotateSpeed;
@@ -58,12 +62,18 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
         var direction = (Target.transform.position - transform.position).normalized;
         var lookRotation = Quaternion.LookRotation(direction, Vector3.up);
         transform.rotation = Quaternion.Lerp(transform.rotation,lookRotation,FT_MoveSpeed * Time.deltaTime / 2f);
-        
+
+        if (!FT_LockY && FT_SetHeightByTarget)
+        {
+            transform.position += Vector3.up * (Target.position.y - transform.position.y + FT_HeightByTarget);
+        }
         
         var distanceToTarget = (transform.position - Target.transform.position).magnitude;
         if (distanceToTarget > FT_MinDistanceToTarget)
         {
-            transform.position += new Vector3(direction.x * FT_MoveAxis.x,direction.y* FT_MoveAxis.y,direction.z* FT_MoveAxis.z)  *//Vector3.Cross(direction , FT_MoveAxis) *
+            transform.position += new Vector3(direction.x * FT_MoveAxis.x,
+                                      FT_LockY ? 0f : direction.y* FT_MoveAxis.y,
+                                      direction.z* FT_MoveAxis.z) *
                                   FT_MoveSpeed  *
                                   (distanceToTarget - FT_MinDistanceToTarget) *
                                   Time.deltaTime;
