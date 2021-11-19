@@ -107,8 +107,10 @@ public class Window : MonoBehaviour
     protected virtual void Initialization()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
-        OpenButton.onClick.AddListener(Open);
-        CloseButton.onClick.AddListener(Close);
+        if(OpenButton)
+            OpenButton.onClick.AddListener(Open);
+        if(CloseButton)
+            CloseButton.onClick.AddListener(Close);
         switch (stateOnAwake)
         {
             case WindowStatesAwake.Close:
