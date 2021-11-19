@@ -93,7 +93,8 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
             return;
         
         transform.position = Target.position;
-        transform.rotation = Target.rotation;
+        if(LT_Rotating)
+            transform.rotation = Target.rotation;
     }
 
     #endregion

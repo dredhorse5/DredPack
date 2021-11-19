@@ -51,6 +51,10 @@ public class Window : MonoBehaviour
     public WindowStatesRead CurrentWindowState = WindowStatesRead.Opened;
     [Button("SwitchState")]
     public bool btn;
+
+    [Space] 
+    public Button CloseButton;
+    public Button OpenButton;
     [Space]
     [SerializeField]
     public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
@@ -103,7 +107,8 @@ public class Window : MonoBehaviour
     protected virtual void Initialization()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
-
+        OpenButton.onClick.AddListener(Open);
+        CloseButton.onClick.AddListener(Close);
         switch (stateOnAwake)
         {
             case WindowStatesAwake.Close:
