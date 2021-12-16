@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Reflection;
 using UnityEditor;
 using System.Collections.Generic;
@@ -147,3 +148,4 @@ public class ShowIfAttributeDrawer : PropertyDrawer
 
     }
 }
+#endif
