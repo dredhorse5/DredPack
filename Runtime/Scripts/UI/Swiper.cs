@@ -19,26 +19,32 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
 
     
     
-    
+    // Swipe
     public UnityEvent<Vector2> SwipeEven = new UnityEvent<Vector2>();
     private bool canSwipe;
     
     
-    
+    // Move delta
     public UnityEvent<Vector2> MoveDeltaEvent= new UnityEvent<Vector2>();
     public Vector2 movedDelta { get; protected set; }
     
     
-    
+    // Zoom
     public UnityEvent<float> ZoomEvent = new UnityEvent<float>();
     private float lastDeltaZoom;
     private bool isZoom;
 
+    // Pull
     public UnityEvent<Vector2> PullEvent = new UnityEvent<Vector2>();
     public Vector2 pullDirection { get; protected set; }
 
+    // Some Events
+    public UnityEvent<PointerEventData> BeginDragEvent = new UnityEvent<PointerEventData>();
+    public UnityEvent<PointerEventData> EndDragEvent = new UnityEvent<PointerEventData>();
+    public UnityEvent<PointerEventData> DragEvent = new UnityEvent<PointerEventData>();
+    
 
-
+    //Some
     private Vector2 startTapPoint;
 
     
@@ -48,16 +54,23 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
         Swipe(eventData);
         Pull(eventData);
         Zoom();
+
+        DragEvent?.Invoke(eventData);
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
         startTapPoint = eventData.position;
         canSwipe = true;
+        
+        BeginDragEvent?.Invoke(eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         canSwipe = true;
+        pullDirection = Vector2.zero;
+        
+        EndDragEvent?.Invoke(eventData);
     }
     private void Update()
     {
