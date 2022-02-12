@@ -4,35 +4,60 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(Image))]
 public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHandler
 {
+    [Header("DeathZones")]
     public float SwipeDeathZone = 50f;
+    public float PullDeathZone = 1f;
 
     [Header("Sensitivity")] 
     public float MoveDeltaSensitivity = 0.01f;
     public float ZoomSensitivity = 0.01f;
 
+    
+    
+    
     public UnityEvent<Vector2> SwipeEven = new UnityEvent<Vector2>();
-    public UnityEvent<Vector2> MoveDeltaEvent= new UnityEvent<Vector2>();
-    public UnityEvent<float> ZoomEvent = new UnityEvent<float>();
-
-    public Vector2 movedDelta;
-
-    private Vector2 startPoint;
     private bool canSwipe;
-
-
+    
+    
+    
+    public UnityEvent<Vector2> MoveDeltaEvent= new UnityEvent<Vector2>();
+    public Vector2 movedDelta { get; protected set; }
+    
+    
+    
+    public UnityEvent<float> ZoomEvent = new UnityEvent<float>();
     private float lastDeltaZoom;
     private bool isZoom;
-    /*private Vector2 startPoint_zoom1;
-    private Vector2 startPoint_zoom2;*/
+
+    public UnityEvent<Vector2> PullEvent = new UnityEvent<Vector2>();
+    public Vector2 pullDirection { get; protected set; }
+
+
+
+    private Vector2 startTapPoint;
+
     
     public void OnDrag(PointerEventData eventData)
     {
         MoveDelta(eventData);
         Swipe(eventData);
+        Pull(eventData);
         Zoom();
+    }
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        startTapPoint = eventData.position;
+        canSwipe = true;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        canSwipe = true;
     }
     private void Update()
     {
@@ -42,8 +67,10 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
     
     public void MoveDelta(PointerEventData eventData)
     {
+#if !UNITY_EDITOR
         if(Input.touchCount != 1)
             return;
+#endif
         movedDelta = eventData.delta * MoveDeltaSensitivity; 
         MoveDeltaEvent?.Invoke(movedDelta);
     }
@@ -52,7 +79,7 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
         if(!canSwipe)
             return;
         
-        Vector2 delta = (eventData.position - startPoint);
+        Vector2 delta = (eventData.position - startTapPoint);
 
         if (delta.x > SwipeDeathZone)
         {
@@ -99,17 +126,17 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
             isZoom = false;
         }
     }
-    
-    
-    
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        startPoint = eventData.position;
-        canSwipe = true;
-    }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void Pull(PointerEventData eventData)
     {
-        canSwipe = true;
+        var delta = startTapPoint - eventData.position;
+        if (delta.magnitude > PullDeathZone)
+        {
+            pullDirection = delta;
+            PullEvent?.Invoke(pullDirection);
+        }
     }
+    
+    
+    
 }

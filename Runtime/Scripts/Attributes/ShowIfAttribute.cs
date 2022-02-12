@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using UnityEngine;
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
@@ -52,3 +53,4 @@ public enum ConditionOperator
     // A field is visible/enabled if at least ONE condition is true.
     Or,
 }
+#endif
