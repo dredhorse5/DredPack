@@ -190,6 +190,8 @@ public class Window : MonoBehaviour
     #region Open or close visual methods:  Animator
     public virtual void Open_Animator()
     {
+        if (Animator == null)
+            Animator = GetComponent<Animator>();
         Animator.SetTrigger(OpenTriggerAnimatorParameter);
         CurrentWindowState = WindowStatesRead.Opened;
 
@@ -197,6 +199,8 @@ public class Window : MonoBehaviour
 
     public virtual void Close_Animator()
     {
+        if (Animator == null)
+            Animator = GetComponent<Animator>();
         Animator.SetTrigger(CLoseTriggerAnimatorParameter);
         CurrentWindowState = WindowStatesRead.Closed;
     }
