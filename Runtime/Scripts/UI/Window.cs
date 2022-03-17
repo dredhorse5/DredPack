@@ -188,14 +188,14 @@ public class Window : MonoBehaviour
 
 
     #region Open or close visual methods:  Animator
-    protected virtual void Open_Animator()
+    public virtual void Open_Animator()
     {
         Animator.SetTrigger(OpenTriggerAnimatorParameter);
         CurrentWindowState = WindowStatesRead.Opened;
 
     }
 
-    protected virtual void Close_Animator()
+    public virtual void Close_Animator()
     {
         Animator.SetTrigger(CLoseTriggerAnimatorParameter);
         CurrentWindowState = WindowStatesRead.Closed;
@@ -205,7 +205,7 @@ public class Window : MonoBehaviour
 
 
     #region Open or close visual methods:  Instantly
-    protected virtual void Open_Instantly()
+    public virtual void Open_Instantly()
     {
         m_canvasGroup.alpha = 1f;
         m_canvasGroup.blocksRaycasts = true;
@@ -215,7 +215,7 @@ public class Window : MonoBehaviour
 
     }
 
-    protected virtual void Close_Instantly()
+    public virtual void Close_Instantly()
     {
         m_canvasGroup.alpha = 0f;
         m_canvasGroup.blocksRaycasts = false;
@@ -229,7 +229,7 @@ public class Window : MonoBehaviour
 
     #region Open or close visual methods:  Slowly
 
-    protected virtual void OpenSlowlyPanel()
+    public virtual void OpenSlowlyPanel()
     {
         if (openingCoroutine != null)
             StopCoroutine(openingCoroutine);
@@ -237,7 +237,7 @@ public class Window : MonoBehaviour
         openingCoroutine = StartCoroutine(OpenSlowlyPanelCor());
     }
 
-    protected virtual void CloseSlowlyPanel()
+    public virtual void CloseSlowlyPanel()
     {
         if (closingCoroutine != null)
             StopCoroutine(closingCoroutine);
