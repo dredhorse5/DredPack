@@ -53,6 +53,7 @@ public class Window : MonoBehaviour
     [Space] 
     public Button CloseButton;
     public Button OpenButton;
+    public Button SwitchButton;
     [Space]
     [SerializeField]
     public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
@@ -109,6 +110,8 @@ public class Window : MonoBehaviour
             OpenButton.onClick.AddListener(Open);
         if(CloseButton)
             CloseButton.onClick.AddListener(Close);
+        if (SwitchButton)
+            SwitchButton.onClick.AddListener(SwitchState);
         switch (stateOnAwake)
         {
             case WindowStatesAwake.Close:
