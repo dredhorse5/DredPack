@@ -6,6 +6,14 @@ using UnityEngine;
 
 public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
 {
+    public enum UpdateTypes
+    {
+        Update,
+        LateUpdate,
+        LateUpdateAndUpdate,
+        FixedUpdate
+    }
+    
     public enum FollowTypes
     {
         LocatedAtTarget, // LT
@@ -13,7 +21,7 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
     }
 
     public Transform Target;
-    
+    public UpdateTypes UpdateType;
     public FollowTypes FollowType = FollowTypes.LocatedAtTarget;
     
     // Located at target (LT)
@@ -35,7 +43,27 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
     
 
 
+    #region Updates
+    
     private void Update()
+    {
+        if (UpdateType == UpdateTypes.Update || UpdateType == UpdateTypes.LateUpdateAndUpdate)
+            UpdateCamera(Time.deltaTime);
+    }
+    private void LateUpdate()
+    {
+        if (UpdateType == UpdateTypes.LateUpdate || UpdateType == UpdateTypes.LateUpdateAndUpdate)
+            UpdateCamera(Time.deltaTime);
+    }
+    private void FixedUpdate()
+    {
+        if (UpdateType == UpdateTypes.FixedUpdate)
+            UpdateCamera(Time.fixedDeltaTime);
+    }
+
+    #endregion
+
+    private void UpdateCamera(float deltaTime)
     {
         if(!Target)
             return;
@@ -43,30 +71,30 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
         switch (FollowType)
         {
             case FollowTypes.LocatedAtTarget:
-                LT_UpdatePosition();
+                LT_UpdatePosition(deltaTime);
                 break;
             case FollowTypes.FollowForTarget:
-                UpdateLT();
+                UpdateLT(deltaTime);
                 break;
         }
     }
 
-    public void LT_UpdatePosition()
+    public void LT_UpdatePosition(float deltaTime)
     {
-        transform.position = Vector3.Lerp(transform.position, Target.position, LT_MoveSpeed * Time.deltaTime / 2f );
+        transform.position = Vector3.Lerp(transform.position, Target.position, LT_MoveSpeed * deltaTime / 2f );
         if(LT_Rotating)
-            transform.rotation = Quaternion.Lerp(transform.rotation, Target.rotation, LT_RotateSpeed* Time.deltaTime / 2f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, Target.rotation, LT_RotateSpeed* deltaTime / 2f);
     }
 
-    public void UpdateLT()
+    public void UpdateLT(float deltaTime)
     {
         var direction = (Target.transform.position - transform.position).normalized;
         var lookRotation = Quaternion.LookRotation(direction, Vector3.up);
-        transform.rotation = Quaternion.Lerp(transform.rotation,lookRotation,FT_MoveSpeed * Time.deltaTime / 2f);
+        transform.rotation = Quaternion.Lerp(transform.rotation,lookRotation,FT_MoveSpeed * deltaTime / 2f);
 
         if (FT_LockY && FT_SetHeightByTarget)
         {
-            transform.position += Vector3.up * (Target.position.y - transform.position.y + FT_HeightByTarget) * Time.deltaTime * FT_SpeedChangeHeight;
+            transform.position += Vector3.up * (Target.position.y - transform.position.y + FT_HeightByTarget) * deltaTime * FT_SpeedChangeHeight;
         }
         
         var distanceToTarget = (transform.position - Target.transform.position).magnitude;
@@ -77,7 +105,7 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
                                       direction.z* FT_MoveAxis.z) *
                                   FT_MoveSpeed  *
                                   (distanceToTarget - FT_MinDistanceToTarget) *
-                                  Time.deltaTime;
+                                  deltaTime;
         }
     }
 
@@ -124,6 +152,7 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
             T.Target = (Transform)EditorGUILayout.ObjectField("Target", T.Target, typeof(Transform));
             EditorGUILayout.Space();
             T.FollowType = (FollowTypes) EditorGUILayout.EnumPopup("Follow Type", T.FollowType);
+            T.UpdateType = (UpdateTypes) EditorGUILayout.EnumPopup("Update Type", T.UpdateType);
             EditorGUI.indentLevel++;
             switch (T.FollowType)
             {
