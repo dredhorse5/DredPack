@@ -69,7 +69,7 @@ public class Swiper : MonoBehaviour, IDragHandler, IBeginDragHandler,IEndDragHan
     {
         canSwipe = true;
         pullDirection = Vector2.zero;
-        movedDelta = 0f;
+        movedDelta = Vector2.zero;
         
         EndDragEvent?.Invoke(eventData);
     }
