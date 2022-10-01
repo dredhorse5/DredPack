@@ -38,6 +38,7 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
     
     public float FT_MoveSpeed;
     public float FT_MinDistanceToTarget;
+    public float FT_MaxDistanceToTarget;
     public float FT_RotateSpeed;
     
     
@@ -98,11 +99,16 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
         }
         
         var distanceToTarget = (transform.position - Target.transform.position).magnitude;
-        if (distanceToTarget > FT_MinDistanceToTarget)
+        if (distanceToTarget > FT_MaxDistanceToTarget)
         {
-            transform.position += new Vector3(direction.x * FT_MoveAxis.x,
-                                      FT_LockY ? 0f : direction.y* FT_MoveAxis.y,
-                                      direction.z* FT_MoveAxis.z) *
+            transform.position += new Vector3(direction.x * FT_MoveAxis.x, FT_LockY ? 0f : direction.y* FT_MoveAxis.y, direction.z* FT_MoveAxis.z) *
+                                  FT_MoveSpeed  *
+                                  (distanceToTarget - FT_MaxDistanceToTarget) *
+                                  Time.deltaTime;
+        }
+        else if (distanceToTarget < FT_MinDistanceToTarget)
+        {
+            transform.position += new Vector3(direction.x * FT_MoveAxis.x, FT_LockY ? 0f : direction.y * FT_MoveAxis.y, direction.z* FT_MoveAxis.z) *
                                   FT_MoveSpeed  *
                                   (distanceToTarget - FT_MinDistanceToTarget) *
                                   deltaTime;
@@ -117,12 +123,23 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
 
     public void SetCameraToTarget()
     {
-        if(FollowType != FollowTypes.LocatedAtTarget)
-            return;
-        
-        transform.position = Target.position;
-        if(LT_Rotating)
-            transform.rotation = Target.rotation;
+        if(FollowType == FollowTypes.LocatedAtTarget)
+        {
+            transform.position = Target.position;
+            if (LT_Rotating)
+                transform.rotation = Target.rotation;
+        }
+        else if (FollowType == FollowTypes.FollowForTarget)
+        {
+
+            var direction = -Target.forward;
+
+            transform.position = Target.position + (new Vector3(direction.x * FT_MoveAxis.x,
+                                                        FT_LockY ? 0f : direction.y * FT_MoveAxis.y,
+                                                        direction.z * FT_MoveAxis.z) *
+                                                    ((FT_MaxDistanceToTarget + FT_MinDistanceToTarget) / 2));
+            transform.position += Vector3.up * (Target.position.y - transform.position.y + FT_HeightByTarget);
+        }
     }
 
     #endregion
@@ -181,11 +198,16 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
                     }
                     T.FT_MoveSpeed = EditorGUILayout.Slider("Move Speed", T.FT_MoveSpeed,0f,100f);
                     T.FT_MinDistanceToTarget = EditorGUILayout.FloatField("Min Distance To Target", T.FT_MinDistanceToTarget);
+                    T.FT_MaxDistanceToTarget = EditorGUILayout.FloatField("Max Distance To Target", T.FT_MaxDistanceToTarget);
                     EditorGUILayout.Space();
                     T.FT_RotateSpeed = EditorGUILayout.Slider("Rotate Speed", T.FT_RotateSpeed,0f,100f);
                     break;
             }        
             EditorGUI.indentLevel--;
+            if (GUILayout.Button("Set camera to Target"))
+            {
+                T.SetCameraToTarget();
+            }
             if (EditorGUI.EndChangeCheck())
             {
                 EditorUtility.SetDirty(T);
