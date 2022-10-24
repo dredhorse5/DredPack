@@ -18,7 +18,10 @@ public class SimpleSingleton<T> : MonoBehaviour where T : MonoBehaviour
             {
                 // Search for existing instance.
                 m_Instance = (T)FindObjectOfType(typeof(T));
-
+                if (m_Instance == null)
+                {
+                    Debug.LogWarning($"Simple singleton of class : {typeof(T)} doesnot exists");
+                }
                 // Create new instance if one doesn't already exist.
                 //if (m_Instance == null)
                 //{
