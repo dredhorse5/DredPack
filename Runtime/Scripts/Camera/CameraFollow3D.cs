@@ -20,9 +20,16 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
         FollowForTarget  // FT
     }
 
+    public enum UpTypes
+    {
+        World,
+        Target
+    }
+
     public Transform Target;
     public UpdateTypes UpdateType;
     public FollowTypes FollowType = FollowTypes.LocatedAtTarget;
+    public UpTypes UpType;
     
     // Located at target (LT)
     public float LT_MoveSpeed;
@@ -90,28 +97,43 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
     public void UpdateLT(float deltaTime)
     {
         var direction = (Target.transform.position - transform.position).normalized;
-        var lookRotation = Quaternion.LookRotation(direction, Vector3.up);
+        var lookRotation = Quaternion.LookRotation(direction, UpType == UpTypes.Target ? Target.up : Vector3.up);
         transform.rotation = Quaternion.Lerp(transform.rotation,lookRotation,FT_MoveSpeed * deltaTime / 2f);
 
-        if (FT_LockY && FT_SetHeightByTarget)
-        {
-            transform.position += Vector3.up * (Target.position.y - transform.position.y + FT_HeightByTarget) * deltaTime * FT_SpeedChangeHeight;
-        }
+       
         
         var distanceToTarget = (transform.position - Target.transform.position).magnitude;
         if (distanceToTarget > FT_MaxDistanceToTarget)
         {
-            transform.position += new Vector3(direction.x * FT_MoveAxis.x, FT_LockY ? 0f : direction.y* FT_MoveAxis.y, direction.z* FT_MoveAxis.z) *
+            transform.position += new Vector3(direction.x * FT_MoveAxis.x, (FT_LockY && UpType == UpTypes.World) ? 0f :direction.y* FT_MoveAxis.y, direction.z* FT_MoveAxis.z) *
                                   FT_MoveSpeed  *
                                   (distanceToTarget - FT_MaxDistanceToTarget) *
-                                  Time.deltaTime;
+                                  deltaTime;
         }
         else if (distanceToTarget < FT_MinDistanceToTarget)
         {
-            transform.position += new Vector3(direction.x * FT_MoveAxis.x, FT_LockY ? 0f : direction.y * FT_MoveAxis.y, direction.z* FT_MoveAxis.z) *
+            transform.position += new Vector3(direction.x * FT_MoveAxis.x, (FT_LockY && UpType == UpTypes.World) ? 0f :direction.y * FT_MoveAxis.y, direction.z* FT_MoveAxis.z) *
                                   FT_MoveSpeed  *
                                   (distanceToTarget - FT_MinDistanceToTarget) *
                                   deltaTime;
+        }
+        if (FT_LockY && FT_SetHeightByTarget)
+        {
+            if(UpType == UpTypes.Target)
+            {
+                Vector3 projectPos = Vector3.Project((transform.position - Target.position), Target.up) +
+                                     Target.position;
+                Debug.DrawLine(Target.position, projectPos);
+
+                var localY = (projectPos - Target.position).magnitude;
+                localY *= (Vector3.Angle(Target.up, (projectPos - Target.position).normalized) > 90 ? -1f : 1f);
+                transform.position += (Target.up * (FT_HeightByTarget - localY))
+                                      * deltaTime * FT_SpeedChangeHeight;
+            }
+            else
+            {
+                transform.position += Vector3.up * (Target.position.y - transform.position.y + FT_HeightByTarget) * deltaTime * FT_SpeedChangeHeight;
+            }
         }
     }
 
@@ -183,6 +205,7 @@ public class CameraFollow3D : SimpleSingleton<CameraFollow3D>
                 case FollowTypes.FollowForTarget:
                     T.FT_MoveAxis = EditorGUILayout.Vector3Field("Move Axis", T.FT_MoveAxis);
                     T.FT_LockY = EditorGUILayout.Toggle("Lock Y", T.FT_LockY);
+                    T.UpType = (UpTypes) EditorGUILayout.EnumPopup("Up Type", T.UpType);
                     if (T.FT_LockY)
                     {
                         EditorGUI.indentLevel++;
