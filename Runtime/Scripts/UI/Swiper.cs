@@ -21,7 +21,7 @@ namespace TapCubes
         public float AltMoveDeltaSensitivity = 0.01f;
         public float ZoomSensitivity = 0.01f;
         [Space]
-        public float MouseZoomSensitivity = 1f;
+        public float MouseZoomSensitivity = 50f;
 
 
         // Swipe
