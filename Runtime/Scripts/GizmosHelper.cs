@@ -2,6 +2,8 @@ using UnityEngine;
 
 public static class GizmosHelper
 {
+#if UNITY_EDITOR
+    
     public static void DrawString(string text, Vector3 worldPos, Color? color = null)
     {
         UnityEditor.Handles.BeginGUI();
@@ -27,4 +29,6 @@ public static class GizmosHelper
         Gizmos.DrawRay(pos + direction, right * arrowHeadLength);
         Gizmos.DrawRay(pos + direction, left * arrowHeadLength);
     }
+#endif
 }
+
