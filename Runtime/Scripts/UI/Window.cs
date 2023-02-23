@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 [RequireComponent(typeof(CanvasGroup))]
 public class Window : MonoBehaviour
@@ -54,6 +55,10 @@ public class Window : MonoBehaviour
     public Button CloseButton;
     public Button OpenButton;
     public Button SwitchButton;
+
+    public UnityEvent OpenEvent;
+    public UnityEvent CloseEvent;
+    public UnityEvent<bool> SwitchEvent;
     [Space]
     [SerializeField]
     public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
@@ -191,6 +196,8 @@ public class Window : MonoBehaviour
     #region Open or close visual methods:  Animator
     public virtual void Open_Animator()
     {
+        SwitchEvent?.Invoke(true);
+        OpenEvent?.Invoke();
         if (Animator == null)
             Animator = GetComponent<Animator>();
         Animator.SetTrigger(OpenTriggerAnimatorParameter);
@@ -200,6 +207,8 @@ public class Window : MonoBehaviour
 
     public virtual void Close_Animator()
     {
+        SwitchEvent?.Invoke(false);
+        CloseEvent?.Invoke();
         if (Animator == null)
             Animator = GetComponent<Animator>();
         Animator.SetTrigger(CLoseTriggerAnimatorParameter);
@@ -212,6 +221,8 @@ public class Window : MonoBehaviour
     #region Open or close visual methods:  Instantly
     public virtual void Open_Instantly()
     {
+        SwitchEvent?.Invoke(true);
+        OpenEvent?.Invoke();
         m_canvasGroup.alpha = 1f;
         m_canvasGroup.blocksRaycasts = true;
         m_canvasGroup.interactable = true;
@@ -222,6 +233,8 @@ public class Window : MonoBehaviour
 
     public virtual void Close_Instantly()
     {
+        SwitchEvent?.Invoke(false);
+        CloseEvent?.Invoke();
         m_canvasGroup.alpha = 0f;
         m_canvasGroup.blocksRaycasts = false;
         m_canvasGroup.interactable = false;
@@ -236,6 +249,8 @@ public class Window : MonoBehaviour
 
     public virtual void OpenSlowlyPanel()
     {
+        SwitchEvent?.Invoke(true);
+        OpenEvent?.Invoke();
         if (openingCoroutine != null)
             StopCoroutine(openingCoroutine);
 
@@ -244,6 +259,8 @@ public class Window : MonoBehaviour
 
     public virtual void CloseSlowlyPanel()
     {
+        SwitchEvent?.Invoke(false);
+        CloseEvent?.Invoke();
         if (closingCoroutine != null)
             StopCoroutine(closingCoroutine);
 
