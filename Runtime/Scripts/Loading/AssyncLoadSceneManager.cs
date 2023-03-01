@@ -1,23 +1,28 @@
 ﻿using UnityEngine.SceneManagement;
 using UnityEngine;
-public class AssyncLoadSceneManager : GeneralSingleton<AssyncLoadSceneManager>
+
+namespace DredPack.Load
 {
-    private string SceneID;
-
-    public void AddSceneToLoad(string SceneName)
+    public class AssyncLoadSceneManager : GeneralSingleton<AssyncLoadSceneManager>
     {
-        SceneID = SceneName;
+        private string SceneID;
+
+        public void AddSceneToLoad(string SceneName)
+        {
+            SceneID = SceneName;
+        }
+
+        public AsyncOperation LoadScene()
+        {
+            AsyncOperation asyncOperation;
+
+            if (SceneID != "")
+                asyncOperation = SceneManager.LoadSceneAsync(SceneID);
+            else
+                return null;
+
+            return asyncOperation;
+        }
     }
 
-    public AsyncOperation LoadScene()
-    {
-        AsyncOperation asyncOperation;
-
-        if (SceneID != "")
-            asyncOperation = SceneManager.LoadSceneAsync(SceneID);
-        else
-            return null;
-
-        return asyncOperation;
-    }
 }

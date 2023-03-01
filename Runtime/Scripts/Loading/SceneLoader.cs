@@ -3,26 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public static class SceneLoader
+namespace DredPack.Load
 {
-    private static string loadingScreenID = "LoadingScreen";
     
-    public static void LoadNewScene(string ID, bool assync = true)
+
+    public static class SceneLoader
     {
-        if (assync)
+        private static string loadingScreenID = "LoadingScreen";
+
+        public static void LoadNewScene(string ID, bool assync = true)
         {
-            AssyncLoadSceneManager.Instance.AddSceneToLoad(ID);
-            SceneManager.LoadScene(loadingScreenID);
+            if (assync)
+            {
+                AssyncLoadSceneManager.Instance.AddSceneToLoad(ID);
+                SceneManager.LoadScene(loadingScreenID);
+            }
+            else
+            {
+                SceneManager.LoadScene(ID);
+            }
         }
-        else
+
+        public static void ReloadScene(bool assync = true)
         {
-            SceneManager.LoadScene(ID);
+            LoadNewScene(SceneManager.GetActiveScene().name, assync);
         }
+
     }
 
-    public static void ReloadScene(bool assync = true)
-    {
-        LoadNewScene(SceneManager.GetActiveScene().name, assync);
-    }
-    
 }

@@ -1,8 +1,12 @@
+using System;
 using System.Collections;
+using DredPack.Help;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+namespace DredPack.UI
+{
     [RequireComponent(typeof(Button))]
     public class Switcher : MonoBehaviour
     {
@@ -21,34 +25,36 @@ using UnityEngine.UI;
         [Header("Saveable")] 
         public bool Saveable = false;
         public string ID;
-        [Button("SetRandomID")] public bool btntosetid; public void SetRandomID() => ID = System.DateTime.Now.Ticks.ToString();
+        [Button("SetRandomID")] public bool btntosetid;
+        public void SetRandomID() => ID = Guid.NewGuid().ToString();
         [Button(nameof(ResetSave))] public bool deleteKeyInMemory;
 
-        [Header("Events")] 
-        public UnityEvent OnEvent;
+        [Header("Events")] public UnityEvent OnEvent;
         public UnityEvent OffEvent;
         public UnityEvent<bool> SwitchEvent;
 
-        [Header("Debug")] 
-        [ReadOnly] public bool CurrentState;
+        [Header("Debug")] [ReadOnly] public bool CurrentState;
         public bool DebugMode;
 
 
 
-        public Image Image => _image ??= GetComponent<Image>(); private Image _image;
-        public Image HandlerImage => _circleImage ??= Handler.GetComponent<Image>(); private Image _circleImage;
-        public Button Button => _button ??= GetComponent<Button>(); private Button _button;
+        public Image Image => _image ??= GetComponent<Image>();
+        private Image _image;
+        public Image HandlerImage => _circleImage ??= Handler.GetComponent<Image>();
+        private Image _circleImage;
+        public Button Button => _button ??= GetComponent<Button>();
+        private Button _button;
 
         private Coroutine switchCor;
         private Vector2 handlerPos;
 
-        
+
 
         private void Awake()
         {
             Button.onClick.AddListener(Switch);
             handlerPos = Handler.anchoredPosition;
-            
+
             if (Saveable)
             {
                 if (ID == "")
@@ -57,7 +63,8 @@ using UnityEngine.UI;
                     Switch(StateOnStart);
                     return;
                 }
-                if(PlayerPrefs.HasKey(ID))
+
+                if (PlayerPrefs.HasKey(ID))
                     Switch(PlayerPrefs.GetInt(ID) > 0);
                 else
                     Switch(StateOnStart);
@@ -90,36 +97,38 @@ using UnityEngine.UI;
 
         public void Switch()
         {
-            if(CurrentState)
+            if (CurrentState)
                 SwitchOff();
             else
                 SwitchOn();
         }
+
         public void Switch(bool state)
         {
-            if(state)
+            if (state)
                 SwitchOn();
             else
                 SwitchOff();
         }
-        
-        
+
+
         public void SwitchWithoutNotification()
         {
-            if(CurrentState)
+            if (CurrentState)
                 SwitchOffWithoutNotification();
             else
                 SwitchOnWithoutNotification();
         }
+
         public void SwitchWithoutNotification(bool state)
         {
-            if(state)
+            if (state)
                 SwitchOnWithoutNotification();
             else
                 SwitchOffWithoutNotification();
         }
-        
-        
+
+
 
         public void SwitchOn(float speedMult = 1f)
         {
@@ -127,32 +136,34 @@ using UnityEngine.UI;
             SwitchEvent?.Invoke(true);
             SwitchOnWithoutNotification(speedMult);
         }
+
         public void SwitchOnWithoutNotification(float speedMult = 1f)
         {
             if (DebugMode)
                 Debug.Log("switching to on");
 
             CurrentState = true;
-            if(switchCor != null)
+            if (switchCor != null)
                 StopCoroutine(switchCor);
             switchCor = StartCoroutine(SwitchOnIE(speedMult));
             SetSave(true);
         }
 
-        
+
         public void SwitchOff(float speedMult = 1f)
         {
             OffEvent?.Invoke();
             SwitchEvent?.Invoke(false);
             SwitchOffWithoutNotification(speedMult);
         }
+
         public void SwitchOffWithoutNotification(float speedMult = 1f)
         {
             if (DebugMode)
                 Debug.Log("switching to off");
 
             CurrentState = false;
-            if(switchCor != null)
+            if (switchCor != null)
                 StopCoroutine(switchCor);
             switchCor = StartCoroutine(SwitchOffIE(speedMult));
             SetSave(false);
@@ -161,12 +172,12 @@ using UnityEngine.UI;
 
         private IEnumerator SwitchOnIE(float speedMult = 1f)
         {
-            if(speedMult < 0)
+            if (speedMult < 0)
             {
                 SetVisualValue(1f);
                 yield break;
             }
-            
+
             for (float i = 0f; i < 1; i += Time.deltaTime * speedMult * SwitchSpeed)
             {
                 SetVisualValue(i);
@@ -178,17 +189,18 @@ using UnityEngine.UI;
 
         private IEnumerator SwitchOffIE(float speedMult = 1f)
         {
-            if(speedMult < 0)
+            if (speedMult < 0)
             {
                 SetVisualValue(0);
                 yield break;
             }
-            
+
             for (float i = 0f; i < 1f; i += Time.deltaTime * speedMult * SwitchSpeed)
             {
                 SetVisualValue(1f - i);
                 yield return null;
             }
+
             SetVisualValue(0);
         }
 
@@ -205,3 +217,5 @@ using UnityEngine.UI;
 
         #endregion
     }
+}
+

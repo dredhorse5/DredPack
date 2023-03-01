@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using NaughtyAttributes;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -20,8 +18,8 @@ namespace DredPack.Audio
         public AudioManager.AudioTypes Type;
         public float LocalVolume = 1f;
         public bool GlobalAudioSource = true;
-        [AllowNesting] [HideIf(nameof(GlobalAudioSource))] public bool OneShot = true;
-        [AllowNesting] [HideIf(nameof(GlobalAudioSource))] public AudioSource LocalAudioSource;
+        public bool OneShot = true;
+        public AudioSource LocalAudioSource;
         public List<AudioClip> Clip;
         
         public AudioManager.AudioByType audioByType { get; private set; }

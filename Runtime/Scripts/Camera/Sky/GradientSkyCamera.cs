@@ -1,11 +1,7 @@
-﻿// Use this script on a Camera create a fixed size gradient mesh that alwyas follow the camera and renders as a background.
+﻿using UnityEngine;
 
-using UnityEngine;
-
-// Use a unique namespace to ensure there are no name conflicts
-namespace Imphenzia
+namespace DredPack.Camera
 {
-    // Execute in edit mode so gradient is updated if the color gradient is changed
     [ExecuteInEditMode]
 
     // This class inherits from GradientSkyCommon.cs where there is common and reusable code
@@ -22,7 +18,7 @@ namespace Imphenzia
         public GameObject childObject;
 
         // Private variables to reference camera, camera cached settings, and clipping plane
-        private Camera _camera;
+        private UnityEngine.Camera _camera;
         private float _cacheFieldOfView;
         private int _cacheCameraWidth;
         private int _cacheCameraHeight;
@@ -50,13 +46,13 @@ namespace Imphenzia
         void Reset()
         {
             // If the component is not used on a camera- throw error and abort
-            if (GetComponent<Camera>() == null)
+            if (GetComponent<UnityEngine.Camera>() == null)
             {
                 Debug.LogError("GameObject must have a camera component - aborting.");
                 return;
             }
             
-            _camera = GetComponent<Camera>();
+            _camera = GetComponent<UnityEngine.Camera>();
 
             // Unity 5.x renders the skybox so you need to change Camera Clear flag to something else, like SolidColor
             if (_camera.clearFlags == CameraClearFlags.Skybox)
@@ -91,7 +87,7 @@ namespace Imphenzia
         void CreateOrGetChildObject()
         {
             // Ensure that the camera component is set if this gets called before reset
-            _camera = GetComponent<Camera>();
+            _camera = GetComponent<UnityEngine.Camera>();
 
             // If there is a child gameobject named CameraFixedGradientSky...
             if (transform.Find("CameraFixedGradientSky") != null)
@@ -204,7 +200,7 @@ namespace Imphenzia
         void SetMeshLocalScale()
         {
             // Get a reference to the camera
-            Camera _camera = GetComponent<Camera>();
+            UnityEngine.Camera _camera = GetComponent<UnityEngine.Camera>();
 
             // ResetAspect needs to be called to ensure that aspect ratio is updated when changing between aspect ratios and between edit/play
             _camera.ResetAspect();

@@ -1,29 +1,17 @@
-﻿// Code that is common to both object and camera attached/fixed gradient skies.
-// Both GradientSkyObject.cs and GradientSkyCamera.cs inherit from this class
-
-using UnityEngine;
+﻿using UnityEngine;
 
 
-// Use a unique namespace to ensure there are no name conflicts
-namespace Imphenzia
+namespace DredPack.Camera
 {
     public class GradientSkyCommon : MonoBehaviour
     {
 
-        // Declare a public gradient - change this gradient in the inspector to change the gradient sky
         public Gradient gradient = null;
         public Gradient Gradient { set { gradient = value; } }
 
-        // Declare a cached gradient to detect if any changes have been made so the mesh can be updated
-        // Hide in inspector - we don't need to see it there (it can't be set to private/protected since those are not serialzied and
-        // kept between play/edit mode).
         [HideInInspector]
         public Gradient cacheGradient;
 
-        /// <summary>
-        /// Method to procedurally create a flat mesh divided based on the number of gradient color keys
-        /// </summary>
-        /// <returns>Generated mesh</returns>
         protected virtual Mesh CreateMesh()
         {
             // If there is no default gradient, create it first

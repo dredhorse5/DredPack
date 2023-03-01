@@ -1,11 +1,17 @@
 ﻿using UnityEngine;
 
-public class ConditionallyVisibleAttribute : MonoBehaviour
+namespace DredPack.Help
 {
-    public string propertyName { get; }
-        
-    public ConditionallyVisibleAttribute(string propName)
+    
+
+    public class ConditionallyVisibleAttribute : MonoBehaviour
     {
-        propertyName = propName;
+        public string propertyName { get; }
+
+        public ConditionallyVisibleAttribute(string propName)
+        {
+            propertyName = propName;
+        }
     }
+
 }
