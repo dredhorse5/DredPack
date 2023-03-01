@@ -45,48 +45,6 @@ namespace DredPack
             Selection.activeObject = rectTransform.gameObject;
         }
 
-        #region Text Creator
-
-        //[MenuItem("GameObject/DredPackUI/Text/White", false, 10)]
-        public static void CreateObject_WhiteText(MenuCommand menuCommand)
-        {
-            CreateObject_Text(menuCommand, Color.white); //
-        }
-
-        //[MenuItem("GameObject/DredPackUI/Text/Black", false, 10)]
-        public static void CreateObject_BlackText(MenuCommand menuCommand)
-        {
-            CreateObject_Text(menuCommand, Color.black);
-        }
-
-        public static void CreateObject_Text(MenuCommand menuCommand, Color color)
-        {
-            var rectTransform = CreateUiElement("Text");
-
-            //rect transform settings
-            rectTransform.sizeDelta = new Vector2(360, 60);
-
-            rectTransform.anchorMin = Vector2.one / 2;
-            rectTransform.anchorMax = Vector2.one / 2;
-
-
-            //text settings
-            var text = rectTransform.gameObject.AddComponent<Text>();
-            text.font = Resources.Load<Font>(fontPath);
-            text.text = "New Text";
-            text.fontSize = 50;
-            text.color = color;
-            text.alignment = TextAnchor.MiddleCenter;
-
-
-            GameObjectUtility.SetParentAndAlign(rectTransform.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(rectTransform.gameObject, "Create " + rectTransform.gameObject.name);
-            Selection.activeObject = rectTransform.gameObject;
-        }
-
-
-        #endregion
-
         #region Buttons Creator
         
         [MenuItem("GameObject/DredPackUI/Button", false, 10)]
