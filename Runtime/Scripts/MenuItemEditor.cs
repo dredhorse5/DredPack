@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using DredPack.UI;
 using UnityEditor;
 using UnityEngine;
@@ -8,11 +6,12 @@ using UnityEngine.UI;
 #if  UNITY_EDITOR
 namespace DredPack
 {
-    
     public class MenuItemEditor : MonoBehaviour
     {
         private static string fontPath = "Fonts/Troika_Regular_Font";
         private static string btnSpritePath = "Sprites/Btn_MainButton_White";
+        private static string swithcerPrefabPath = "Prefabs/Switcher";
+        private static string buttonPrefabPath = "Prefabs/Button";
 
 
 
@@ -48,13 +47,13 @@ namespace DredPack
 
         #region Text Creator
 
-        [MenuItem("GameObject/DredPackUI/Text/White", false, 10)]
+        //[MenuItem("GameObject/DredPackUI/Text/White", false, 10)]
         public static void CreateObject_WhiteText(MenuCommand menuCommand)
         {
             CreateObject_Text(menuCommand, Color.white); //
         }
 
-        [MenuItem("GameObject/DredPackUI/Text/Black", false, 10)]
+        //[MenuItem("GameObject/DredPackUI/Text/Black", false, 10)]
         public static void CreateObject_BlackText(MenuCommand menuCommand)
         {
             CreateObject_Text(menuCommand, Color.black);
@@ -89,94 +88,27 @@ namespace DredPack
         #endregion
 
         #region Buttons Creator
-
-
-        [MenuItem("GameObject/DredPackUI/Button/White", false, 10)]
-        static void CreateObjectButtonWhite(MenuCommand menuCommand)
+        
+        [MenuItem("GameObject/DredPackUI/Button", false, 10)]
+        static void CreateButton(MenuCommand menuCommand)
         {
-            CreateObejctButton(menuCommand, Color.white, Color.black, "Button");
+            var gameObject = InstantiateUiPrefab(buttonPrefabPath, menuCommand);
+
+            Undo.RegisterCreatedObjectUndo(gameObject, "Create " + gameObject.name);
+            Selection.activeObject = gameObject;
         }
-
-        [MenuItem("GameObject/DredPackUI/Button/Red", false, 10)]
-        static void CreateObejctButtonRed(MenuCommand menuCommand)
-        {
-            CreateObejctButton(menuCommand, Color.red, Color.white, "RedButton");
-        }
-
-        [MenuItem("GameObject/DredPackUI/Button/Green", false, 10)]
-        static void CreateObejctButtonGreen(MenuCommand menuCommand)
-        {
-            CreateObejctButton(menuCommand, Color.green, Color.white, "GreenButton");
-        }
-
-        [MenuItem("GameObject/DredPackUI/Button/Blue", false, 10)]
-        static void CreateObejctButtonBlue(MenuCommand menuCommand)
-        {
-            CreateObejctButton(menuCommand, Color.blue, Color.white, "BlueButton");
-        }
-
-        [MenuItem("GameObject/DredPackUI/Button/Light Blue", false, 10)]
-        static void CreateObejctButtonLightBlue(MenuCommand menuCommand)
-        {
-            CreateObejctButton(menuCommand, new Color(0, 255, 255, 255), Color.white, "LightBlueButton");
-        }
-
-        [MenuItem("GameObject/DredPackUI/Button/Yellow", false, 10)]
-        static void CreateObejctButtonYellow(MenuCommand menuCommand)
-        {
-            CreateObejctButton(menuCommand, Color.yellow, Color.white, "YellowButton");
-        }
-
-        [MenuItem("GameObject/DredPackUI/Button/Purple", false, 10)]
-        static void CreateObejctButtonPurple(MenuCommand menuCommand)
-        {
-            CreateObejctButton(menuCommand, new Color(255, 0, 255, 255), Color.white, "PurpleButton");
-        }
-
-
-        static void CreateObejctButton(MenuCommand menuCommand, Color btnColor, Color textColor, string name)
-        {
-            var rectTransform = CreateUiElement(name);
-
-            //rect transform settings
-            rectTransform.sizeDelta = new Vector2(400, 100);
-
-            rectTransform.anchorMin = Vector2.one / 2;
-            rectTransform.anchorMax = Vector2.one / 2;
-
-
-            //Image Settings
-            var image = rectTransform.gameObject.AddComponent<Image>();
-            image.sprite = Resources.Load<Sprite>(btnSpritePath);
-            image.type = Image.Type.Sliced;
-            image.color = btnColor;
-
-            //button settings
-            var button = rectTransform.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-
-
-            //text settings
-            var rectTransformText = CreateUiElement("Text", rectTransform.transform);
-            rectTransformText.anchorMin = Vector2.zero;
-            rectTransformText.anchorMax = Vector2.one;
-            rectTransformText.offsetMin = new Vector2(0, 15);
-            rectTransformText.offsetMax = Vector2.zero;
-
-            var text = rectTransformText.gameObject.AddComponent<Text>();
-            text.font = Resources.Load<Font>(fontPath);
-            text.text = "Button";
-            text.fontSize = 50;
-            text.color = textColor;
-            text.alignment = TextAnchor.MiddleCenter;
-
-
-            GameObjectUtility.SetParentAndAlign(rectTransform.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(rectTransform.gameObject, "Create " + rectTransform.gameObject.name);
-            Selection.activeObject = rectTransform.gameObject;
-        }
-
         #endregion
+
+        [MenuItem("GameObject/DredPackUI/Switcher", false, 10)]
+        static void CreateSwitcher(MenuCommand menuCommand)
+        {
+            var switcher = InstantiateUiPrefab(swithcerPrefabPath, menuCommand);
+            
+            Undo.RegisterCreatedObjectUndo(switcher, "Create " + switcher.name);
+            Selection.activeObject = switcher;
+        }
+
+        #region Help
 
         public static RectTransform CreateUiElement(string name, Transform parent = null)
         {
@@ -185,17 +117,7 @@ namespace DredPack
             if (!parent)
             {
                 //CanvasSettings
-                var canvas = FindObjectOfType<Canvas>();
-                if (!canvas)
-                {
-                    GameObject canvasGO = new GameObject("Canvas");
-                    canvasGO.layer = 5;
-                    canvas = canvasGO.AddComponent<Canvas>();
-                    canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                    canvasGO.AddComponent<CanvasScaler>();
-                    canvasGO.AddComponent<GraphicRaycaster>();
-                }
-
+                var canvas = GetCanvas();
                 go.transform.parent = canvas.transform;
             }
             else
@@ -211,6 +133,44 @@ namespace DredPack
 
             return rectTransform;
         }
+
+        private static Canvas GetCanvas()
+        {
+            var canvas = FindObjectOfType<Canvas>();
+            if (!canvas)
+            {
+                GameObject canvasGO = new GameObject("Canvas");
+                canvasGO.layer = 5;
+                canvas = canvasGO.AddComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvasGO.AddComponent<CanvasScaler>();
+                canvasGO.AddComponent<GraphicRaycaster>();
+            }
+
+            return canvas;
+        }
+
+        private static Transform GetContextCanvasParent(MenuCommand menuCommand)
+        {
+            var parent = menuCommand.context ? (menuCommand.context as GameObject).transform : null;
+            return parent ?? GetCanvas().transform;
+        }
+
+        private static GameObject InstantiateUiPrefab(string path, MenuCommand menuCommand, Vector3 pos = new Vector3(), bool unpack = true)
+        {
+            var prefab = Resources.Load(path) as GameObject;
+            var switcher = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            if(unpack)
+                PrefabUtility.UnpackPrefabInstance(switcher,PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+
+            
+            switcher.transform.SetParent(GetContextCanvasParent(menuCommand));
+            switcher.transform.localPosition = pos;
+            return switcher;
+        }
+        
+
+        #endregion
     }
 }
 
