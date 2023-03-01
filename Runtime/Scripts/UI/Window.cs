@@ -68,7 +68,7 @@ namespace DredPack.UI
 
         #region Slowly Fields
 
-        [HideInInspector] public float ShowingSpeed = 1f;
+        [HideInInspector] public float ShowingSpeed = 8f;
 
         [NonSerialized] public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
