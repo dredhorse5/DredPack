@@ -7,7 +7,6 @@ using System.Reflection;
 
 namespace DredPack.Help
 {
-#if UNITY_EDITOR
     [System.AttributeUsage(AttributeTargets.Field)]
     public class ButtonAttribute : PropertyAttribute
     {
@@ -19,6 +18,7 @@ namespace DredPack.Help
         }
     }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(ButtonAttribute))]
     public class InspectorButtonPropertyDrawer : PropertyDrawer
     {
