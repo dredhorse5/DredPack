@@ -15,7 +15,7 @@ namespace DredPack.Audio
         public AudioManager.AudioTypes Type;
         [Space]
         public Toggle MuteToggle;
-        public TapCubes.Switcher MuteSwitcher;
+        public Switcher MuteSwitcher;
         public Slider VolumeSlider;
 
         private AudioManager.AudioByType audioByType;
