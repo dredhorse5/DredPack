@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DredPack.AudioControl
+namespace DredPack.Audio
 {
     ///==========================================
     ///         Made in Pair of slippers
