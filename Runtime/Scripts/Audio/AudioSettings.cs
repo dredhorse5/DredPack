@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DredPack.Audio
+namespace AudioControl
 {
     ///==========================================
     ///         Made in Pair of slippers
@@ -15,6 +15,7 @@ namespace DredPack.Audio
         public AudioManager.AudioTypes Type;
         [Space]
         public Toggle MuteToggle;
+        public TapCubes.Switcher MuteSwitcher;
         public Slider VolumeSlider;
 
         private AudioManager.AudioByType audioByType;
@@ -22,6 +23,12 @@ namespace DredPack.Audio
         private void Start()
         {
             audioByType = AudioManager.GetAudioType(Type);
+            if (MuteSwitcher)
+            {
+                MuteSwitcher.SwitchEvent.AddListener(SetMute);
+                audioByType.ChangeMuteEvent.AddListener(UpdateSwitcher);
+                UpdateSwitcher();
+            }
             if(MuteToggle)
             {
                 MuteToggle.onValueChanged.AddListener(SetMute);
@@ -40,6 +47,7 @@ namespace DredPack.Audio
         {
             audioByType.SetMute(state);
             UpdateToggle();
+            UpdateSwitcher();
         }
 
         public void SetVolume(float volume)
@@ -52,6 +60,12 @@ namespace DredPack.Audio
         {
             if(MuteToggle)
                 MuteToggle.SetIsOnWithoutNotify(audioByType.Muted);
+        }
+
+        public void UpdateSwitcher(bool _ = false)
+        {
+            if(MuteSwitcher)
+                MuteSwitcher.SwitchWithoutNotification(audioByType.Muted);
         }
 
         public void UpdateSlider(float _ = 1f)
