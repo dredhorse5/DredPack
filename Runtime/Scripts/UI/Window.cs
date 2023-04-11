@@ -70,7 +70,7 @@ namespace DredPack.UI
 
         [HideInInspector] public float ShowingSpeed = 8f;
 
-        [NonSerialized] public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [HideInInspector] public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
         #endregion
 
@@ -79,9 +79,9 @@ namespace DredPack.UI
 
         #region Animator Fields
 
-        [NonSerialized] public Animator Animator;
-        [NonSerialized] public string OpenTriggerAnimatorParameter = "Open";
-        [NonSerialized] public string CLoseTriggerAnimatorParameter = "Close";
+        [HideInInspector] public Animator Animator;
+        [HideInInspector] public string OpenTriggerAnimatorParameter = "Open";
+        [HideInInspector] public string CLoseTriggerAnimatorParameter = "Close";
 
         #endregion
 
@@ -197,7 +197,7 @@ namespace DredPack.UI
         {
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
-            if (Animator == null)
+            if (Animator == null && CurrentWindowState != WindowStatesRead.Opened)
                 Animator = GetComponent<Animator>();
             Animator.SetTrigger(OpenTriggerAnimatorParameter);
             CurrentWindowState = WindowStatesRead.Opened;
@@ -208,7 +208,7 @@ namespace DredPack.UI
         {
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
-            if (Animator == null)
+            if (Animator == null && CurrentWindowState != WindowStatesRead.Closed)
                 Animator = GetComponent<Animator>();
             Animator.SetTrigger(CLoseTriggerAnimatorParameter);
             CurrentWindowState = WindowStatesRead.Closed;
