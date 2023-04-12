@@ -234,7 +234,6 @@ namespace DredPack.UI
             if (Close_OpenMethod == PanelOpenCloseMethods.Animator)
             {
                 Open_Animator(true);
-                return;
             }
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
@@ -251,7 +250,6 @@ namespace DredPack.UI
             if (Close_OpenMethod == PanelOpenCloseMethods.Animator)
             {
                 Close_Animator(true);
-                return;
             }
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
