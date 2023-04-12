@@ -81,7 +81,8 @@ namespace DredPack.UI
 
         [HideInInspector] public Animator Animator;
         [HideInInspector] public string OpenTriggerAnimatorParameter = "Open";
-        [HideInInspector] public string CLoseTriggerAnimatorParameter = "Close";
+        [HideInInspector] public string CloseTriggerAnimatorParameter = "Close";
+        [HideInInspector] public string SpeedAnimatorParameter = "Speed";
 
         #endregion
 
@@ -193,24 +194,32 @@ namespace DredPack.UI
 
         #region Open or close visual methods:  Animator
 
-        public virtual void Open_Animator()
+        public virtual void Open_Animator(bool instantly = false)
         {
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
-            if (Animator == null && CurrentWindowState != WindowStatesRead.Opened)
+            if (Animator == null)
                 Animator = GetComponent<Animator>();
-            Animator.SetTrigger(OpenTriggerAnimatorParameter);
+            if(instantly || CurrentWindowState != WindowStatesRead.Opened)
+            {
+                Animator.SetTrigger(OpenTriggerAnimatorParameter);
+                Animator.SetFloat(SpeedAnimatorParameter,instantly ? 10000 : 1);
+            }
             CurrentWindowState = WindowStatesRead.Opened;
 
         }
 
-        public virtual void Close_Animator()
+        public virtual void Close_Animator(bool instantly = false)
         {
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
-            if (Animator == null && CurrentWindowState != WindowStatesRead.Closed)
+            if (Animator == null)
                 Animator = GetComponent<Animator>();
-            Animator.SetTrigger(CLoseTriggerAnimatorParameter);
+            if(instantly || CurrentWindowState != WindowStatesRead.Closed)
+            {
+                Animator.SetTrigger(CloseTriggerAnimatorParameter);
+                Animator.SetFloat(SpeedAnimatorParameter, instantly ? 10000 : 1);
+            }
             CurrentWindowState = WindowStatesRead.Closed;
         }
 
@@ -222,6 +231,11 @@ namespace DredPack.UI
 
         public virtual void Open_Instantly()
         {
+            if (Close_OpenMethod == PanelOpenCloseMethods.Animator)
+            {
+                Open_Animator(true);
+                return;
+            }
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
             m_canvasGroup.alpha = 1f;
@@ -229,11 +243,16 @@ namespace DredPack.UI
             m_canvasGroup.interactable = true;
 
             CurrentWindowState = WindowStatesRead.Opened;
-
+            
         }
 
         public virtual void Close_Instantly()
         {
+            if (Close_OpenMethod == PanelOpenCloseMethods.Animator)
+            {
+                Close_Animator(true);
+                return;
+            }
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
             m_canvasGroup.alpha = 0f;
@@ -351,10 +370,9 @@ namespace DredPack.UI
                     case PanelOpenCloseMethods.Animator:
                         EditorGUI.indentLevel++;
                         T.Animator = (Animator) EditorGUILayout.ObjectField("Animator", T.Animator, typeof(Animator));
-                        T.OpenTriggerAnimatorParameter =
-                            EditorGUILayout.TextField("Open", T.OpenTriggerAnimatorParameter);
-                        T.CLoseTriggerAnimatorParameter =
-                            EditorGUILayout.TextField("Close", T.CLoseTriggerAnimatorParameter);
+                        T.OpenTriggerAnimatorParameter = EditorGUILayout.TextField("Open", T.OpenTriggerAnimatorParameter);
+                        T.CloseTriggerAnimatorParameter = EditorGUILayout.TextField("Close", T.CloseTriggerAnimatorParameter);
+                        T.SpeedAnimatorParameter = EditorGUILayout.TextField("Speed", T.SpeedAnimatorParameter);
                         EditorGUI.indentLevel--;
                         break;
 
