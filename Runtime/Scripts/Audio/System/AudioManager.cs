@@ -64,7 +64,10 @@ namespace DredPack.Audio
         public enum AudioTypes
         {
             Music,
-            Audio
+            Audio,
+            Audio1,
+            Audio2,
+            Audio3
             // Shoot
             // Environment
             // voice
