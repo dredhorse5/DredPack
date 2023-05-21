@@ -27,6 +27,7 @@ namespace DredPack.Audio
         private bool isMuted = false;
 
         private MonoBehaviour owner;
+        [NonSerialized]
         private bool isInited = false;
         public AudioField()
         {
