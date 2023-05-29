@@ -286,7 +286,7 @@ namespace DredPack.UI
             closingCoroutine = StartCoroutine(CloseSlowlyPanelCor());
         }
 
-        private IEnumerator OpenSlowlyPanelCor()
+        public IEnumerator OpenSlowlyPanelCor()
         {
             CurrentWindowState = WindowStatesRead.Opening;
 
@@ -307,7 +307,7 @@ namespace DredPack.UI
             openingCoroutine = null;
         }
 
-        private IEnumerator CloseSlowlyPanelCor()
+        public IEnumerator CloseSlowlyPanelCor()
         {
             CurrentWindowState = WindowStatesRead.Closing;
 
