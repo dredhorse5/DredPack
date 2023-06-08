@@ -11,12 +11,7 @@ namespace DredPack
             get
             {
                 if (m_Instance == null)
-                {
                     m_Instance = (T) FindObjectOfType(typeof(T));
-                    if (m_Instance == null)
-                        Debug.LogError($"Simple singleton of class : {typeof(T)} does not exists");
-                }
-
                 return m_Instance;
             }
         }
