@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
-using DredPack.Help;
+#if UNITY_EDITOR
+using DredPack.DredpackEditor;
 using UnityEditor;
+#endif
+using DredPack.Help;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -13,15 +16,6 @@ namespace DredPack.UI
     public class Window : MonoBehaviour
     {
         #region Enums
-
-        public enum SideAppearType
-        {
-            FromLeft,
-            FromRight,
-            FromUp,
-            FromDown
-        }
-
         public enum PanelOpenCloseMethods
         {
             Animator,
@@ -50,18 +44,18 @@ namespace DredPack.UI
 
 
 
-        [SerializeField] public WindowStatesAwake stateOnAwake = WindowStatesAwake.Close;
-        [ReadOnly] [SerializeField] public WindowStatesRead CurrentWindowState = WindowStatesRead.Opened;
-        [Button("SwitchState")] public bool btn;
+        public WindowStatesAwake stateOnAwake = WindowStatesAwake.Close;
+        [ReadOnly] public WindowStatesRead CurrentWindowState = WindowStatesRead.Opened;
 
-        [Space] public Button CloseButton;
+        public Button CloseButton;
         public Button OpenButton;
         public Button SwitchButton;
 
         public UnityEvent OpenEvent;
         public UnityEvent CloseEvent;
         public UnityEvent<bool> SwitchEvent;
-        [Space] [SerializeField] public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
+        [Space] public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
+        public bool Disengageable = false;
 
 
 
@@ -73,16 +67,27 @@ namespace DredPack.UI
         [HideInInspector] public AnimationCurve Curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
         #endregion
-
-
-
-
+        
         #region Animator Fields
 
         [HideInInspector] public Animator Animator;
         [HideInInspector] public string OpenTriggerAnimatorParameter = "Open";
         [HideInInspector] public string CloseTriggerAnimatorParameter = "Close";
         [HideInInspector] public string SpeedAnimatorParameter = "Speed";
+
+        #endregion
+
+        #region SideAppear Fields
+
+        [HideInInspector] public AnimationCurve SideAppear_Curve1 =
+            new AnimationCurve(new[] {new Keyframe(0, 0,3.14016724f,3.14016724f), new Keyframe(.6f, 1.1f,0f,0f), new Keyframe(1, 1,0f,0f)});
+
+        public float SideAppear_Speed = 2.85f;
+        public RectTransform SideAppear_Up;
+        public RectTransform SideAppear_Right;
+        public RectTransform SideAppear_Down;
+        public RectTransform SideAppear_Left;
+        
 
         #endregion
 
@@ -101,6 +106,11 @@ namespace DredPack.UI
 
         private CanvasGroup _canvasGroup;
 
+        private float sideAppear_UpDefY;
+        private float sideAppear_RightDefX;
+        private float sideAppear_DownDefY;
+        private float sideAppear_LeftDefX;
+
         private void Start()
         {
             Initialization();
@@ -114,7 +124,7 @@ namespace DredPack.UI
             if (CloseButton)
                 CloseButton.onClick.AddListener(Close);
             if (SwitchButton)
-                SwitchButton.onClick.AddListener(SwitchState);
+                SwitchButton.onClick.AddListener(Switch);
             switch (stateOnAwake)
             {
                 case WindowStatesAwake.Close:
@@ -125,6 +135,16 @@ namespace DredPack.UI
                     Open_Instantly();
                     break;
             }
+
+            if (SideAppear_Up)
+                sideAppear_UpDefY = SideAppear_Up.anchoredPosition.y;
+            if (SideAppear_Right)
+                sideAppear_RightDefX = SideAppear_Right.anchoredPosition.x;
+            if (SideAppear_Down)
+                sideAppear_DownDefY = SideAppear_Down.anchoredPosition.y;
+            if (SideAppear_Left)
+                sideAppear_LeftDefX = SideAppear_Left.anchoredPosition.x;
+
         }
 
 
@@ -134,6 +154,8 @@ namespace DredPack.UI
         /// </summary>
         public virtual void Open()
         {
+            if(Disengageable)
+                gameObject.SetActive(true);
             switch (Close_OpenMethod)
             {
                 case PanelOpenCloseMethods.Animator:
@@ -144,6 +166,9 @@ namespace DredPack.UI
                     break;
                 case PanelOpenCloseMethods.Slowly:
                     OpenSlowlyPanel();
+                    break;
+                case PanelOpenCloseMethods.SideAppear:
+                    Open_SideAppear();
                     break;
             }
         }
@@ -163,6 +188,9 @@ namespace DredPack.UI
                     break;
                 case PanelOpenCloseMethods.Slowly:
                     CloseSlowlyPanel();
+                    break;
+                case PanelOpenCloseMethods.SideAppear:
+                    Close_SideAppear();
                     break;
             }
         }
@@ -231,6 +259,8 @@ namespace DredPack.UI
 
         public virtual void Open_Instantly()
         {
+            if(Disengageable && Application.isPlaying)
+                gameObject.SetActive(true);
             if (Close_OpenMethod == PanelOpenCloseMethods.Animator)
             {
                 Open_Animator(true);
@@ -258,6 +288,8 @@ namespace DredPack.UI
             m_canvasGroup.interactable = false;
 
             CurrentWindowState = WindowStatesRead.Closed;
+            if(Disengageable && Application.isPlaying)
+                gameObject.SetActive(false);
         }
 
         #endregion
@@ -326,6 +358,9 @@ namespace DredPack.UI
 
             CurrentWindowState = WindowStatesRead.Closed;
             closingCoroutine = null;
+            
+            if(Disengageable)
+                gameObject.SetActive(false);
         }
 
         #endregion
@@ -333,59 +368,220 @@ namespace DredPack.UI
         #region Open or close visual methods: Appear from side
 
 
+        public virtual void Open_SideAppear()
+        {
+            SwitchEvent?.Invoke(true);
+            OpenEvent?.Invoke();
+            
+            if (openingCoroutine != null)
+                StopCoroutine(openingCoroutine);
+            openingCoroutine = StartCoroutine(IE());
+
+            IEnumerator IE()
+            {
+                CurrentWindowState = WindowStatesRead.Opening;
+                m_canvasGroup.interactable = false;
+                m_canvasGroup.blocksRaycasts = false;
+                m_canvasGroup.alpha = 1f;
+                //up
+                if (SideAppear_Up)
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_UpDefY, sideAppear_UpDefY, SideAppear_Speed,
+                        SideAppear_Curve1,
+                        _ => SideAppear_Up.anchoredPosition = new Vector2(SideAppear_Up.anchoredPosition.x, _)));
+                //right
+                if (SideAppear_Right)
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_RightDefX, sideAppear_RightDefX, SideAppear_Speed,
+                        SideAppear_Curve1,
+                        _ => SideAppear_Right.anchoredPosition = new Vector2(_, SideAppear_Right.anchoredPosition.y)));
+                //down
+                if (SideAppear_Down)
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_DownDefY, sideAppear_DownDefY, SideAppear_Speed,
+                        SideAppear_Curve1,
+                        _ => SideAppear_Down.anchoredPosition = new Vector2(SideAppear_Down.anchoredPosition.x, _)));
+                //left
+                if (SideAppear_Left)
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_LeftDefX, sideAppear_LeftDefX, SideAppear_Speed,
+                        SideAppear_Curve1,
+                        _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
+                yield return new WaitForSeconds(1f / SideAppear_Speed);
+                yield return null;
+
+                CurrentWindowState = WindowStatesRead.Opened;
+                m_canvasGroup.interactable = true;
+                m_canvasGroup.blocksRaycasts = true;
+                closingCoroutine = null;
+                
+            }
+        }
+
+        public virtual void Close_SideAppear()
+        {
+            SwitchEvent?.Invoke(false);
+            CloseEvent?.Invoke();
+            
+            if (closingCoroutine != null)
+                StopCoroutine(closingCoroutine);
+            closingCoroutine = StartCoroutine(IE());
+
+            IEnumerator IE()
+            {
+                CurrentWindowState = WindowStatesRead.Closing;
+                m_canvasGroup.interactable = false;
+                m_canvasGroup.blocksRaycasts = false;
+                //up
+                if (SideAppear_Up)
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_UpDefY, sideAppear_UpDefY, SideAppear_Speed, InverseCurve.Get(SideAppear_Curve1),
+                        _ => SideAppear_Up.anchoredPosition = new Vector2(SideAppear_Up.anchoredPosition.x, _)));
+                //right
+                if (SideAppear_Right)
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_RightDefX, sideAppear_RightDefX, SideAppear_Speed, InverseCurve.Get(SideAppear_Curve1),
+                        _ => SideAppear_Right.anchoredPosition = new Vector2(_, SideAppear_Right.anchoredPosition.y)));
+                //down
+                if (SideAppear_Down)
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_DownDefY, sideAppear_DownDefY, SideAppear_Speed, InverseCurve.Get(SideAppear_Curve1),
+                        _ => SideAppear_Down.anchoredPosition = new Vector2(SideAppear_Down.anchoredPosition.x, _)));
+                //left
+                if (SideAppear_Left)
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_LeftDefX, sideAppear_LeftDefX, SideAppear_Speed, InverseCurve.Get(SideAppear_Curve1),
+                        _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
+                yield return new WaitForSeconds(1f / SideAppear_Speed);
+                
+
+                m_canvasGroup.alpha = 0f;
+                CurrentWindowState = WindowStatesRead.Closed;
+                closingCoroutine = null;
+                
+                if(Disengageable)
+                    gameObject.SetActive(false);
+            }
+        }
 
         #endregion
+
+        public void FindSidePanels()
+        {
+            var left = transform.Find("Left");
+            var right = transform.Find("Right");
+            var down = transform.Find("Down");
+            var up = transform.Find("Up");
+            SideAppear_Left =   left  ? left.GetComponent<RectTransform>()  : SideAppear_Left;
+            SideAppear_Right =  right ? right.GetComponent<RectTransform>() : SideAppear_Right;
+            SideAppear_Down =   down  ? down.GetComponent<RectTransform>()  : SideAppear_Down;
+            SideAppear_Up =     up    ? up.GetComponent<RectTransform>()    : SideAppear_Up;
+        }
 
 
         #region EDITOR
 
 #if UNITY_EDITOR
         [CustomEditor(typeof(Window))]
-        public class WindowEditor : Editor
+        public class WindowEditor : DredInspectorEditor<Window>
         {
-            private Window T
-            {
-                get
-                {
-                    if (_t == null)
-                        _t = (Window) target;
-                    return _t;
-                }
-            }
-
-            private Window _t;
+            private int currentTab;
 
 
             public override void OnInspectorGUI()
             {
-                base.OnInspectorGUI();
-                EditorGUI.BeginChangeCheck();
+                serializedObject.Update();
+                
+                DrawComponentHeader();
+                Tabs();
+                EditorGUILayout.BeginVertical(GUI.skin.box);
+                switch (currentTab)
+                {
+                    case 0: Tabs_General(); break;
+                    case 1: Tabs_Events(); break;
+                    case 2: Tabs_Animation(); break;
+                }
+                EditorGUILayout.EndVertical();
+                
+                serializedObject.ApplyModifiedProperties();
+            }
+
+            private void Tabs()
+            {
+                GUIContent[] toolbarTabs = new GUIContent[3];
+                toolbarTabs[0] = new GUIContent("General");
+                toolbarTabs[1] = new GUIContent("Events");
+                toolbarTabs[2] = new GUIContent("Animation");
+
+                currentTab = GUILayout.Toolbar(currentTab, toolbarTabs);
+            }
+
+            private void Tabs_General()
+            {
+                var labelStyle = new GUIStyle();
+                labelStyle.fontStyle = FontStyle.Bold;
+                labelStyle.normal.textColor =  Color.white;
+                labelStyle.fontSize = 15;
+                
+                GUILayout.Label("States", labelStyle);
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.stateOnAwake)), new GUIContent("On Start"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CurrentWindowState)), new GUIContent("Current"));
+                EditorGUI.indentLevel--;
+                if (GUILayout.Button("Switch State"))
+                    T.SwitchState();
+                GUILayout.Space(5);
+                
+                GUILayout.Label("Buttons",labelStyle);
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseButton)), new GUIContent("Close"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.OpenButton)), new GUIContent("Open"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SwitchButton)), new GUIContent("Switch"));
+                EditorGUI.indentLevel--;
+                
+                GUILayout.Label("Some",labelStyle);
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Disengageable)));
+                EditorGUI.indentLevel--;
+                
+            }
+
+            private void Tabs_Events()
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.OpenEvent)));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseEvent)));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SwitchEvent)));
+            }
+
+            private void Tabs_Animation()
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Close_OpenMethod)), new GUIContent("Animation"));
+                EditorGUI.indentLevel++;
                 switch (T.Close_OpenMethod)
                 {
                     case PanelOpenCloseMethods.Instantly:
                         break;
 
                     case PanelOpenCloseMethods.Animator:
-                        EditorGUI.indentLevel++;
-                        T.Animator = (Animator) EditorGUILayout.ObjectField("Animator", T.Animator, typeof(Animator));
-                        T.OpenTriggerAnimatorParameter = EditorGUILayout.TextField("Open", T.OpenTriggerAnimatorParameter);
-                        T.CloseTriggerAnimatorParameter = EditorGUILayout.TextField("Close", T.CloseTriggerAnimatorParameter);
-                        T.SpeedAnimatorParameter = EditorGUILayout.TextField("Speed", T.SpeedAnimatorParameter);
+                        
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Animator)));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.OpenTriggerAnimatorParameter)), new GUIContent("Open Trigger"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseTriggerAnimatorParameter)), new GUIContent("Close Trigger"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SpeedAnimatorParameter)), new GUIContent("Speed Parameter"));
                         EditorGUI.indentLevel--;
                         break;
 
                     case PanelOpenCloseMethods.Slowly:
-                        EditorGUI.indentLevel++;
-                        T.ShowingSpeed = EditorGUILayout.FloatField("Showing Speed", T.ShowingSpeed);
-                        T.Curve = EditorGUILayout.CurveField("Curve", T.Curve);
-                        EditorGUI.indentLevel--;
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.ShowingSpeed)), new GUIContent("Speed"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Curve)));
+                        break;
+                    case PanelOpenCloseMethods.SideAppear:
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Speed)),new GUIContent("Speed"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Curve1)),new GUIContent("Curve"));
+
+                        GUILayout.Space(5);
+                        if (GUILayout.Button("Find Panels"))
+                            T.FindSidePanels();
+
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Up)),new GUIContent("Up"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Right)),new GUIContent("Right"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Down)),new GUIContent("Down"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Left)),new GUIContent("Left"));
                         break;
                 }
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    EditorUtility.SetDirty(T);
-                }
+                EditorGUI.indentLevel--;
 
             }
         }
