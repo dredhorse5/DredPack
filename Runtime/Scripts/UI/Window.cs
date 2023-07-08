@@ -392,6 +392,8 @@ namespace DredPack.UI
 
         public virtual void Open_SideAppearCurve()
         {
+            if(CurrentWindowState == WindowStatesRead.Opening || CurrentWindowState == WindowStatesRead.Opened)
+                return;
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
             
@@ -445,6 +447,8 @@ namespace DredPack.UI
 
         public virtual void Close_SideAppearCurve()
         {
+            if(CurrentWindowState == WindowStatesRead.Closing || CurrentWindowState == WindowStatesRead.Closed)
+                return;
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
             
@@ -502,6 +506,8 @@ namespace DredPack.UI
 
         public virtual void Open_SideAppearConstant()
         {
+            if(CurrentWindowState == WindowStatesRead.Opening || CurrentWindowState == WindowStatesRead.Opened)
+                return;
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
             
@@ -563,6 +569,8 @@ namespace DredPack.UI
 
         public virtual void Close_SideAppearConstant()
         {
+            if(CurrentWindowState == WindowStatesRead.Closing || CurrentWindowState == WindowStatesRead.Closed)
+                return;
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
             
