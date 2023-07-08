@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace DredPack.DredpackEditor
 {
+    #if UNITY_EDITOR
     public class DredInspectorEditor<W> : Editor where W : MonoBehaviour
     {
         public W T
@@ -37,4 +38,5 @@ namespace DredPack.DredpackEditor
             GUILayout.EndVertical();
         }
     }
+    #endif
 }
