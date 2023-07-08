@@ -43,7 +43,6 @@ namespace DredPack.Help
 
 
         }
-
         public static IEnumerator LerpFloatIE(float startVal, float endVal, float speed, AnimationCurve curve, Action<float> feedback,
             Action endFeedback = null)
         {
@@ -66,7 +65,6 @@ namespace DredPack.Help
                 owner.StopCoroutine(coroutine);
             coroutine = owner.StartCoroutine(LerpVector3IE(startVal, endVal, speed, curve, feedback, endFeedback));
         }
-
         public static IEnumerator LerpVector3IE(Vector3 startVal, Vector3 endVal, float speed, AnimationCurve curve,
             Action<Vector3> feedback, Action endFeedback = null)
         {
@@ -94,7 +92,6 @@ namespace DredPack.Help
             if (endFeedback != null)
                 endFeedback.Invoke();
         }
-
 
     }
 }

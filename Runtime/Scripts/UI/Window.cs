@@ -7,7 +7,9 @@ using UnityEditor;
 using DredPack.Help;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
+using Image = UnityEngine.UI.Image;
 
 namespace DredPack.UI
 {
@@ -21,7 +23,8 @@ namespace DredPack.UI
             Animator,
             Instantly,
             Slowly,
-            SideAppear
+            SideAppearCurve,
+            SideAppearConstant,
         }
 
         public enum WindowStatesRead
@@ -32,11 +35,7 @@ namespace DredPack.UI
             Closing
         }
 
-        public enum WindowStatesAwake
-        {
-            Open,
-            Close
-        }
+        public enum WindowStatesAwake { Open, Close }
 
         #endregion
 
@@ -59,6 +58,7 @@ namespace DredPack.UI
 
 
 
+        
 
         #region Slowly Fields
 
@@ -79,15 +79,24 @@ namespace DredPack.UI
 
         #region SideAppear Fields
 
-        [HideInInspector] public AnimationCurve SideAppear_Curve1 =
-            new AnimationCurve(new[] {new Keyframe(0, 0,3.14016724f,3.14016724f), new Keyframe(.6f, 1.1f,0f,0f), new Keyframe(1, 1,0f,0f)});
+        #region Curve
+        public AnimationCurve SideAppear_Curve1 = new AnimationCurve(new[] {new Keyframe(0, 0,3.14016724f,3.14016724f), new Keyframe(.6f, 1.1f,0f,0f), new Keyframe(1, 1,0f,0f)});
+        #endregion
 
+        #region Constant
+
+        public float SideAppear_bounceValue = 20f;
+        [Range(0,1f)]
+        public float SideAppear_bounceTime = .6f;
+
+        #endregion
+        
         public float SideAppear_Speed = 2.85f;
         public RectTransform SideAppear_Up;
         public RectTransform SideAppear_Right;
         public RectTransform SideAppear_Down;
         public RectTransform SideAppear_Left;
-        
+        public Image SideAppear_Background;
 
         #endregion
 
@@ -110,6 +119,9 @@ namespace DredPack.UI
         private float sideAppear_RightDefX;
         private float sideAppear_DownDefY;
         private float sideAppear_LeftDefX;
+        private float sideAppear_defBackgroundAlpha;
+
+        public static int currentWindowTab;
 
         private void Start()
         {
@@ -144,6 +156,8 @@ namespace DredPack.UI
                 sideAppear_DownDefY = SideAppear_Down.anchoredPosition.y;
             if (SideAppear_Left)
                 sideAppear_LeftDefX = SideAppear_Left.anchoredPosition.x;
+            if (SideAppear_Background)
+                sideAppear_defBackgroundAlpha = SideAppear_Background.color.a;
 
         }
 
@@ -167,8 +181,11 @@ namespace DredPack.UI
                 case PanelOpenCloseMethods.Slowly:
                     OpenSlowlyPanel();
                     break;
-                case PanelOpenCloseMethods.SideAppear:
-                    Open_SideAppear();
+                case PanelOpenCloseMethods.SideAppearCurve:
+                    Open_SideAppearCurve();
+                    break;
+                case PanelOpenCloseMethods.SideAppearConstant:
+                    Open_SideAppearConstant();
                     break;
             }
         }
@@ -189,8 +206,11 @@ namespace DredPack.UI
                 case PanelOpenCloseMethods.Slowly:
                     CloseSlowlyPanel();
                     break;
-                case PanelOpenCloseMethods.SideAppear:
-                    Close_SideAppear();
+                case PanelOpenCloseMethods.SideAppearCurve:
+                    Close_SideAppearCurve();
+                    break;
+                case PanelOpenCloseMethods.SideAppearConstant:
+                    Close_SideAppearConstant();
                     break;
             }
         }
@@ -365,10 +385,10 @@ namespace DredPack.UI
 
         #endregion
 
-        #region Open or close visual methods: Appear from side
+        #region Open or close visual methods: SideAppear By Curve
 
 
-        public virtual void Open_SideAppear()
+        public virtual void Open_SideAppearCurve()
         {
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
@@ -403,8 +423,14 @@ namespace DredPack.UI
                     StartCoroutine(Lerper.LerpFloatIE(-sideAppear_LeftDefX, sideAppear_LeftDefX, SideAppear_Speed,
                         SideAppear_Curve1,
                         _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
+                
+                //background
+                if (SideAppear_Background)
+                    StartCoroutine(Lerper.LerpFloatIE(0f, sideAppear_defBackgroundAlpha, SideAppear_Speed,
+                        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                        _ => SideAppear_Background.color = new Color(SideAppear_Background.color.r,
+                            SideAppear_Background.color.g, SideAppear_Background.color.b, _)));
                 yield return new WaitForSeconds(1f / SideAppear_Speed);
-                yield return null;
 
                 CurrentWindowState = WindowStatesRead.Opened;
                 m_canvasGroup.interactable = true;
@@ -414,7 +440,7 @@ namespace DredPack.UI
             }
         }
 
-        public virtual void Close_SideAppear()
+        public virtual void Close_SideAppearCurve()
         {
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
@@ -444,7 +470,16 @@ namespace DredPack.UI
                 if (SideAppear_Left)
                     StartCoroutine(Lerper.LerpFloatIE(-sideAppear_LeftDefX, sideAppear_LeftDefX, SideAppear_Speed, InverseCurve.Get(SideAppear_Curve1),
                         _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
+                
+                //background
+                if (SideAppear_Background)
+                    StartCoroutine(Lerper.LerpFloatIE(sideAppear_defBackgroundAlpha, 0f,SideAppear_Speed,
+                        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                        _ => SideAppear_Background.color = new Color(SideAppear_Background.color.r,
+                            SideAppear_Background.color.g, SideAppear_Background.color.b, _)));
+                        
                 yield return new WaitForSeconds(1f / SideAppear_Speed);
+                
                 
 
                 m_canvasGroup.alpha = 0f;
@@ -458,17 +493,165 @@ namespace DredPack.UI
 
         #endregion
 
+        #region Open or close visual methods: SideAppear By Constant Value
+
+
+        public virtual void Open_SideAppearConstant()
+        {
+            SwitchEvent?.Invoke(true);
+            OpenEvent?.Invoke();
+            
+            if (openingCoroutine != null)
+                StopCoroutine(openingCoroutine);
+            openingCoroutine = StartCoroutine(IE());
+
+            IEnumerator IE()
+            {
+                CurrentWindowState = WindowStatesRead.Opening;
+                m_canvasGroup.interactable = false;
+                m_canvasGroup.blocksRaycasts = false;
+                m_canvasGroup.alpha = 1f;
+                //up
+                if (SideAppear_Up)
+                {
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_UpDefY));
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_UpDefY, sideAppear_UpDefY, SideAppear_Speed, curve,
+                        _ => SideAppear_Up.anchoredPosition = new Vector2(SideAppear_Up.anchoredPosition.x, _)));
+                }
+                //right
+                if (SideAppear_Right)
+                {
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_RightDefX)); 
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_RightDefX, sideAppear_RightDefX, SideAppear_Speed, curve,
+                        _ => SideAppear_Right.anchoredPosition = new Vector2(_, SideAppear_Right.anchoredPosition.y)));
+                }
+                //down
+                if (SideAppear_Down)
+                {
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_DownDefY)); 
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_DownDefY, sideAppear_DownDefY, SideAppear_Speed, curve,
+                        _ => SideAppear_Down.anchoredPosition = new Vector2(SideAppear_Down.anchoredPosition.x, _)));
+                }
+                //left
+                if (SideAppear_Left)
+                {
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_LeftDefX)); 
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_LeftDefX, sideAppear_LeftDefX, SideAppear_Speed, curve,
+                        _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
+                }
+                
+                //background
+                if (SideAppear_Background)
+                    StartCoroutine(Lerper.LerpFloatIE(0f, sideAppear_defBackgroundAlpha, SideAppear_Speed,
+                        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                        _ => SideAppear_Background.color = new Color(SideAppear_Background.color.r,
+                            SideAppear_Background.color.g, SideAppear_Background.color.b, _)));
+                yield return new WaitForSeconds(1f / SideAppear_Speed);
+
+                CurrentWindowState = WindowStatesRead.Opened;
+                m_canvasGroup.interactable = true;
+                m_canvasGroup.blocksRaycasts = true;
+                closingCoroutine = null;
+                
+            }
+        }
+
+        public virtual void Close_SideAppearConstant()
+        {
+            SwitchEvent?.Invoke(false);
+            CloseEvent?.Invoke();
+            
+            if (closingCoroutine != null)
+                StopCoroutine(closingCoroutine);
+            closingCoroutine = StartCoroutine(IE());
+
+            IEnumerator IE()
+            {
+                CurrentWindowState = WindowStatesRead.Closing;
+                m_canvasGroup.interactable = false;
+                m_canvasGroup.blocksRaycasts = false;
+                //up
+                if (SideAppear_Up)
+                {
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_UpDefY)); 
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_UpDefY, sideAppear_UpDefY, SideAppear_Speed,
+                        InverseCurve.Get(curve),
+                        _ => SideAppear_Up.anchoredPosition = new Vector2(SideAppear_Up.anchoredPosition.x, _)));
+                }
+                //right
+                if (SideAppear_Right)
+                {
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_RightDefX)); 
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_RightDefX, sideAppear_RightDefX, SideAppear_Speed,
+                        InverseCurve.Get(curve),
+                        _ => SideAppear_Right.anchoredPosition = new Vector2(_, SideAppear_Right.anchoredPosition.y)));
+                }
+                //down
+                if (SideAppear_Down)
+                {
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_DownDefY)); 
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_DownDefY, sideAppear_DownDefY, SideAppear_Speed,
+                        InverseCurve.Get(curve),
+                        _ => SideAppear_Down.anchoredPosition = new Vector2(SideAppear_Down.anchoredPosition.x, _)));
+                }
+                //left
+                if (SideAppear_Left)
+                {
+                    
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_LeftDefX)); 
+                    StartCoroutine(Lerper.LerpFloatIE(-sideAppear_LeftDefX, sideAppear_LeftDefX, SideAppear_Speed,
+                        InverseCurve.Get(curve),
+                        _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
+                }
+                
+                //background
+                if (SideAppear_Background)
+                    StartCoroutine(Lerper.LerpFloatIE(sideAppear_defBackgroundAlpha, 0f,SideAppear_Speed,
+                        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                        _ => SideAppear_Background.color = new Color(SideAppear_Background.color.r,
+                            SideAppear_Background.color.g, SideAppear_Background.color.b, _)));
+                        
+                yield return new WaitForSeconds(1f / SideAppear_Speed);
+                
+                
+
+                m_canvasGroup.alpha = 0f;
+                CurrentWindowState = WindowStatesRead.Closed;
+                closingCoroutine = null;
+                
+                if(Disengageable)
+                    gameObject.SetActive(false);
+            }
+        }
+
         public void FindSidePanels()
         {
             var left = transform.Find("Left");
             var right = transform.Find("Right");
             var down = transform.Find("Down");
             var up = transform.Find("Up");
+            var background = GetComponent<Image>();
             SideAppear_Left =   left  ? left.GetComponent<RectTransform>()  : SideAppear_Left;
             SideAppear_Right =  right ? right.GetComponent<RectTransform>() : SideAppear_Right;
             SideAppear_Down =   down  ? down.GetComponent<RectTransform>()  : SideAppear_Down;
             SideAppear_Up =     up    ? up.GetComponent<RectTransform>()    : SideAppear_Up;
+            SideAppear_Background = background ?? SideAppear_Background;
         }
+
+        private AnimationCurve GetSideAppearBounceCurve(float maxVal)
+        {
+            var val = (maxVal + SideAppear_bounceValue) / maxVal;
+            var key = new Keyframe(SideAppear_bounceTime,val);
+            return new AnimationCurve(new[]
+            {
+                new Keyframe(0, 0,3.14016724f,3.14016724f), 
+                key, 
+                new Keyframe(1, 1,0f,0f)
+            });
+
+        }
+        #endregion
+
 
 
         #region EDITOR
@@ -477,8 +660,6 @@ namespace DredPack.UI
         [CustomEditor(typeof(Window))]
         public class WindowEditor : DredInspectorEditor<Window>
         {
-            private int currentTab;
-
 
             public override void OnInspectorGUI()
             {
@@ -487,7 +668,7 @@ namespace DredPack.UI
                 DrawComponentHeader();
                 Tabs();
                 EditorGUILayout.BeginVertical(GUI.skin.box);
-                switch (currentTab)
+                switch (currentWindowTab)
                 {
                     case 0: Tabs_General(); break;
                     case 1: Tabs_Events(); break;
@@ -504,8 +685,7 @@ namespace DredPack.UI
                 toolbarTabs[0] = new GUIContent("General");
                 toolbarTabs[1] = new GUIContent("Events");
                 toolbarTabs[2] = new GUIContent("Animation");
-
-                currentTab = GUILayout.Toolbar(currentTab, toolbarTabs);
+                currentWindowTab = GUILayout.Toolbar(currentWindowTab, toolbarTabs);
             }
 
             private void Tabs_General()
@@ -567,9 +747,16 @@ namespace DredPack.UI
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.ShowingSpeed)), new GUIContent("Speed"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Curve)));
                         break;
-                    case PanelOpenCloseMethods.SideAppear:
+                    case PanelOpenCloseMethods.SideAppearCurve:
+                    case PanelOpenCloseMethods.SideAppearConstant:
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Speed)),new GUIContent("Speed"));
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Curve1)),new GUIContent("Curve"));
+                        if(T.Close_OpenMethod == PanelOpenCloseMethods.SideAppearCurve)
+                            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Curve1)),new GUIContent("Curve"));
+                        else
+                        {
+                            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_bounceTime)),new GUIContent("Bounce Time"));
+                            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_bounceValue)),new GUIContent("Bounce Value"));
+                        }
 
                         GUILayout.Space(5);
                         if (GUILayout.Button("Find Panels"))
@@ -579,6 +766,8 @@ namespace DredPack.UI
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Right)),new GUIContent("Right"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Down)),new GUIContent("Down"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Left)),new GUIContent("Left"));
+                        GUILayout.Space(3);
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Background)),new GUIContent("Background"));
                         break;
                 }
                 EditorGUI.indentLevel--;
