@@ -80,7 +80,7 @@ namespace DredPack.UI
         #region SideAppear Fields
 
         #region Curve
-        public AnimationCurve SideAppear_Curve1 = new AnimationCurve(new[] {new Keyframe(0, 0,3.14016724f,3.14016724f), new Keyframe(.6f, 1.1f,0f,0f), new Keyframe(1, 1,0f,0f)});
+        public AnimationCurve SideAppear_Curve1 = new AnimationCurve(new[] {new Keyframe(0, 0,4.57445812f,4.57445812f), new Keyframe(.6f, 1.1f,0f,0f), new Keyframe(1, 1,0f,0f)});
         #endregion
 
         #region Constant
@@ -91,7 +91,7 @@ namespace DredPack.UI
 
         #endregion
         
-        public float SideAppear_Speed = 2.85f;
+        public float SideAppear_Speed = 2f;
         public RectTransform SideAppear_Up;
         public RectTransform SideAppear_Right;
         public RectTransform SideAppear_Down;
@@ -404,7 +404,7 @@ namespace DredPack.UI
                 m_canvasGroup.blocksRaycasts = false;
                 m_canvasGroup.alpha = 1f;
                 //up
-                if (SideAppear_Up)
+                if (SideAppear_Up) // 4.57445812 0.484901249
                     StartCoroutine(Lerper.LerpFloatIE(-sideAppear_UpDefY, sideAppear_UpDefY, SideAppear_Speed,
                         SideAppear_Curve1,
                         _ => SideAppear_Up.anchoredPosition = new Vector2(SideAppear_Up.anchoredPosition.x, _)));
@@ -573,7 +573,7 @@ namespace DredPack.UI
                 //up
                 if (SideAppear_Up)
                 {
-                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_UpDefY)); 
+                    var curve = GetSideAppearBounceCurve(Mathf.Abs(sideAppear_UpDefY));
                     StartCoroutine(Lerper.LerpFloatIE(-sideAppear_UpDefY, sideAppear_UpDefY, SideAppear_Speed,
                         InverseCurve.Get(curve),
                         _ => SideAppear_Up.anchoredPosition = new Vector2(SideAppear_Up.anchoredPosition.x, _)));
@@ -644,7 +644,7 @@ namespace DredPack.UI
             var key = new Keyframe(SideAppear_bounceTime,val);
             return new AnimationCurve(new[]
             {
-                new Keyframe(0, 0,3.14016724f,3.14016724f), 
+                new Keyframe(0, 0,4.57445812f,4.57445812f), 
                 key, 
                 new Keyframe(1, 1,0f,0f)
             });
