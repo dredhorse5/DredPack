@@ -397,8 +397,7 @@ namespace DredPack.UI
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
             
-            if (openingCoroutine != null)
-                StopCoroutine(openingCoroutine);
+            StopAllCoroutines();
             openingCoroutine = StartCoroutine(IE());
 
             IEnumerator IE()
@@ -452,8 +451,7 @@ namespace DredPack.UI
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
             
-            if (closingCoroutine != null)
-                StopCoroutine(closingCoroutine);
+            StopAllCoroutines();
             closingCoroutine = StartCoroutine(IE());
 
             IEnumerator IE()
