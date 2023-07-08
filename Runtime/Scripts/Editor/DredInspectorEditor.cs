@@ -17,6 +17,15 @@ namespace DredPack.DredpackEditor
 
         private W _t;
         
+        public static GUIStyle LabelStyle(int fontSize = 15)
+        {
+            var labelStyle = new GUIStyle();
+            labelStyle.fontStyle = FontStyle.Bold;
+            labelStyle.normal.textColor = Color.white;
+            labelStyle.fontSize = fontSize;
+            return labelStyle;
+        }
+        
         public static void DrawComponentHeader(string customName = null)
         {
             GUILayout.BeginVertical();

@@ -90,7 +90,9 @@ namespace DredPack.UI
         public float SideAppear_bounceTime = .6f;
 
         #endregion
-        
+
+        public float SideAppear_OpenDelay = 0f;
+        public float SideAppear_CloseDelay = 0f;
         public float SideAppear_Speed = 2f;
         public RectTransform SideAppear_Up;
         public RectTransform SideAppear_Right;
@@ -402,6 +404,7 @@ namespace DredPack.UI
                 CurrentWindowState = WindowStatesRead.Opening;
                 m_canvasGroup.interactable = false;
                 m_canvasGroup.blocksRaycasts = false;
+                yield return new WaitForSeconds(SideAppear_OpenDelay);
                 m_canvasGroup.alpha = 1f;
                 //up
                 if (SideAppear_Up) // 4.57445812 0.484901249
@@ -454,6 +457,7 @@ namespace DredPack.UI
                 CurrentWindowState = WindowStatesRead.Closing;
                 m_canvasGroup.interactable = false;
                 m_canvasGroup.blocksRaycasts = false;
+                yield return new WaitForSeconds(SideAppear_CloseDelay);
                 //up
                 if (SideAppear_Up)
                     StartCoroutine(Lerper.LerpFloatIE(-sideAppear_UpDefY, sideAppear_UpDefY, SideAppear_Speed, InverseCurve.Get(SideAppear_Curve1),
@@ -510,6 +514,7 @@ namespace DredPack.UI
                 CurrentWindowState = WindowStatesRead.Opening;
                 m_canvasGroup.interactable = false;
                 m_canvasGroup.blocksRaycasts = false;
+                yield return new WaitForSeconds(SideAppear_OpenDelay);
                 m_canvasGroup.alpha = 1f;
                 //up
                 if (SideAppear_Up)
@@ -570,6 +575,7 @@ namespace DredPack.UI
                 CurrentWindowState = WindowStatesRead.Closing;
                 m_canvasGroup.interactable = false;
                 m_canvasGroup.blocksRaycasts = false;
+                yield return new WaitForSeconds(SideAppear_CloseDelay);
                 //up
                 if (SideAppear_Up)
                 {
@@ -690,11 +696,8 @@ namespace DredPack.UI
 
             private void Tabs_General()
             {
-                var labelStyle = new GUIStyle();
-                labelStyle.fontStyle = FontStyle.Bold;
-                labelStyle.normal.textColor =  Color.white;
-                labelStyle.fontSize = 15;
-                
+                var labelStyle = LabelStyle();
+
                 GUILayout.Label("States", labelStyle);
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.stateOnAwake)), new GUIContent("On Start"));
@@ -757,8 +760,18 @@ namespace DredPack.UI
                             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_bounceTime)),new GUIContent("Bounce Time"));
                             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_bounceValue)),new GUIContent("Bounce Value"));
                         }
-
-                        GUILayout.Space(5);
+                        GUILayout.Space(8);
+                        
+                        EditorGUILayout.LabelField("Delays",LabelStyle(12));
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(15);
+                        GUILayout.Label("Open", GUILayout.Width(33));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_OpenDelay)),GUIContent.none);
+                        GUILayout.Label("Close", GUILayout.Width(36));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_CloseDelay)),GUIContent.none);
+                        EditorGUILayout.EndHorizontal();
+                        
+                        GUILayout.Space(8);
                         if (GUILayout.Button("Find Panels"))
                             T.FindSidePanels();
 
