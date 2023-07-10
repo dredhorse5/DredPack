@@ -18,47 +18,43 @@ namespace DredPack.UI
     public class Window : MonoBehaviour
     {
         #region Enums
-        public enum PanelOpenCloseMethods
-        {
-            Animator,
-            Instantly,
-            Slowly,
-            SideAppearCurve,
-            SideAppearConstant,
-        }
-
-        public enum WindowStatesRead
-        {
-            Opened,
-            Opening,
-            Closed,
-            Closing
-        }
-
+        public enum PanelOpenCloseMethods { Animator, Instantly, Slowly, SideAppearCurve, SideAppearConstant, }
+        public enum WindowStatesRead { Opened, Opening, Closed, Closing }
         public enum WindowStatesAwake { Open, Close }
-
         #endregion
 
+        #region Inspector Fields
 
+        #region General
 
-
-
+        
         public WindowStatesAwake stateOnAwake = WindowStatesAwake.Close;
-        [ReadOnly] public WindowStatesRead CurrentWindowState = WindowStatesRead.Opened;
+        [ReadOnly] 
+        public WindowStatesRead CurrentWindowState = WindowStatesRead.Opened;
 
         public Button CloseButton;
         public Button OpenButton;
         public Button SwitchButton;
 
+        public bool Disengageable = false;
+        public bool CloseOnAnyWindowOpen;
+
+        #endregion
+
+        #region Events
+
+        
         public UnityEvent OpenEvent;
         public UnityEvent CloseEvent;
         public UnityEvent<bool> SwitchEvent;
-        [Space] public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
-        public bool Disengageable = false;
 
+        #endregion
 
+        #region Animation
 
         
+        public PanelOpenCloseMethods Close_OpenMethod = PanelOpenCloseMethods.Slowly;
+
 
         #region Slowly Fields
 
@@ -102,8 +98,20 @@ namespace DredPack.UI
 
         #endregion
 
+        #endregion
+
+
+
+        
+        #endregion
+        
+        #region innear fields
+        
+
         protected Coroutine openingCoroutine;
         protected Coroutine closingCoroutine;
+        
+        private static UnityEvent<Window> windowOpenEventStatic = new UnityEvent<Window>();
 
         protected CanvasGroup m_canvasGroup
         {
@@ -124,10 +132,23 @@ namespace DredPack.UI
         private float sideAppear_defBackgroundAlpha;
 
         public static int currentWindowTab;
+        
+        
+        #endregion
 
         private void Start()
         {
             Initialization();
+        }
+
+        private void OnEnable()
+        {
+            windowOpenEventStatic.AddListener(OnWindowOpen);
+        }
+
+        private void OnDisable()
+        {
+            windowOpenEventStatic.RemoveListener(OnWindowOpen);
         }
 
         protected virtual void Initialization()
@@ -172,6 +193,7 @@ namespace DredPack.UI
         {
             if(Disengageable)
                 gameObject.SetActive(true);
+            windowOpenEventStatic?.Invoke(this);
             switch (Close_OpenMethod)
             {
                 case PanelOpenCloseMethods.Animator:
@@ -217,6 +239,7 @@ namespace DredPack.UI
             }
         }
 
+
         public void SwitchState()
         {
             if (CurrentWindowState == WindowStatesRead.Opened || CurrentWindowState == WindowStatesRead.Opening)
@@ -239,6 +262,20 @@ namespace DredPack.UI
             {
                 Open();
             }
+        }
+
+        public void Switch(bool state)
+        {
+            if (state)
+                Open();
+            else 
+                Close();
+        }
+        
+        private void OnWindowOpen(DredPack.UI.Window window)
+        {
+            if (window != this && CloseOnAnyWindowOpen)
+                Close();
         }
 
 
@@ -723,6 +760,7 @@ namespace DredPack.UI
                 GUILayout.Label("Some",labelStyle);
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Disengageable)));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseOnAnyWindowOpen)));
                 EditorGUI.indentLevel--;
                 
             }
