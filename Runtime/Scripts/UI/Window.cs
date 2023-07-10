@@ -38,6 +38,7 @@ namespace DredPack.UI
 
         public bool Disengageable = false;
         public bool CloseOnAnyWindowOpen;
+        public bool CloseOnOutsideClick;
 
         #endregion
 
@@ -113,6 +114,15 @@ namespace DredPack.UI
         
         private static UnityEvent<Window> windowOpenEventStatic = new UnityEvent<Window>();
 
+
+        private float sideAppear_UpDefY;
+        private float sideAppear_RightDefX;
+        private float sideAppear_DownDefY;
+        private float sideAppear_LeftDefX;
+        private float sideAppear_defBackgroundAlpha;
+
+        public static int currentWindowTab;
+
         protected CanvasGroup m_canvasGroup
         {
             get
@@ -122,17 +132,11 @@ namespace DredPack.UI
                 return _canvasGroup;
             }
         }
-
         private CanvasGroup _canvasGroup;
-
-        private float sideAppear_UpDefY;
-        private float sideAppear_RightDefX;
-        private float sideAppear_DownDefY;
-        private float sideAppear_LeftDefX;
-        private float sideAppear_defBackgroundAlpha;
-
-        public static int currentWindowTab;
-        
+        private UnityEngine.Camera Camera => _camera ??= UnityEngine.Camera.main;
+        private UnityEngine.Camera _camera;
+        public Canvas connectedCanvas => _canvas ??= GetComponentInParent<Canvas>();
+        private Canvas _canvas;
         
         #endregion
 
@@ -141,6 +145,31 @@ namespace DredPack.UI
             Initialization();
         }
 
+        private void Update()
+        {
+            CheckOutsideClick();
+        }
+
+        private void CheckOutsideClick()
+        {
+            if (CloseOnOutsideClick)
+            {
+                // Проверяем, было ли касание на экране
+                if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+                    CheckWindow(Input.GetTouch(0).position);
+                else if(Input.GetMouseButtonUp(0))
+                    CheckWindow(Input.mousePosition);
+                void CheckWindow(Vector2 touchPosition)
+                {
+                    // Проверяем, если окно активно и касание было вне его области, закрываем окно
+                    if (CurrentWindowState == WindowStatesRead.Opened &&
+                        !RectTransformUtility.RectangleContainsScreenPoint(GetComponent<RectTransform>(), touchPosition,
+                            Camera))
+                        Close();
+                }
+            }
+            
+        }
         private void OnEnable()
         {
             windowOpenEventStatic.AddListener(OnWindowOpen);
@@ -761,6 +790,13 @@ namespace DredPack.UI
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Disengageable)));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseOnAnyWindowOpen)));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseOnOutsideClick)));
+                if (T.CloseOnOutsideClick &&
+                    (!T.connectedCanvas || T.connectedCanvas.renderMode != RenderMode.ScreenSpaceCamera))
+                {
+                    EditorGUILayout.HelpBox("Canvas must have a renderMode = Screen Space - Camera \nIn Future it will be fixed", MessageType.Warning);
+                }
+
                 EditorGUI.indentLevel--;
                 
             }
