@@ -460,6 +460,8 @@ namespace DredPack.UI
         {
             if(CurrentWindowState == WindowStatesRead.Opening || CurrentWindowState == WindowStatesRead.Opened)
                 return;
+            if(Disengageable)
+                gameObject.SetActive(true);
             CurrentWindowState = WindowStatesRead.Opening;
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
@@ -572,6 +574,8 @@ namespace DredPack.UI
         {
             if(CurrentWindowState == WindowStatesRead.Opening || CurrentWindowState == WindowStatesRead.Opened)
                 return;
+            if(Disengageable)
+                gameObject.SetActive(true);
             CurrentWindowState = WindowStatesRead.Opening;
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
