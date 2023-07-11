@@ -460,6 +460,7 @@ namespace DredPack.UI
         {
             if(CurrentWindowState == WindowStatesRead.Opening || CurrentWindowState == WindowStatesRead.Opened)
                 return;
+            CurrentWindowState = WindowStatesRead.Opening;
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
             
@@ -468,7 +469,6 @@ namespace DredPack.UI
 
             IEnumerator IE()
             {
-                CurrentWindowState = WindowStatesRead.Opening;
                 m_canvasGroup.interactable = false;
                 m_canvasGroup.blocksRaycasts = false;
                 yield return new WaitForSeconds(SideAppear_OpenDelay);
@@ -514,6 +514,7 @@ namespace DredPack.UI
         {
             if(CurrentWindowState == WindowStatesRead.Closing || CurrentWindowState == WindowStatesRead.Closed)
                 return;
+            CurrentWindowState = WindowStatesRead.Closing;
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
             
@@ -522,7 +523,6 @@ namespace DredPack.UI
 
             IEnumerator IE()
             {
-                CurrentWindowState = WindowStatesRead.Closing;
                 m_canvasGroup.interactable = false;
                 m_canvasGroup.blocksRaycasts = false;
                 yield return new WaitForSeconds(SideAppear_CloseDelay);
@@ -572,16 +572,19 @@ namespace DredPack.UI
         {
             if(CurrentWindowState == WindowStatesRead.Opening || CurrentWindowState == WindowStatesRead.Opened)
                 return;
+            CurrentWindowState = WindowStatesRead.Opening;
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
             
+            StopAllCoroutines();
             if (openingCoroutine != null)
                 StopCoroutine(openingCoroutine);
+            if (closingCoroutine != null)
+                StopCoroutine(closingCoroutine);
             openingCoroutine = StartCoroutine(IE());
 
             IEnumerator IE()
             {
-                CurrentWindowState = WindowStatesRead.Opening;
                 m_canvasGroup.interactable = false;
                 m_canvasGroup.blocksRaycasts = false;
                 yield return new WaitForSeconds(SideAppear_OpenDelay);
@@ -635,16 +638,19 @@ namespace DredPack.UI
         {
             if(CurrentWindowState == WindowStatesRead.Closing || CurrentWindowState == WindowStatesRead.Closed)
                 return;
+            CurrentWindowState = WindowStatesRead.Closing;
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
             
+            StopAllCoroutines();
             if (closingCoroutine != null)
                 StopCoroutine(closingCoroutine);
+            if (openingCoroutine != null)
+                StopCoroutine(openingCoroutine);
             closingCoroutine = StartCoroutine(IE());
 
             IEnumerator IE()
             {
-                CurrentWindowState = WindowStatesRead.Closing;
                 m_canvasGroup.interactable = false;
                 m_canvasGroup.blocksRaycasts = false;
                 yield return new WaitForSeconds(SideAppear_CloseDelay);
