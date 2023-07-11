@@ -13,7 +13,7 @@ namespace DredPack
             {
                 if (!_instance)
                 {
-                    _instance = FindObjectOfType<T>();
+                    _instance = FindObjectOfType<T>(true);
                     if (!_instance)
                     {
                         GameObject obj = new GameObject();
@@ -31,7 +31,7 @@ namespace DredPack
             if (!Application.isPlaying)
                 return;
 
-            T[] check = FindObjectsOfType<T>();
+            T[] check = FindObjectsOfType<T>(true);
             if (check.Length > 0)
             {
                 foreach (T searched in check)

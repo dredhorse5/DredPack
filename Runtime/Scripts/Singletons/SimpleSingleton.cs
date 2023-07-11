@@ -11,7 +11,7 @@ namespace DredPack
             get
             {
                 if (m_Instance == null)
-                    m_Instance = (T) FindObjectOfType(typeof(T));
+                    m_Instance = (T) FindObjectOfType(typeof(T), true);
                 return m_Instance;
             }
         }
