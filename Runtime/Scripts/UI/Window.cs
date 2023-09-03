@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using DredPack.DredpackEditor;
 using UnityEditor;
@@ -7,6 +8,7 @@ using UnityEditor;
 using DredPack.Help;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
@@ -97,7 +99,10 @@ namespace DredPack.UI
         public RectTransform SideAppear_Right;
         public RectTransform SideAppear_Down;
         public RectTransform SideAppear_Left;
-        public Image SideAppear_Background;
+        public Image[] SideAppear_Backgrounds;
+        private float[] SideAppear_Backgrounds_alphas;
+        public CanvasGroup[] SideAppear_Backgrounds_CanvasRenderers;
+        private float[] SideAppear_Backgrounds_CanvasRenderers_alphas;
 
         #endregion
 
@@ -208,8 +213,17 @@ namespace DredPack.UI
                 sideAppear_DownDefY = SideAppear_Down.anchoredPosition.y;
             if (SideAppear_Left)
                 sideAppear_LeftDefX = SideAppear_Left.anchoredPosition.x;
-            if (SideAppear_Background)
-                sideAppear_defBackgroundAlpha = SideAppear_Background.color.a;
+            
+            
+            SideAppear_Backgrounds_alphas = new float[SideAppear_Backgrounds.Length];
+            for (int i = 0; i < SideAppear_Backgrounds.Length; i++)
+                if (SideAppear_Backgrounds[i])
+                    SideAppear_Backgrounds_alphas[i] = SideAppear_Backgrounds[i].color.a;
+            
+            SideAppear_Backgrounds_CanvasRenderers_alphas = new float[SideAppear_Backgrounds_CanvasRenderers.Length];
+            for (var i = 0; i < SideAppear_Backgrounds_CanvasRenderers.Length; i++)
+                if (SideAppear_Backgrounds_CanvasRenderers[i])
+                    SideAppear_Backgrounds_CanvasRenderers_alphas[i] = SideAppear_Backgrounds_CanvasRenderers[i].alpha;
 
         }
 
@@ -506,12 +520,29 @@ namespace DredPack.UI
                         SideAppear_Curve1,
                         _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
                 
-                //background
-                if (SideAppear_Background)
-                    StartCoroutine(Lerper.LerpFloatIE(0f, sideAppear_defBackgroundAlpha, SideAppear_Speed,
-                        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
-                        _ => SideAppear_Background.color = new Color(SideAppear_Background.color.r,
-                            SideAppear_Background.color.g, SideAppear_Background.color.b, _)));
+                //backgrounds
+                for (var i = 0; i < SideAppear_Backgrounds.Length; i++)
+                {
+                    var b = SideAppear_Backgrounds[i];
+                    if(b)
+                        StartCoroutine(Lerper.LerpFloatIE(0f,SideAppear_Backgrounds_alphas[i], SideAppear_Speed,
+                            AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                            _ => b.color = new Color(b.color.r, b.color.g, b.color.b, _)));
+                }
+                
+
+                //canvas renderers
+                for (var i = 0; i < SideAppear_Backgrounds_CanvasRenderers.Length; i++)
+                {
+                    var c = SideAppear_Backgrounds_CanvasRenderers[i];
+                    if (c)
+                    {
+                        StartCoroutine(Lerper.LerpFloatIE(0f,SideAppear_Backgrounds_CanvasRenderers_alphas[i],
+                            SideAppear_Speed,
+                            AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                            _ => c.alpha = _));
+                    }
+                }
                 yield return new WaitForSeconds(1f / SideAppear_Speed);
 
                 CurrentWindowState = WindowStatesRead.Opened;
@@ -555,13 +586,31 @@ namespace DredPack.UI
                     StartCoroutine(Lerper.LerpFloatIE(-sideAppear_LeftDefX, sideAppear_LeftDefX, SideAppear_Speed, InverseCurve.Get(SideAppear_Curve1),
                         _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
                 
-                //background
-                if (SideAppear_Background)
-                    StartCoroutine(Lerper.LerpFloatIE(sideAppear_defBackgroundAlpha, 0f,SideAppear_Speed,
-                        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
-                        _ => SideAppear_Background.color = new Color(SideAppear_Background.color.r,
-                            SideAppear_Background.color.g, SideAppear_Background.color.b, _)));
-                        
+                
+                //backgrounds
+                for (var i = 0; i < SideAppear_Backgrounds.Length; i++)
+                {
+                    var b = SideAppear_Backgrounds[i];
+                    if(b)
+                        StartCoroutine(Lerper.LerpFloatIE(SideAppear_Backgrounds_alphas[i], 0f, SideAppear_Speed,
+                            AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                            _ => b.color = new Color(b.color.r, b.color.g, b.color.b, _)));
+                }
+                
+
+                //canvas renderers
+                for (var i = 0; i < SideAppear_Backgrounds_CanvasRenderers.Length; i++)
+                {
+                    var c = SideAppear_Backgrounds_CanvasRenderers[i];
+                    if (c)
+                    {
+                        StartCoroutine(Lerper.LerpFloatIE(SideAppear_Backgrounds_CanvasRenderers_alphas[i], 0f,
+                            SideAppear_Speed,
+                            AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                            _ => c.alpha = _));
+                    }
+                }
+                
                 yield return new WaitForSeconds(1f / SideAppear_Speed);
                 
                 
@@ -636,12 +685,30 @@ namespace DredPack.UI
                         _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
                 }
                 
-                //background
-                if (SideAppear_Background)
-                    StartCoroutine(Lerper.LerpFloatIE(0f, sideAppear_defBackgroundAlpha, SideAppear_Speed,
-                        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
-                        _ => SideAppear_Background.color = new Color(SideAppear_Background.color.r,
-                            SideAppear_Background.color.g, SideAppear_Background.color.b, _)));
+                
+                //backgrounds
+                for (var i = 0; i < SideAppear_Backgrounds.Length; i++)
+                {
+                    var b = SideAppear_Backgrounds[i];
+                    if(b)
+                        StartCoroutine(Lerper.LerpFloatIE(0f,SideAppear_Backgrounds_alphas[i], SideAppear_Speed,
+                            AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                            _ => b.color = new Color(b.color.r, b.color.g, b.color.b, _)));
+                }
+                
+
+                //canvas renderers
+                for (var i = 0; i < SideAppear_Backgrounds_CanvasRenderers.Length; i++)
+                {
+                    var c = SideAppear_Backgrounds_CanvasRenderers[i];
+                    if (c)
+                    {
+                        StartCoroutine(Lerper.LerpFloatIE(0f,SideAppear_Backgrounds_CanvasRenderers_alphas[i],
+                            SideAppear_Speed,
+                            AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                            _ => c.alpha = _));
+                    }
+                }
                 yield return new WaitForSeconds(1f / SideAppear_Speed);
 
                 CurrentWindowState = WindowStatesRead.Opened;
@@ -706,13 +773,29 @@ namespace DredPack.UI
                         _ => SideAppear_Left.anchoredPosition = new Vector2(_, SideAppear_Left.anchoredPosition.y)));
                 }
                 
-                //background
-                if (SideAppear_Background)
-                    StartCoroutine(Lerper.LerpFloatIE(sideAppear_defBackgroundAlpha, 0f,SideAppear_Speed,
-                        AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
-                        _ => SideAppear_Background.color = new Color(SideAppear_Background.color.r,
-                            SideAppear_Background.color.g, SideAppear_Background.color.b, _)));
-                        
+                //backgrounds
+                for (var i = 0; i < SideAppear_Backgrounds.Length; i++)
+                {
+                    var b = SideAppear_Backgrounds[i];
+                    if(b)
+                        StartCoroutine(Lerper.LerpFloatIE(SideAppear_Backgrounds_alphas[i], 0f, SideAppear_Speed,
+                            AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                            _ => b.color = new Color(b.color.r, b.color.g, b.color.b, _)));
+                }
+                
+
+                //canvas renderers
+                for (var i = 0; i < SideAppear_Backgrounds_CanvasRenderers.Length; i++)
+                {
+                    var c = SideAppear_Backgrounds_CanvasRenderers[i];
+                    if (c)
+                    {
+                        StartCoroutine(Lerper.LerpFloatIE(SideAppear_Backgrounds_CanvasRenderers_alphas[i], 0f,
+                            SideAppear_Speed,
+                            AnimationCurve.EaseInOut(0f, 0f, 1f, 1f),
+                            _ => c.alpha = _));
+                    }
+                }
                 yield return new WaitForSeconds(1f / SideAppear_Speed);
                 
                 
@@ -734,12 +817,13 @@ namespace DredPack.UI
             var right = transform.Find("Right");
             var down = transform.Find("Down");
             var up = transform.Find("Up");
-            var background = GetComponent<Image>();
             SideAppear_Left =   left  ? left.GetComponent<RectTransform>()  : SideAppear_Left;
             SideAppear_Right =  right ? right.GetComponent<RectTransform>() : SideAppear_Right;
             SideAppear_Down =   down  ? down.GetComponent<RectTransform>()  : SideAppear_Down;
             SideAppear_Up =     up    ? up.GetComponent<RectTransform>()    : SideAppear_Up;
-            SideAppear_Background = background ?? SideAppear_Background;
+            
+            /*var background = GetComponent<Image>();
+            SideAppear_Background = background ?? SideAppear_Background;*/
         }
 
         private AnimationCurve GetSideAppearBounceCurve(float maxVal)
@@ -893,7 +977,8 @@ namespace DredPack.UI
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Down)),new GUIContent("Down"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Left)),new GUIContent("Left"));
                         GUILayout.Space(3);
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Background)),new GUIContent("Background"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Backgrounds)),new GUIContent("Backgrounds"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Backgrounds_CanvasRenderers)),new GUIContent("CanvasRenderers"));
                         break;
                 }
                 EditorGUI.indentLevel--;
