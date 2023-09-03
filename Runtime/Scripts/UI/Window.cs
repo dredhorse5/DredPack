@@ -383,7 +383,7 @@ namespace DredPack.UI
             if(Disengageable && Application.isPlaying)
                 gameObject.SetActive(false);
             if (DisableCanvasOnClose && _canvas && Application.isPlaying)
-                _canvas.enabled = true;
+                _canvas.enabled = false;
         }
 
         #endregion
