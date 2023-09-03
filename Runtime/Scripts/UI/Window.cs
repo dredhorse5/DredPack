@@ -39,7 +39,7 @@ namespace DredPack.UI
         public bool Disengageable = false;
         public bool CloseOnAnyWindowOpen;
         public bool CloseOnOutsideClick;
-        public bool DisableCanvasOnClose = false;
+        public bool disableCanvasOnClose = false;
         public Canvas _canvas;
 
         #endregion
@@ -222,7 +222,7 @@ namespace DredPack.UI
         {
             if(Disengageable)
                 gameObject.SetActive(true);
-            if (DisableCanvasOnClose && _canvas)
+            if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = true;
             windowOpenEventStatic?.Invoke(this);
             switch (Close_OpenMethod)
@@ -351,7 +351,7 @@ namespace DredPack.UI
         {
             if(Disengageable && Application.isPlaying)
                 gameObject.SetActive(true);
-            if (DisableCanvasOnClose && _canvas && Application.isPlaying)
+            if (disableCanvasOnClose && _canvas && Application.isPlaying)
                 _canvas.enabled = true;
             if (Close_OpenMethod == PanelOpenCloseMethods.Animator)
             {
@@ -382,7 +382,7 @@ namespace DredPack.UI
             CurrentWindowState = WindowStatesRead.Closed;
             if(Disengageable && Application.isPlaying)
                 gameObject.SetActive(false);
-            if (DisableCanvasOnClose && _canvas && Application.isPlaying)
+            if (disableCanvasOnClose && _canvas && Application.isPlaying)
                 _canvas.enabled = false;
         }
 
@@ -455,7 +455,7 @@ namespace DredPack.UI
             
             if(Disengageable)
                 gameObject.SetActive(false);
-            if (DisableCanvasOnClose && _canvas)
+            if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = false;
         }
 
@@ -470,7 +470,7 @@ namespace DredPack.UI
                 return;
             if(Disengageable)
                 gameObject.SetActive(true);
-            if (DisableCanvasOnClose && _canvas)
+            if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = true;
             CurrentWindowState = WindowStatesRead.Opening;
             SwitchEvent?.Invoke(true);
@@ -572,7 +572,7 @@ namespace DredPack.UI
                 
                 if(Disengageable)
                     gameObject.SetActive(false);
-                if (DisableCanvasOnClose && _canvas)
+                if (disableCanvasOnClose && _canvas)
                     _canvas.enabled = false;
             }
         }
@@ -588,7 +588,7 @@ namespace DredPack.UI
                 return;
             if(Disengageable)
                 gameObject.SetActive(true);
-            if (DisableCanvasOnClose && _canvas)
+            if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = true;
             CurrentWindowState = WindowStatesRead.Opening;
             SwitchEvent?.Invoke(true);
@@ -723,7 +723,7 @@ namespace DredPack.UI
                 
                 if(Disengageable)
                     gameObject.SetActive(false);
-                if (DisableCanvasOnClose && _canvas)
+                if (disableCanvasOnClose && _canvas)
                     _canvas.enabled = false;
             }
         }
@@ -785,7 +785,7 @@ namespace DredPack.UI
             private void Reset()
             {
                 T._canvas = T.GetComponent<Canvas>();
-                T.DisableCanvasOnClose = T._canvas;
+                //T.disableCanvasOnClose = T._canvas;
             }
 
             private void Tabs()
@@ -824,8 +824,8 @@ namespace DredPack.UI
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseOnOutsideClick)));
                 if (T.CloseOnOutsideClick)
                     EditorGUILayout.HelpBox("Canvas must have a renderMode = Screen Space - Camera", MessageType.Warning);
-                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.DisableCanvasOnClose)));
-                if(T.DisableCanvasOnClose)
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.disableCanvasOnClose)));
+                if(T.disableCanvasOnClose)
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T._canvas)), new GUIContent("Canvas"));
                     
 
