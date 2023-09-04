@@ -892,10 +892,10 @@ namespace DredPack.UI
                 if (GUILayout.Button("Switch State"))
                     T.SwitchState();
                 if (Application.isPlaying)
-                    GUI.enabled = false;
+                    EditorGUI.BeginDisabledGroup(false);
                 if (GUILayout.Button("Switch with animation"))
                     T.Switch();
-                GUI.enabled = true;
+                EditorGUI.BeginDisabledGroup(true);
                  
                 GUILayout.Space(5);
                 
