@@ -140,8 +140,7 @@ namespace DredPack.UI
             }
         }
         private CanvasGroup _canvasGroup;
-        private UnityEngine.Camera Camera => _camera ??= UnityEngine.Camera.main;
-        private UnityEngine.Camera _camera;
+        public UnityEngine.Camera camera;
         
         #endregion
 
@@ -169,7 +168,7 @@ namespace DredPack.UI
                     // Проверяем, если окно активно и касание было вне его области, закрываем окно
                     if (CurrentWindowState == WindowStatesRead.Opened &&
                         !RectTransformUtility.RectangleContainsScreenPoint(GetComponent<RectTransform>(), touchPosition,
-                            Camera))
+                            camera))
                         Close();
                 }
             }
@@ -906,11 +905,16 @@ namespace DredPack.UI
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Disengageable)));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseOnAnyWindowOpen)));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseOnOutsideClick)));
+                EditorGUI.indentLevel++;
                 if (T.CloseOnOutsideClick)
-                    EditorGUILayout.HelpBox("Canvas must have a renderMode = Screen Space - Camera", MessageType.Warning);
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.camera)), new GUIContent("Camera"));
+                EditorGUI.indentLevel--;
+                    
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.disableCanvasOnClose)));
+                EditorGUI.indentLevel++;
                 if(T.disableCanvasOnClose)
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T._canvas)), new GUIContent("Canvas"));
+                EditorGUI.indentLevel--;
                     
 
                 EditorGUI.indentLevel--;
