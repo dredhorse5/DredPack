@@ -891,6 +891,12 @@ namespace DredPack.UI
                 EditorGUI.indentLevel--;
                 if (GUILayout.Button("Switch State"))
                     T.SwitchState();
+                if (Application.isPlaying)
+                    GUI.enabled = false;
+                if (GUILayout.Button("Switch with animation"))
+                    T.Switch();
+                GUI.enabled = true;
+                 
                 GUILayout.Space(5);
                 
                 GUILayout.Label("Buttons",labelStyle);
