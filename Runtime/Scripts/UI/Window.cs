@@ -180,7 +180,7 @@ namespace DredPack.UI
         
         private void SwitchGraphicRaycaster(bool arg0)
         {
-            if(_graphicRaycaster)
+            if(_graphicRaycaster && disableRaycastOnClose)
                 _graphicRaycaster.enabled = arg0;
         }
         private void OnEnable()
