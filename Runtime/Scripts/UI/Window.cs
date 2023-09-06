@@ -9,6 +9,7 @@ using DredPack.Help;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
@@ -42,7 +43,9 @@ namespace DredPack.UI
         public bool CloseOnAnyWindowOpen;
         public bool CloseOnOutsideClick;
         public bool disableCanvasOnClose = false;
+        public bool disableRaycastOnClose = true;
         public Canvas _canvas;
+        public GraphicRaycaster _graphicRaycaster; 
 
         #endregion
 
@@ -174,6 +177,12 @@ namespace DredPack.UI
             }
             
         }
+        
+        private void SwitchGraphicRaycaster(bool arg0)
+        {
+            if(_graphicRaycaster)
+                _graphicRaycaster.enabled = arg0;
+        }
         private void OnEnable()
         {
             windowOpenEventStatic.AddListener(OnWindowOpen);
@@ -193,6 +202,9 @@ namespace DredPack.UI
                 CloseButton.onClick.AddListener(Close);
             if (SwitchButton)
                 SwitchButton.onClick.AddListener(Switch);
+            
+            if(disableRaycastOnClose)
+                SwitchEvent.AddListener(SwitchGraphicRaycaster);
             switch (stateOnAwake)
             {
                 case WindowStatesAwake.Close:
@@ -868,6 +880,8 @@ namespace DredPack.UI
             private void Reset()
             {
                 T._canvas = T.GetComponent<Canvas>();
+                if(!T._graphicRaycaster)
+                    T._graphicRaycaster = T.GetComponent<GraphicRaycaster>();
                 //T.disableCanvasOnClose = T._canvas;
             }
 
@@ -910,19 +924,29 @@ namespace DredPack.UI
                 EditorGUI.indentLevel++;
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Disengageable)));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseOnAnyWindowOpen)));
+                
+                
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseOnOutsideClick)));
                 EditorGUI.indentLevel++;
                 if (T.CloseOnOutsideClick)
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.camera)), new GUIContent("Camera"));
                 EditorGUI.indentLevel--;
                     
+                
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.disableCanvasOnClose)));
                 EditorGUI.indentLevel++;
                 if(T.disableCanvasOnClose)
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T._canvas)), new GUIContent("Canvas"));
                 EditorGUI.indentLevel--;
-                    
-
+                
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.disableRaycastOnClose)));
+                EditorGUI.indentLevel++;
+                if(T.disableRaycastOnClose)
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T._graphicRaycaster)), new GUIContent("GraphicRaycaster"));
+                EditorGUI.indentLevel--;
+                
+                
+                EditorGUI.indentLevel--;
                 EditorGUI.indentLevel--;
                 
             }
