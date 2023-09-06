@@ -53,7 +53,9 @@ namespace DredPack.UI
 
         
         public UnityEvent OpenEvent;
+        public UnityEvent OpenedEvent;
         public UnityEvent CloseEvent;
+        public UnityEvent ClosedEvent;
         public UnityEvent<bool> SwitchEvent;
 
         #endregion
@@ -341,6 +343,7 @@ namespace DredPack.UI
         {
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
+            OpenedEvent?.Invoke();
             if (Animator == null)
                 Animator = GetComponent<Animator>();
             if(instantly || CurrentWindowState != WindowStatesRead.Opened)
@@ -356,6 +359,7 @@ namespace DredPack.UI
         {
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
+            ClosedEvent?.Invoke();
             if (Animator == null)
                 Animator = GetComponent<Animator>();
             if(instantly || CurrentWindowState != WindowStatesRead.Closed)
@@ -384,6 +388,7 @@ namespace DredPack.UI
             }
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
+            OpenedEvent?.Invoke();
             m_canvasGroup.alpha = 1f;
             m_canvasGroup.blocksRaycasts = true;
             m_canvasGroup.interactable = true;
@@ -400,6 +405,7 @@ namespace DredPack.UI
             }
             SwitchEvent?.Invoke(false);
             CloseEvent?.Invoke();
+            ClosedEvent?.Invoke();
             m_canvasGroup.alpha = 0f;
             m_canvasGroup.blocksRaycasts = false;
             m_canvasGroup.interactable = false;
@@ -456,6 +462,7 @@ namespace DredPack.UI
 
             CurrentWindowState = WindowStatesRead.Opened;
             openingCoroutine = null;
+            OpenedEvent?.Invoke();
         }
 
         public IEnumerator CloseSlowlyPanelCor()
@@ -482,6 +489,7 @@ namespace DredPack.UI
                 gameObject.SetActive(false);
             if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = false;
+            ClosedEvent?.Invoke();
         }
 
         #endregion
@@ -560,6 +568,7 @@ namespace DredPack.UI
                 m_canvasGroup.interactable = true;
                 m_canvasGroup.blocksRaycasts = true;
                 closingCoroutine = null;
+                OpenedEvent?.Invoke();
                 
             }
         }
@@ -634,6 +643,7 @@ namespace DredPack.UI
                     gameObject.SetActive(false);
                 if (disableCanvasOnClose && _canvas)
                     _canvas.enabled = false;
+                ClosedEvent?.Invoke();
             }
         }
 
@@ -726,6 +736,7 @@ namespace DredPack.UI
                 m_canvasGroup.interactable = true;
                 m_canvasGroup.blocksRaycasts = true;
                 closingCoroutine = null;
+                OpenedEvent?.Invoke();
                 
             }
         }
@@ -819,6 +830,7 @@ namespace DredPack.UI
                     gameObject.SetActive(false);
                 if (disableCanvasOnClose && _canvas)
                     _canvas.enabled = false;
+                ClosedEvent?.Invoke();
             }
         }
 
@@ -954,8 +966,10 @@ namespace DredPack.UI
 
             private void Tabs_Events()
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.OpenEvent)));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseEvent)));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.OpenEvent)),new GUIContent("Start Open Event"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.OpenedEvent)),new GUIContent("End Open Event"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseEvent)),new GUIContent("Start Close Event"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.ClosedEvent)),new GUIContent("End Close Event"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SwitchEvent)));
             }
 
