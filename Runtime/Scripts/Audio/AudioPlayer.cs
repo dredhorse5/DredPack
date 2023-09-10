@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
 
 namespace DredPack.Audio
@@ -11,6 +13,7 @@ namespace DredPack.Audio
     ///==========================================
     public class AudioPlayer : MonoBehaviour
     {
+        public List<AudioField> sd;[AllowNesting]
         public AudioField Field;
         
         private void Start()

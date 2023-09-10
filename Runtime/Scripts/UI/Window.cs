@@ -868,7 +868,7 @@ namespace DredPack.UI
         #region EDITOR
 
 #if UNITY_EDITOR
-        [CustomEditor(typeof(Window))]
+        [CustomEditor(typeof(Window)),CanEditMultipleObjects]
         public class WindowEditor : DredInspectorEditor<Window>
         {
 
