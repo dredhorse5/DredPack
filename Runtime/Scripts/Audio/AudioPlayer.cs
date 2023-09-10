@@ -13,7 +13,6 @@ namespace DredPack.Audio
     ///==========================================
     public class AudioPlayer : MonoBehaviour
     {
-        public List<AudioField> sd;[AllowNesting]
         public AudioField Field;
         
         private void Start()

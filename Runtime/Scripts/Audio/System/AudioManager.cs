@@ -84,9 +84,14 @@ namespace DredPack.Audio
         {
             Music,
             Audio,
-            Audio1,
-            Audio2,
-            Audio3
+            UI,
+            Environment,
+            Shoot,
+            Some1,
+            Some2,
+            Some3,
+            Some4
+            
             // Shoot
             // Environment
             // voice
