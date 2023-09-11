@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 namespace DredPack.Audio
 {
@@ -18,9 +17,8 @@ namespace DredPack.Audio
     [RequireComponent(typeof(AudioSource))]
     public class AudioManager : GeneralSingleton<AudioManager>
     {
-        public List<AudioGroup> AudioGroups;
-        
         private static List<AudioByType> audioList = new List<AudioByType>();
+
         private AudioSource _audioSource;
 
         protected override void Awake()
@@ -60,38 +58,16 @@ namespace DredPack.Audio
         {
             _audioSource.PlayOneShot(clip, volume);
         }
+        
 
-        public void PlayOneShot(string audioClipGroupID, float volume = 1f)
-        {
-            _audioSource.PlayOneShot(GetClipFromGroup(audioClipGroupID), volume);
-        }
-
-        public AudioGroup GetAudioGroup(string byID) => AudioGroups.Find(_ => _.ID == byID);
-        public AudioClip GetClipFromGroup(string byID)
-        {
-            var audioGroup = GetAudioGroup(byID);
-            if(audioGroup == null)
-            {
-                Debug.Log($"AudioGroup by id: {byID} does not exists!");
-                return null;
-            }
-
-            return audioGroup.GetRandomClip();
-        }
-
-
+        
         public enum AudioTypes
         {
             Music,
             Audio,
-            UI,
-            Environment,
-            Shoot,
-            Some1,
-            Some2,
-            Some3,
-            Some4
-            
+            Audio1,
+            Audio2,
+            Audio3
             // Shoot
             // Environment
             // voice
@@ -140,18 +116,6 @@ namespace DredPack.Audio
                 var hasKey = PlayerPrefs.HasKey(MUTE_KEY);
                 var intPtr = PlayerPrefs.GetInt(MUTE_KEY);
                 return hasKey && intPtr == 1;
-            }
-        }
-        
-        [Serializable]
-        public class AudioGroup
-        {
-            public string ID;
-            public List<AudioClip> Clips;
-
-            public AudioClip GetRandomClip()
-            {
-                return Clips[Random.Range(0, Clips.Count)];
             }
         }
     }
