@@ -1,9 +1,7 @@
 {
     "name": "DredPack",
     "rootNamespace": "",
-    "references": [
-        "NaughtyAttributes.Core"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
