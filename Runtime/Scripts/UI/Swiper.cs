@@ -35,7 +35,7 @@ namespace DredPack.UI
 
 
         // Zoom
-        public UnityEvent<float> ZoomEvent = new UnityEvent<float>();
+        public UnityEvent<Vector2, float> ZoomEvent = new UnityEvent<Vector2, float>();
         private float lastDeltaZoom;
         private bool isZoom;
 
@@ -58,6 +58,7 @@ namespace DredPack.UI
         //Some
         private Vector2 startTapPoint;
         private bool mouseInZone = false;
+        private bool wasZoom;
 
 
         public void OnDrag(PointerEventData eventData)
@@ -96,6 +97,10 @@ namespace DredPack.UI
 
         private void Update()
         {
+            if (Input.touchCount == 0)
+            {
+                wasZoom = false;
+            }
             Zoom();
             AltMoveDelta();
         }
@@ -103,6 +108,10 @@ namespace DredPack.UI
 
         private void MoveDelta(PointerEventData eventData)
         {
+            if (wasZoom)
+            {
+                return;
+            }
 #if !UNITY_EDITOR
         if(Input.touchCount != 1)
             return;
@@ -167,15 +176,25 @@ namespace DredPack.UI
                 if (isZoom == false)
                 {
                     isZoom = true;
+                    wasZoom = true;
                     lastDeltaZoom = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
                     return;
                 }
 
                 float delta = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
                 var zoom = (lastDeltaZoom - delta) * ZoomSensitivity;
-
+               
                 if (Mathf.Abs(zoom) > 0.01)
-                    ZoomEvent.Invoke(-zoom);
+                {
+                    var center = (Input.GetTouch(0).position + Input.GetTouch(1).position) / 2f;
+                    var pos = new Vector3(
+                        center.x / Screen.width,
+                        center.y / Screen.height,
+                        0);
+                    pos -= Vector3.one / 2f;
+                    pos *= 2f;
+                    ZoomEvent.Invoke(pos, -zoom);
+                }
 
                 lastDeltaZoom = delta;
 
@@ -185,7 +204,13 @@ namespace DredPack.UI
                 isZoom = false;
                 if(mouseInZone)
                 {
-                    ZoomEvent.Invoke(Input.mouseScrollDelta.y * AltMoveDeltaSensitivity * MouseZoomSensitivity);
+                    var pos = new Vector3(
+                        Input.mousePosition.x / Screen.width,
+                        Input.mousePosition.y / Screen.height,
+                        0);
+                    pos -= Vector3.one / 2f;
+                    pos *= 2f;
+                    ZoomEvent.Invoke(pos, Input.mouseScrollDelta.y * AltMoveDeltaSensitivity * MouseZoomSensitivity);
                 }
             }
         }
