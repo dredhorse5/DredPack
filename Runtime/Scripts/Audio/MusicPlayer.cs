@@ -24,8 +24,8 @@ namespace DredPack.Audio
         {
             _audioSource = GetComponent<AudioSource>();
             Field.Initialize(this);
-            Field.LocalAudioSource = _audioSource;
-            Field.OneShot = false;
+            Field.Advanced.LocalAudioSource = _audioSource;
+            Field.Advanced.OneShot = false;
         }
 
         private void Update()
@@ -51,8 +51,8 @@ namespace DredPack.Audio
                 yield return new WaitForSeconds(delay);
                 nowAudioField = field;
                 nowAudioField.Initialize(this);
-                nowAudioField.LocalAudioSource = _audioSource;
-                nowAudioField.OneShot = true;
+                nowAudioField.Advanced.LocalAudioSource = _audioSource;
+                nowAudioField.Advanced.OneShot = true;
                 nowAudioField.Play();
             }
         }
