@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DredPack.Audio;
 #if UNITY_EDITOR
 using DredPack.DredpackEditor;
 using UnityEditor;
@@ -30,15 +31,23 @@ namespace DredPack.UI
 
         #region General
 
-        
+        //States
         public WindowStatesAwake stateOnAwake = WindowStatesAwake.Close;
         [ReadOnly] 
         public WindowStatesRead CurrentWindowState = WindowStatesRead.Opened;
 
+        //Buttons
         public Button CloseButton;
         public Button OpenButton;
         public Button SwitchButton;
 
+        //Audio
+        public bool UseAudio = false;
+        public float PlayAudioAfterSceneLoad = 1f;
+        public AudioField AudioOnOpen;
+        public AudioField AudioOnClose;
+        
+        //Some
         public bool Disengageable = false;
         public bool CloseOnAnyWindowOpen;
         public bool CloseOnOutsideClick;
@@ -180,10 +189,20 @@ namespace DredPack.UI
             
         }
         
-        private void SwitchGraphicRaycaster(bool arg0)
+        private void OnSwitch(bool arg0)
         {
             if(_graphicRaycaster && disableRaycastOnClose)
                 _graphicRaycaster.enabled = arg0;
+            if(UseAudio)
+            {
+                if(Time.timeSinceLevelLoad > PlayAudioAfterSceneLoad)
+                {
+                    if (arg0)
+                        AudioOnOpen.Play();
+                    else
+                        AudioOnClose.Play();
+                }
+            }
         }
         private void OnEnable()
         {
@@ -205,8 +224,7 @@ namespace DredPack.UI
             if (SwitchButton)
                 SwitchButton.onClick.AddListener(Switch);
             
-            if(disableRaycastOnClose)
-                SwitchEvent.AddListener(SwitchGraphicRaycaster);
+                SwitchEvent.AddListener(OnSwitch);
             switch (stateOnAwake)
             {
                 case WindowStatesAwake.Close:
@@ -868,7 +886,7 @@ namespace DredPack.UI
         #region EDITOR
 
 #if UNITY_EDITOR
-        [CustomEditor(typeof(Window))]
+        [CustomEditor(typeof(Window)),CanEditMultipleObjects]
         public class WindowEditor : DredInspectorEditor<Window>
         {
 
@@ -894,6 +912,9 @@ namespace DredPack.UI
                 T._canvas = T.GetComponent<Canvas>();
                 if(!T._graphicRaycaster)
                     T._graphicRaycaster = T.GetComponent<GraphicRaycaster>();
+                T.AudioOnClose.GroupID = "Window Close";
+                T.AudioOnOpen.GroupID = "Window Open";
+                T.PlayAudioAfterSceneLoad = 1f;
                 //T.disableCanvasOnClose = T._canvas;
             }
 
@@ -930,6 +951,18 @@ namespace DredPack.UI
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.CloseButton)), new GUIContent("Close"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.OpenButton)), new GUIContent("Open"));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SwitchButton)), new GUIContent("Switch"));
+                EditorGUI.indentLevel--;
+                
+                
+                GUILayout.Label("Audio",labelStyle);
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.UseAudio)), new GUIContent("UseAudio"));
+                if(T.UseAudio)
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.PlayAudioAfterSceneLoad)), new GUIContent("PlayAudioAfterSceneLoad"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.AudioOnOpen)), new GUIContent("AudioOnOpen"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.AudioOnClose)), new GUIContent("AudioOnClose"));
+                }
                 EditorGUI.indentLevel--;
                 
                 GUILayout.Label("Some",labelStyle);
