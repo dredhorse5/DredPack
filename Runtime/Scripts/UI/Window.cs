@@ -44,8 +44,8 @@ namespace DredPack.UI
         //Audio
         public bool UseAudio = false;
         public float PlayAudioAfterSceneLoad = 1f;
-        public AudioField AudioOnOpen;
-        public AudioField AudioOnClose;
+        public AudioField AudioOnOpen = new AudioField();
+        public AudioField AudioOnClose = new AudioField();
         
         //Some
         public bool Disengageable = false;
