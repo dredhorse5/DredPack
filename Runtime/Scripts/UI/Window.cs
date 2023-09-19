@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using DredPack.Audio;
 #if UNITY_EDITOR
 using DredPack.DredpackEditor;
