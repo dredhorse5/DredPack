@@ -55,11 +55,11 @@ namespace DredPack.Audio
 
         ~AudioField()
         {
-            if(audioByType)
+            if(audioByType != null)
             {
-                if(audioByType.ChangeMuteEvent)
+                if(audioByType.ChangeMuteEvent != null)
                     audioByType.ChangeMuteEvent.RemoveListener(OnMuteChange);
-                if(audioByType.ChangeVolumeEvent)
+                if(audioByType.ChangeVolumeEvent != null)
                     audioByType.ChangeVolumeEvent.RemoveListener(OnGlobalVolumeChange);
             }
         }
