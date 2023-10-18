@@ -55,8 +55,13 @@ namespace DredPack.Audio
 
         ~AudioField()
         {
-            audioByType.ChangeMuteEvent.RemoveListener(OnMuteChange);
-            audioByType.ChangeVolumeEvent.RemoveListener(OnGlobalVolumeChange);
+            if(audioByType)
+            {
+                if(audioByType.ChangeMuteEvent)
+                    audioByType.ChangeMuteEvent.RemoveListener(OnMuteChange);
+                if(audioByType.ChangeVolumeEvent)
+                    audioByType.ChangeVolumeEvent.RemoveListener(OnGlobalVolumeChange);
+            }
         }
 
         public void Initialize(MonoBehaviour owner)
