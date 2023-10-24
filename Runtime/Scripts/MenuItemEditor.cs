@@ -66,6 +66,16 @@ namespace DredPack
             Selection.activeObject = switcher;
         }
 
+        [MenuItem("Edit/Toggle DredWindow #&q")]
+        static void ToggleSelectedWindow()
+        {
+            if ((Selection.activeObject is GameObject gm))
+            {
+                if (gm.TryGetComponent(out Window window))
+                    window.SwitchState();
+            }
+        }
+
         #region Help
 
         public static RectTransform CreateUiElement(string name, Transform parent = null)
