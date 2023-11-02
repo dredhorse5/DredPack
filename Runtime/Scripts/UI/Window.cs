@@ -131,7 +131,7 @@ namespace DredPack.UI
         protected Coroutine openingCoroutine;
         protected Coroutine closingCoroutine;
         
-        private static UnityEvent<Window> windowOpenEventStatic = new UnityEvent<Window>();
+        public static UnityEvent<Window> windowOpenEventStatic = new UnityEvent<Window>();
 
 
         private float sideAppear_UpDefY;
