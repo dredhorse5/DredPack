@@ -20,7 +20,7 @@ namespace DredPack.UI
     public class Window : MonoBehaviour
     {
         #region Enums
-        public enum PanelOpenCloseMethods { Animator, Instantly, Slowly, SideAppearCurve, SideAppearConstant, }
+        public enum PanelOpenCloseMethods { Animator, Instantly, Slowly, SideAppearCurve, SideAppearConstant, ScaledPopUp }
         public enum WindowStatesRead { Opened, Opening, Closed, Closing }
         public enum WindowStatesAwake { Open, Close }
         #endregion
@@ -115,6 +115,18 @@ namespace DredPack.UI
         private float[] SideAppear_Backgrounds_alphas;
         public CanvasGroup[] SideAppear_Backgrounds_CanvasRenderers;
         private float[] SideAppear_Backgrounds_CanvasRenderers_alphas;
+
+        #endregion
+
+        #region PopUpScale
+
+        public float PopUpScale_Speed = 2f; 
+        public AnimationCurve PopUpScale_OpenScaleCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        public AnimationCurve PopUpScale_CloseScaleCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        public AnimationCurve PopUpScale_AlphaCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        public Transform PopUpScale_ScaledPanel;
+        public float PopUpScale_StartScale = 0.5f;
+        
 
         #endregion
 
@@ -285,6 +297,9 @@ namespace DredPack.UI
                 case PanelOpenCloseMethods.SideAppearConstant:
                     Open_SideAppearConstant();
                     break;
+                case PanelOpenCloseMethods.ScaledPopUp:
+                    Open_ScaledPopUp();
+                    break;
             }
         }
 
@@ -309,6 +324,9 @@ namespace DredPack.UI
                     break;
                 case PanelOpenCloseMethods.SideAppearConstant:
                     Close_SideAppearConstant();
+                    break;
+                case PanelOpenCloseMethods.ScaledPopUp:
+                    Close_ScaledPopUp();
                     break;
             }
         }
@@ -879,6 +897,147 @@ namespace DredPack.UI
         }
         #endregion
 
+        #region Open or close visual methods: Scaled Pop-Up
+
+        
+        public virtual void Open_ScaledPopUp()
+        {
+            SwitchEvent?.Invoke(true);
+            OpenEvent?.Invoke();
+            if (openingCoroutine != null)
+                StopCoroutine(openingCoroutine);
+            StopAllCoroutines();
+
+            openingCoroutine = StartCoroutine(Open_ScaledPopUpCor());
+        }
+
+        public virtual void Close_ScaledPopUp()
+        {
+            SwitchEvent?.Invoke(false);
+            CloseEvent?.Invoke();
+            if (closingCoroutine != null)
+                StopCoroutine(closingCoroutine);
+            StopAllCoroutines();
+
+            closingCoroutine = StartCoroutine(Close_ScaledPopUpCor());
+        }
+
+        public IEnumerator Open_ScaledPopUpCor()
+        {
+            CurrentWindowState = WindowStatesRead.Opening;
+
+            if(Disengageable)
+                gameObject.SetActive(true);
+            if (disableCanvasOnClose && _canvas)
+                _canvas.enabled = true;
+            
+            m_canvasGroup.interactable = true;
+            m_canvasGroup.blocksRaycasts = true;
+            yield return new WaitForSeconds(SideAppear_OpenDelay);
+            m_canvasGroup.alpha = 1f;
+
+            //Start============
+            
+            //backgrounds
+            for (var i = 0; i < SideAppear_Backgrounds.Length; i++)
+            {
+                var b = SideAppear_Backgrounds[i];
+                if(b)
+                {
+                    StartCoroutine(Lerper.LerpFloatIE(0f, SideAppear_Backgrounds_alphas[i], 
+                        PopUpScale_Speed,
+                        PopUpScale_AlphaCurve,
+                        _ => b.color = new Color(b.color.r, b.color.g, b.color.b, _)));
+                }
+            }
+            //canvas renderers
+            for (var i = 0; i < SideAppear_Backgrounds_CanvasRenderers.Length; i++)
+            {
+                var c = SideAppear_Backgrounds_CanvasRenderers[i];
+                if (c)
+                { 
+                    StartCoroutine(Lerper.LerpFloatIE(0f,SideAppear_Backgrounds_CanvasRenderers_alphas[i],
+                        PopUpScale_Speed,
+                        PopUpScale_AlphaCurve,
+                        _ => c.alpha = _));
+                }
+            }
+
+            //StartCoroutine(Lerper.LerpFloatIE(0f, 1f, PopUpScale_Speed, PopUpScale_AlphaCurve, _ => m_canvasGroup.alpha = _));
+            
+            StartCoroutine(Lerper.LerpVector3IE(Vector3.one * PopUpScale_StartScale, Vector3.one, PopUpScale_Speed, PopUpScale_OpenScaleCurve, _ => PopUpScale_ScaledPanel.localScale = _));
+            
+            
+            
+            
+            //End=========
+            yield return new WaitForSeconds(1f / SideAppear_Speed);
+            
+            CurrentWindowState = WindowStatesRead.Opened;
+            openingCoroutine = null;
+            EndOpenEvent?.Invoke();
+        }
+
+        public IEnumerator Close_ScaledPopUpCor()
+        {
+            CurrentWindowState = WindowStatesRead.Closing;
+
+            m_canvasGroup.interactable = false;
+            m_canvasGroup.blocksRaycasts = false;
+
+            
+
+            CurrentWindowState = WindowStatesRead.Closed;
+            closingCoroutine = null;
+            
+            yield return new WaitForSeconds(SideAppear_CloseDelay);
+            
+            //Start============
+
+            //backgrounds
+            for (var i = 0; i < SideAppear_Backgrounds.Length; i++)
+            {
+                var b = SideAppear_Backgrounds[i];
+                if(b)
+                {
+                    StartCoroutine(Lerper.LerpFloatIE(SideAppear_Backgrounds_alphas[i], 0f, 
+                        PopUpScale_Speed,
+                        PopUpScale_AlphaCurve,
+                        _ => b.color = new Color(b.color.r, b.color.g, b.color.b, _)));
+                }
+            }
+                
+
+            //canvas renderers
+            for (var i = 0; i < SideAppear_Backgrounds_CanvasRenderers.Length; i++)
+            {
+                var c = SideAppear_Backgrounds_CanvasRenderers[i];
+                if (c)
+                {
+                    StartCoroutine(Lerper.LerpFloatIE(SideAppear_Backgrounds_CanvasRenderers_alphas[i], 0f,
+                        PopUpScale_Speed,
+                        PopUpScale_AlphaCurve,
+                        _ => c.alpha = _));
+                }
+            }
+            //StartCoroutine(Lerper.LerpFloatIE(1f, 0f, PopUpScale_Speed, PopUpScale_AlphaCurve, _ => m_canvasGroup.alpha = _));
+            
+            StartCoroutine(Lerper.LerpVector3IE(Vector3.one,Vector3.one * PopUpScale_StartScale, PopUpScale_Speed, PopUpScale_CloseScaleCurve, _ => PopUpScale_ScaledPanel.localScale = _));
+            
+            //End=========
+            yield return new WaitForSeconds(1f / SideAppear_Speed);
+
+            m_canvasGroup.alpha = 0f;
+            if(Disengageable)
+                gameObject.SetActive(false);
+            if (disableCanvasOnClose && _canvas)
+                _canvas.enabled = false;
+            EndCloseEvent?.Invoke();
+        }
+
+
+        #endregion
+
 
 
         #region EDITOR
@@ -909,11 +1068,16 @@ namespace DredPack.UI
             {
                 T._canvas = T.GetComponent<Canvas>();
                 if(!T._graphicRaycaster)
+                {
                     T._graphicRaycaster = T.GetComponent<GraphicRaycaster>();
+                    if (!T._graphicRaycaster)
+                        T.disableRaycastOnClose = false;
+                }
                 T.AudioOnClose.GroupID = "Window Close";
                 T.AudioOnOpen.GroupID = "Window Open";
                 T.PlayAudioAfterSceneLoad = 1f;
-                //T.disableCanvasOnClose = T._canvas;
+                if(!T.PopUpScale_ScaledPanel && T.transform.childCount > 0)
+                    T.PopUpScale_ScaledPanel = T.transform.GetChild(0);
             }
 
             private void Tabs()
@@ -1059,10 +1223,37 @@ namespace DredPack.UI
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Backgrounds)),new GUIContent("Backgrounds"));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Backgrounds_CanvasRenderers)),new GUIContent("CanvasRenderers"));
                         break;
+                    case PanelOpenCloseMethods.ScaledPopUp:
+                        EditorGUILayout.LabelField("Delays",LabelStyle(12));
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(15);
+                        GUILayout.Label("Open", GUILayout.Width(33));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_OpenDelay)),GUIContent.none);
+                        GUILayout.Label("Close", GUILayout.Width(36));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_CloseDelay)),GUIContent.none);
+                        EditorGUILayout.EndHorizontal();
+                        GUILayout.Space(15);
+                        
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.PopUpScale_Speed)),new GUIContent("Speed"));
+                        GUILayout.Space(15);
+                        EditorGUILayout.LabelField("Scale",LabelStyle(12));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.PopUpScale_ScaledPanel)),new GUIContent("ScaledPanel"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.PopUpScale_StartScale)),new GUIContent("StartScale"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.PopUpScale_OpenScaleCurve)),new GUIContent("OpenCurve"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.PopUpScale_CloseScaleCurve)),new GUIContent("CloseCurve"));
+                        GUILayout.Space(15);
+                        EditorGUILayout.LabelField("Alpha",LabelStyle(12));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.PopUpScale_AlphaCurve)),new GUIContent("AlphaCurve"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Backgrounds)),new GUIContent("Backgrounds"));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.SideAppear_Backgrounds_CanvasRenderers)),new GUIContent("CanvasRenderers"));
+                        
+                        
+                        break;
                 }
                 EditorGUI.indentLevel--;
 
             }
+            
         }
 #endif
 
