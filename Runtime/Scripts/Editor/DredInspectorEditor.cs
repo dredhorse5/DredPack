@@ -18,7 +18,7 @@ namespace DredPack.DredpackEditor
 
         private W _t;
         
-        public static GUIStyle LabelStyle(int fontSize = 15)
+        public GUIStyle LabelStyle(int fontSize = 15)
         {
             var labelStyle = new GUIStyle();
             labelStyle.fontStyle = FontStyle.Bold;
@@ -27,7 +27,7 @@ namespace DredPack.DredpackEditor
             return labelStyle;
         }
         
-        public static void DrawComponentHeader(string customName = null)
+        public void DrawComponentHeader(string customName = null)
         {
             GUILayout.BeginVertical();
             GUIStyle myStyle = new GUIStyle();
@@ -36,6 +36,11 @@ namespace DredPack.DredpackEditor
             myStyle.normal.textColor =  Color.white;
             GUILayout.Label(customName ?? typeof(W).Name, myStyle);
             GUILayout.EndVertical();
+        }
+
+        public void DrawLabel(string name,int fontSize = 15)
+        {
+            GUILayout.Label(name,LabelStyle(fontSize));
         }
     }
     #endif

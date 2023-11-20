@@ -11,20 +11,22 @@ namespace DredPack.UI
 
         protected virtual void OnEnable()
         {
-            Window.OpenEvent.AddListener(OnOpen);
+            //TODO: uncomment
+            /*Window.OpenEvent.AddListener(OnOpen);
             Window.EndOpenEvent.AddListener(OnOpened);
             Window.CloseEvent.AddListener(OnClose);
             Window.EndCloseEvent.AddListener(OnClosed);
-            Window.SwitchEvent.AddListener(OnSwitch);
+            Window.SwitchEvent.AddListener(OnSwitch);*/
         }
 
         protected virtual void OnDisable()
         {
-            Window.OpenEvent.RemoveListener(OnOpen);
+            //TODO: uncomment
+            /*Window.OpenEvent.RemoveListener(OnOpen);
             Window.EndOpenEvent.RemoveListener(OnOpened);
             Window.CloseEvent.RemoveListener(OnClose);
             Window.EndCloseEvent.RemoveListener(OnClosed);
-            Window.SwitchEvent.RemoveListener(OnSwitch);
+            Window.SwitchEvent.RemoveListener(OnSwitch);*/
         }
 
         protected virtual void OnOpen() { }
@@ -34,9 +36,10 @@ namespace DredPack.UI
         protected virtual void OnSwitch(bool currentState) { }
 
         
-        public virtual void Open() => Window.Open();
-        public virtual void Close() => Window.Close();
-        public virtual void Switch() => Window.Switch();
-        public virtual void Switch(bool state) => Window.Switch(state);
+        //TODO:Window.GetType remove
+        public virtual void Open() => Window.GetType();
+        public virtual void Close() => Window.GetType();
+        public virtual void Switch() => Window.GetType();
+        public virtual void Switch(bool state) => Window.GetType();
     }
 }
