@@ -7,10 +7,12 @@ namespace DredPack.WindowEditor
     {
         protected WindowEditor window;
         protected SerializedProperty tabProperty;
+        protected SerializedProperty componentsProperty;
         public Tab(WindowEditor window, string tabName)
         {
             this.window = window;
             tabProperty = this.window.serializedObject.FindProperty(tabName);
+            componentsProperty = this.window.serializedObject.FindProperty("Components");
         }
 
         public virtual void Draw()

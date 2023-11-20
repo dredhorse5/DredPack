@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DredPack.Audio;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -21,9 +22,43 @@ namespace DredPack.UI
 
             public void OnStateChanged(StatesRead state);
         }
-
+        
         [Serializable]
-        public struct EventsTab : IWindowCallback
+        public class Components
+        {
+            public GameObject DisableableObject;
+            public Canvas Canvas;
+            public GraphicRaycaster Raycaster;
+            public Graphic BackgroundImage;
+            public Graphic CanvasGroup;
+        }
+        
+
+        #region Tabs
+        [Serializable]
+        public class GeneralTab
+        {
+            public StatesRead CurrentState;
+            public StatesAwakeMethod StateOnAwakeMethod;
+            public StatesAwake StateOnAwake;
+
+            //Buttons
+            public Button CloseButton;
+            public Button OpenButton;
+            public Button SwitchButton;
+            
+            //Some
+            public bool Disableable = false;
+            public bool EnableableCanvas = false;
+            public bool EnableableRaycaster = true;
+            public bool CloseIfAnyWindowOpen;
+            public bool CloseOnOutsideClick;
+        }
+
+        
+        
+        [Serializable]
+        public class EventsTab : IWindowCallback
         {
             public UnityEvent StartOpen;
             public UnityEvent StartClose;
@@ -44,29 +79,9 @@ namespace DredPack.UI
             public void OnEndSwitch(bool state) => EndSwitch?.Invoke(state);
             public void OnStateChanged(StatesRead state) => StateChanged?.Invoke(state);
         }
-
-
+        
         [Serializable]
-        public struct GeneralTab
-        {
-            public StatesRead CurrentState;
-            public StatesAwakeMethod StateOnAwakeMethod;
-            public StatesAwakeMethod StateOnAwake;
-
-            //Buttons
-            public Button CloseButton;
-            public Button OpenButton;
-            public Button SwitchButton;
-
-            //Audio
-            public bool UseAudio;
-            public AudioField AudioOnStartOpen;
-            public AudioField AudioOnEndOpen;
-            public AudioField AudioOnStartClose;
-            public AudioField AudioOnEndClose;
-        }
-        [Serializable]
-        public struct AudioTab : IWindowCallback
+        public class AudioTab : IWindowCallback
         {
             public SCPAudio[] List;
 
@@ -87,7 +102,11 @@ namespace DredPack.UI
             }
         }
 
+        #endregion
 
+        #region Enums
+
+        
 
         public enum StatesRead
         {
@@ -118,6 +137,11 @@ namespace DredPack.UI
             Nothing
         }
 
+        #endregion
+
+        #region StateChangedProperty
+
+        
 
 
         [Serializable]
@@ -139,7 +163,11 @@ namespace DredPack.UI
             public AudioField Audio;
             protected override void Execute() => Audio.Play();
         }
+        
+        
 
+        #endregion
+        
         //возможность выбирать, когда вызывать StatesAwake
         //вызывать ли его вообще
         //вызывать ли ивенты при старте

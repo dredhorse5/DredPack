@@ -38,7 +38,7 @@ namespace DredPack.WindowEditor
             
             int toBeRemovedEntry = -1;
 
-            EditorGUILayout.Space();
+            EditorGUILayout.Space(0);
 
             Vector2 removeButtonSize = GUIStyle.none.CalcSize(iconToolbarMinus);
 
@@ -51,20 +51,18 @@ namespace DredPack.WindowEditor
 
                 Rect callbackRect = GUILayoutUtility.GetLastRect();
 
-                Rect removeButtonPos = new Rect(callbackRect.xMax - removeButtonSize.x - 8, callbackRect.y + 10, removeButtonSize.x, removeButtonSize.y);
+                Rect removeButtonPos = new Rect(callbackRect.xMax - removeButtonSize.x - 8, callbackRect.y + 5, removeButtonSize.x, removeButtonSize.y);
                 if (GUI.Button(removeButtonPos, iconToolbarMinus, GUIStyle.none))
-                {
                     toBeRemovedEntry = i;
-                }
+                
                 EditorGUILayout.PropertyField(audio, eventIDName);
 
-                EditorGUILayout.Space();
+                EditorGUILayout.Space(0);
             }
 
             if (toBeRemovedEntry > -1)
-            {
-                RemoveEntry(toBeRemovedEntry);
-            }
+                eventsProperty.DeleteArrayElementAtIndex(toBeRemovedEntry);
+            
 
             
             
@@ -73,16 +71,10 @@ namespace DredPack.WindowEditor
             btPosition.x = btPosition.x + (btPosition.width - addButonWidth) / 2;
             btPosition.width = addButonWidth;
             if (GUI.Button(btPosition, addButonContent))
-            {
                 ShowAddTriggerMenu();
-            }
         }
-        
-        private void RemoveEntry(int toBeRemovedEntry)
-        {
-            eventsProperty.DeleteArrayElementAtIndex(toBeRemovedEntry);
-        }
-        
+
+
         private void ShowAddTriggerMenu()
         {
             // Now create the menu, add items and show it
@@ -96,10 +88,7 @@ namespace DredPack.WindowEditor
                 {
                     SerializedProperty delegateEntry = eventsProperty.GetArrayElementAtIndex(p);
                     SerializedProperty eventProperty = delegateEntry.FindPropertyRelative("State");
-                    if (eventProperty.enumValueIndex == i)
-                    {
-                        active = false;
-                    }
+                    active = eventProperty.enumValueIndex != i;
                 }
                 if (active)
                     menu.AddItem(eventTypes[i], false, OnAddNewSelected, i);

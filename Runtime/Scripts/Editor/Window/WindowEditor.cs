@@ -1,23 +1,26 @@
 ﻿using System;
+using System.Linq;
 using DredPack.DredpackEditor;
 using DredPack.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DredPack.WindowEditor
 {
 
-    [CustomEditor(typeof(UI.Window)), CanEditMultipleObjects]
-    public class WindowEditor : DredInspectorEditor<UI.Window>
+    [CustomEditor(typeof(Window)), CanEditMultipleObjects]
+    public class WindowEditor : DredInspectorEditor<Window>
     {
-        private Tab generalTab;
+        private GeneralTab generalTab;
         private EventsTab eventsTab;
         private AudioTab auidoTab;
         private Tab animationTab;
 
+        private static int currentWindowTab;
         private void OnEnable()
         {
-            generalTab = new Tab(this, "");
+            generalTab = new GeneralTab(this, nameof(T.General));
             eventsTab = new EventsTab(this, nameof(T.Events));
             auidoTab = new AudioTab(this, nameof(T.Audio));
             animationTab = new Tab(this,"");
@@ -30,7 +33,7 @@ namespace DredPack.WindowEditor
             DrawComponentHeader("Window - v3");
             Tabs();
             EditorGUILayout.BeginVertical(GUI.skin.box);
-            switch (UI.Window.currentWindowTab)
+            switch (currentWindowTab)
             {
                 case 0:
                     generalTab.Draw();
@@ -55,11 +58,7 @@ namespace DredPack.WindowEditor
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void Reset()
-        {
-
-        }
-
+        
         private void Tabs()
         {
             GUIContent[] toolbarTabs = new GUIContent[4];
@@ -67,7 +66,7 @@ namespace DredPack.WindowEditor
             toolbarTabs[1] = new GUIContent("Events");
             toolbarTabs[2] = new GUIContent("Audio");
             toolbarTabs[3] = new GUIContent("Animation");
-            UI.Window.currentWindowTab = GUILayout.Toolbar(UI.Window.currentWindowTab, toolbarTabs);
+            currentWindowTab = GUILayout.Toolbar(currentWindowTab, toolbarTabs);
         }
 
     }
