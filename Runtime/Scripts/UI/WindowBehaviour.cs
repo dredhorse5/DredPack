@@ -5,41 +5,37 @@ using UnityEngine;
 namespace DredPack.UI
 {
     [RequireComponent(typeof(Window))]
-    public class WindowBehaviour : MonoBehaviour
+    public class WindowBehaviour : MonoBehaviour, WindowClasses.IWindow, WindowClasses.IWindowCallback
     {
         public Window Window => _window ??= GetComponent<Window>(); private Window _window;
 
         protected virtual void OnEnable()
         {
-            //TODO: uncomment
-            /*Window.OpenEvent.AddListener(OnOpen);
-            Window.EndOpenEvent.AddListener(OnOpened);
-            Window.CloseEvent.AddListener(OnClose);
-            Window.EndCloseEvent.AddListener(OnClosed);
-            Window.SwitchEvent.AddListener(OnSwitch);*/
+            Window.RegisterCallback(this);
         }
 
         protected virtual void OnDisable()
         {
-            //TODO: uncomment
-            /*Window.OpenEvent.RemoveListener(OnOpen);
-            Window.EndOpenEvent.RemoveListener(OnOpened);
-            Window.CloseEvent.RemoveListener(OnClose);
-            Window.EndCloseEvent.RemoveListener(OnClosed);
-            Window.SwitchEvent.RemoveListener(OnSwitch);*/
+            Window.RemoveCallback(this);
         }
 
-        protected virtual void OnOpen() { }
-        protected virtual void OnOpened() { }
-        protected virtual void OnClose() { }
-        protected virtual void OnClosed(){}
-        protected virtual void OnSwitch(bool currentState) { }
 
         
-        //TODO:Window.GetType remove
-        public virtual void Open() => Window.GetType();
-        public virtual void Close() => Window.GetType();
-        public virtual void Switch() => Window.GetType();
-        public virtual void Switch(bool state) => Window.GetType();
+        
+        public virtual void Open() => Window.Open();
+        public virtual void Close() => Window.Close();
+        public virtual void Switch() => Window.Switch();
+        public virtual void Switch(bool state) => Window.Switch(state);
+        
+        
+        
+        
+        public virtual void OnStartOpen() { }
+        public virtual void OnStartClose() { }
+        public virtual void OnStartSwitch(bool state) { }
+        public virtual void OnEndOpen() { }
+        public virtual void OnEndClose() { }
+        public virtual void OnEndSwitch(bool state) { }
+        public virtual void OnStateChanged(WindowClasses.StatesRead state) { }
     }
 }

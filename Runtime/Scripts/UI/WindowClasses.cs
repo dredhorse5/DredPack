@@ -23,20 +23,36 @@ namespace DredPack.UI
             public void OnStateChanged(StatesRead state);
         }
         
+        public interface IWindow
+        {
+            public void Open();
+            public void Close();
+            public void Switch();
+            public void Switch(bool state);
+        }
+        
         [Serializable]
-        public class Components
+        public struct Components
         {
             public GameObject DisableableObject;
             public Canvas Canvas;
             public GraphicRaycaster Raycaster;
             public Graphic BackgroundImage;
-            public Graphic CanvasGroup;
+            public CanvasGroup CanvasGroup;
         }
         
 
         #region Tabs
+        
         [Serializable]
-        public class GeneralTab
+        public class Tab
+        {
+            protected Window window;
+            public virtual void Init(Window owner) => window = owner;
+        }
+        
+        [Serializable]
+        public class GeneralTab : Tab, IWindowCallback
         {
             public StatesRead CurrentState;
             public StatesAwakeMethod StateOnAwakeMethod;
@@ -53,12 +69,65 @@ namespace DredPack.UI
             public bool EnableableRaycaster = true;
             public bool CloseIfAnyWindowOpen;
             public bool CloseOnOutsideClick;
+
+            public override void Init(Window owner)
+            {
+                base.Init(owner);
+                if(CloseButton) CloseButton.onClick.AddListener(window.Close);
+                if(OpenButton) OpenButton.onClick.AddListener(window.Open);
+                if(SwitchButton) SwitchButton.onClick.AddListener(window.Switch);
+            }
+
+            public void OnStartOpen()
+            {
+                if(Disableable && window.Components.DisableableObject)
+                    window.Components.DisableableObject.gameObject.SetActive(true);
+                if (EnableableCanvas && window.Components.Canvas)
+                    window.Components.Canvas.enabled = true;
+            }
+
+            public void OnStartClose()
+            {
+                if (EnableableRaycaster)
+                    window.Components.Raycaster.enabled = false;
+                
+                if (window.Components.CanvasGroup)
+                {
+                    window.Components.CanvasGroup.interactable = false;
+                    window.Components.CanvasGroup.blocksRaycasts = false;
+                }
+            }
+
+            public void OnStartSwitch(bool state) { }
+
+            public void OnEndOpen()
+            {
+                if (EnableableRaycaster && window.Components.Raycaster)
+                    window.Components.Raycaster.enabled = true;
+                if (window.Components.CanvasGroup)
+                {
+                    window.Components.CanvasGroup.interactable = true;
+                    window.Components.CanvasGroup.blocksRaycasts = true;
+                }
+            }
+
+            public void OnEndClose()
+            {
+                if(Disableable && window.Components.DisableableObject)
+                    window.Components.DisableableObject.gameObject.SetActive(false);
+                if (EnableableCanvas && window.Components.Canvas)
+                    window.Components.Canvas.enabled = false;
+            }
+
+            public void OnEndSwitch(bool state) { }
+
+            public void OnStateChanged(StatesRead state) { }
         }
 
         
         
         [Serializable]
-        public class EventsTab : IWindowCallback
+        public class EventsTab : Tab, IWindowCallback
         {
             public UnityEvent StartOpen;
             public UnityEvent StartClose;
@@ -81,7 +150,7 @@ namespace DredPack.UI
         }
         
         [Serializable]
-        public class AudioTab : IWindowCallback
+        public class AudioTab : Tab, IWindowCallback
         {
             public SCPAudio[] List;
 

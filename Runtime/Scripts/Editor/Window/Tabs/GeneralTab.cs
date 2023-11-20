@@ -38,7 +38,7 @@ namespace DredPack.WindowEditor
             }
 
 
-            if (GUILayout.Button("Switch State (ctrl + shift + Q)"))
+            if (GUILayout.Button("Switch State (alt + shift + Q)"))
                 Debug.Log("Switch state!"); //window.T.SwitchState();
             GUI.enabled = Application.isPlaying;
             if (GUILayout.Button("Switch with animation"))
