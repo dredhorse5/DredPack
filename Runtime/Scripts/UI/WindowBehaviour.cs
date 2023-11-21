@@ -22,14 +22,17 @@ namespace DredPack.UI
 
         
         
-        public virtual void Open() => Window.Open();
-        public virtual void Close() => Window.Close();
-        public virtual void Switch() => Window.Switch();
-        public virtual void Switch(bool state) => Window.Switch(state);
+        public virtual Coroutine OpenCor() => Window.OpenCor();
+        public virtual Coroutine CloseCor() => Window.CloseCor();
+        public virtual Coroutine SwitchCor() => Window.SwitchCor();
+        public virtual Coroutine SwitchCor(bool state) => Window.SwitchCor(state);
         
-        
-        
-        
+        public void Open() => OpenCor();
+        public void Close() => CloseCor();
+        public void Switch() => SwitchCor();
+        public void Switch(bool state) => SwitchCor(state);
+
+
         public virtual void OnStartOpen() { }
         public virtual void OnStartClose() { }
         public virtual void OnStartSwitch(bool state) { }

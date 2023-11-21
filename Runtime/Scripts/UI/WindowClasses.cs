@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DredPack.Audio;
+using DredPack.UI.WindowAnimations;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -25,6 +26,10 @@ namespace DredPack.UI
         
         public interface IWindow
         {
+            public Coroutine OpenCor();
+            public Coroutine CloseCor();
+            public Coroutine SwitchCor();
+            public Coroutine SwitchCor(bool state);
             public void Open();
             public void Close();
             public void Switch();
@@ -73,9 +78,9 @@ namespace DredPack.UI
             public override void Init(Window owner)
             {
                 base.Init(owner);
-                if(CloseButton) CloseButton.onClick.AddListener(window.Close);
-                if(OpenButton) OpenButton.onClick.AddListener(window.Open);
-                if(SwitchButton) SwitchButton.onClick.AddListener(window.Switch);
+                if(CloseButton) CloseButton.onClick.AddListener(() => window.CloseCor());
+                if(OpenButton) OpenButton.onClick.AddListener(() =>window.OpenCor());
+                if(SwitchButton) SwitchButton.onClick.AddListener(() =>window.SwitchCor());
             }
 
             public void OnStartOpen()
@@ -88,7 +93,7 @@ namespace DredPack.UI
 
             public void OnStartClose()
             {
-                if (EnableableRaycaster)
+                if (EnableableRaycaster && window.Components.Raycaster)
                     window.Components.Raycaster.enabled = false;
                 
                 if (window.Components.CanvasGroup)
@@ -169,6 +174,54 @@ namespace DredPack.UI
                 for (int i = 0; i < List.Length; i++)
                     List[i]?.TryExecute(state);
             }
+        }
+        
+        [Serializable]
+        public class AnimationTab : Tab
+        {
+            public string currentAnimationName = "";
+
+            public WindowAnimation currentAnimation
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(currentAnimationName))
+                        currentAnimationName = allAnimations[0].Name;
+                    _currentAnimation = GetAnimation(currentAnimationName);
+                    return _currentAnimation;
+                }
+            }
+
+            [SerializeReference][SerializeField] private WindowAnimation _currentAnimation;
+
+            public string[] allAnimationNames
+            {
+                get
+                {
+                    string[] list = new string[allAnimations.Length];
+                    for (int i = 0; i < allAnimations.Length; i++)
+                        list[i] = allAnimations[i].Name;
+                    return list;
+                }
+            }
+
+            public WindowAnimation[] allAnimations = new WindowAnimation[]
+            {
+                new Fade(), new Instantly()
+            };
+
+            public WindowAnimation GetAnimation(string name)
+            {
+                for (int i = 0; i < allAnimations.Length; i++)
+                {
+                    if (allAnimations[i].Name == name)
+                        return allAnimations[i];
+                }
+
+                //Debug.LogError($"Cant find anim with name: {name}");
+                return allAnimations[0];
+            }
+            
         }
 
         #endregion

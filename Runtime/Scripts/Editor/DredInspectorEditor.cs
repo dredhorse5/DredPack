@@ -43,5 +43,34 @@ namespace DredPack.DredpackEditor
             GUILayout.Label(name,LabelStyle(fontSize));
         }
     }
+
+    public static class DredInspectorEditorTemplates
+    {
+        
+        public static GUIStyle LabelStyle(int fontSize = 15)
+        {
+            var labelStyle = new GUIStyle();
+            labelStyle.fontStyle = FontStyle.Bold;
+            labelStyle.normal.textColor = Color.white;
+            labelStyle.fontSize = fontSize;
+            return labelStyle;
+        }
+        
+        public static void DrawComponentHeader(string customName = "")
+        {
+            GUILayout.BeginVertical();
+            GUIStyle myStyle = new GUIStyle();
+            myStyle.fontSize = 25;
+            myStyle.fontStyle = FontStyle.Bold;
+            myStyle.normal.textColor =  Color.white;
+            GUILayout.Label(customName, myStyle);
+            GUILayout.EndVertical();
+        }
+
+        public static void DrawLabel(string name,int fontSize = 15)
+        {
+            GUILayout.Label(name,LabelStyle(fontSize));
+        }
+    }
     #endif
 }

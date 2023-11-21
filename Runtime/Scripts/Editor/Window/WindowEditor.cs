@@ -15,7 +15,7 @@ namespace DredPack.WindowEditor
         private GeneralTab generalTab;
         private EventsTab eventsTab;
         private AudioTab auidoTab;
-        private Tab animationTab;
+        private AnimationTab animationTab;
 
         private static int currentWindowTab;
         private void OnEnable()
@@ -23,7 +23,7 @@ namespace DredPack.WindowEditor
             generalTab = new GeneralTab(this, nameof(T.General));
             eventsTab = new EventsTab(this, nameof(T.Events));
             auidoTab = new AudioTab(this, nameof(T.Audio));
-            animationTab = new Tab(this,"");
+            animationTab = new AnimationTab(this,nameof(T.Animation));
         }
 
         public override void OnInspectorGUI()

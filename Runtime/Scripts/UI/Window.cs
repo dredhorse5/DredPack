@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DredPack.Audio;
+using DredPack.UI.WindowAnimations;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -15,10 +18,15 @@ namespace DredPack.UI
         public WindowClasses.GeneralTab General = new WindowClasses.GeneralTab();
         public WindowClasses.EventsTab Events = new WindowClasses.EventsTab();
         public WindowClasses.AudioTab Audio = new WindowClasses.AudioTab();
+        public WindowClasses.AnimationTab Animation = new WindowClasses.AnimationTab();
 
         public WindowClasses.Components Components = new WindowClasses.Components();
 
-        private HashSet<WindowClasses.IWindowCallback> callbacks;
+        private HashSet<WindowClasses.IWindowCallback> callbacks = new HashSet<WindowClasses.IWindowCallback>();
+
+        
+
+        private Coroutine switchCor;
 
         private void Awake()
         {
@@ -28,13 +36,79 @@ namespace DredPack.UI
             RegisterCallback(new WindowClasses.IWindowCallback[]{General,Events,Audio});
         }
 
-        public void Open() { }
+        
+        public void Open() => OpenCor();
+        public Coroutine OpenCor()
+        {
+            if(switchCor != null)
+                StopCoroutine(switchCor);
+            switchCor = StartCoroutine(OpenIE());
+            return switchCor;
+        }
 
-        public void Close() { }
+        
+        public void Close() => CloseCor();
+        public Coroutine CloseCor()
+        {
+            if (switchCor != null)
+                StopCoroutine(switchCor);
+            switchCor = StartCoroutine(CloseIE());
+            return switchCor;
+        }
 
-        public void Switch() { }
+        
+        public void Switch() => SwitchCor();
+        public Coroutine SwitchCor()
+        {
+            if(General.CurrentState == WindowClasses.StatesRead.Closed || General.CurrentState == WindowClasses.StatesRead.Closing)
+                return OpenCor();
+            return CloseCor();
+        }
 
-        public void Switch(bool state) { }
+        
+        public void Switch(bool state) => SwitchCor(state);
+        public Coroutine SwitchCor(bool state)
+        {
+            if(state) return OpenCor();
+            return CloseCor();
+        }
+
+        
+
+        private IEnumerator OpenIE()
+        {
+            Animation.currentAnimation.Init(this);
+            Animation.currentAnimation?.StopAllCoroutines();
+            ChangeState(WindowClasses.StatesRead.Opening);
+            OnStartOpen();
+            OnStartSwitch(true);
+            
+            yield return Animation.currentAnimation.UpdateOpen();
+            
+            ChangeState(WindowClasses.StatesRead.Opened);
+            OnEndOpen();
+            OnEndSwitch(true);
+        }
+        private IEnumerator CloseIE()
+        {
+            Animation.currentAnimation.Init(this);
+            Animation.currentAnimation?.StopAllCoroutines();
+            ChangeState(WindowClasses.StatesRead.Closing);
+            OnStartClose();
+            OnStartSwitch(false);
+            
+            yield return Animation.currentAnimation.UpdateClose();
+            
+            OnEndClose();
+            ChangeState(WindowClasses.StatesRead.Closed);
+            OnEndSwitch(false);
+        }
+
+        private void ChangeState(WindowClasses.StatesRead state)
+        {
+            General.CurrentState = state;
+            OnStateChanged(General.CurrentState);
+        }
 
 
         #region Callbacks
@@ -105,28 +179,46 @@ namespace DredPack.UI
         #endregion
 
 
-        private void Reset()
+        
+        
+        #if UNITY_EDITOR
+        private void Reset() => InitComponents();
+        private void OnValidate() => InitComponents();
+
+
+        private void InitComponents()
         {
-            Components.DisableableObject = gameObject;
+            if(Components.DisableableObject == null)
+                Components.DisableableObject = gameObject;
 
-            Components.Canvas = GetComponent<Canvas>();
-            if (!Components.Canvas)
+            if(Components.Canvas == null)
             {
-                var canvases = GetComponentsInParent<Canvas>();
-                Components.Canvas = canvases.Length > 0 ? canvases.First() : null;
+                Components.Canvas = GetComponent<Canvas>();
+                if (!Components.Canvas)
+                {
+                    var canvases = GetComponentsInParent<Canvas>();
+                    Components.Canvas = canvases.Length > 0 ? canvases.First() : null;
+                }
             }
 
-            Components.Raycaster = GetComponent<GraphicRaycaster>();
-            General.EnableableRaycaster = Components.Raycaster;
-            if (!Components.Canvas)
+            if(Components.Raycaster == null)
             {
-                var canvases = GetComponentsInParent<GraphicRaycaster>();
-                Components.Raycaster = canvases.Length > 0 ? canvases.First() : null;
+                Components.Raycaster = GetComponent<GraphicRaycaster>();
+                General.EnableableRaycaster = Components.Raycaster;
+                if (!Components.Canvas)
+                {
+                    var canvases = GetComponentsInParent<GraphicRaycaster>();
+                    Components.Raycaster = canvases.Length > 0 ? canvases.First() : null;
+                }
             }
 
-            Components.BackgroundImage = GetComponent<Image>();
-            Components.CanvasGroup = GetComponent<CanvasGroup>();
+            if(Components.BackgroundImage == null)
+                Components.BackgroundImage = GetComponent<Image>();
+            if(Components.CanvasGroup == null)
+                Components.CanvasGroup = GetComponent<CanvasGroup>();
+            EditorUtility.SetDirty(this);
         }
+        #endif
     }
 
 }
