@@ -760,7 +760,7 @@ MonoBehaviour:
     DisableableObject: {fileID: 1331034303}
     Canvas: {fileID: 737187240}
     Raycaster: {fileID: 0}
-    BackgroundImage: {fileID: 0}
+    BackgroundImage: {fileID: 1331034305}
     CanvasGroup: {fileID: 1331034308}
   references:
     version: 1
@@ -771,21 +771,21 @@ MonoBehaviour:
         _currentAnimation:
           id: 1
         allAnimations:
-        - Speed: 1
+        - Speed: 7.73
         - Speed: 1
     00000001:
       type: {class: Fade, ns: DredPack.UI.WindowAnimations, asm: DredPack}
       data:
-        Speed: 1
+        Speed: 7.73
         Curve:
           serializedVersion: 2
           m_Curve:
           - serializedVersion: 3
             time: 0
-            value: 0
+            value: 1
             inSlope: 0
             outSlope: 0
-            tangentMode: 0
+            tangentMode: 34
             weightedMode: 0
             inWeight: 0
             outWeight: 0
@@ -794,7 +794,7 @@ MonoBehaviour:
             value: 1
             inSlope: 0
             outSlope: 0
-            tangentMode: 0
+            tangentMode: 34
             weightedMode: 0
             inWeight: 0
             outWeight: 0
