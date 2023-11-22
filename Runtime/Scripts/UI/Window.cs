@@ -18,7 +18,7 @@ namespace DredPack.UI
         public WindowClasses.GeneralTab General = new WindowClasses.GeneralTab();
         public WindowClasses.EventsTab Events = new WindowClasses.EventsTab();
         public WindowClasses.AudioTab Audio = new WindowClasses.AudioTab();
-        public WindowClasses.AnimationTab Animation = new WindowClasses.AnimationTab();
+        [SerializeReference] public WindowClasses.AnimationTab Animation = new WindowClasses.AnimationTab();
 
         public WindowClasses.Components Components = new WindowClasses.Components();
 

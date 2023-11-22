@@ -68,7 +68,8 @@ namespace DredPack.UI.WindowAnimations
         public virtual void DrawCustomInspector(SerializedObject obj,SerializedProperty animationProperty)
         {
             DredInspectorEditorTemplates.DrawLabel(Name);
-            EditorGUILayout.PropertyField(animationProperty.FindPropertyRelative("Speed"));
+            if(animationProperty.FindPropertyRelative("Speed") != null)
+                EditorGUILayout.PropertyField(animationProperty.FindPropertyRelative("Speed"));
         }
 #endif
         #endregion

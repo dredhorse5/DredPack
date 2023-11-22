@@ -192,7 +192,7 @@ namespace DredPack.UI
                 }
             }
 
-            [SerializeReference][SerializeField] private WindowAnimation _currentAnimation;
+            [SerializeReference][SerializeField] public WindowAnimation _currentAnimation;
 
             public string[] allAnimationNames
             {
