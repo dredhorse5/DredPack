@@ -179,7 +179,22 @@ namespace DredPack.UI
         [Serializable]
         public class AnimationTab : Tab
         {
-            public string currentAnimationName = "";
+            public string currentAnimationName
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(_currentAnimationName))
+                        _currentAnimationName = allAnimations[0].Name;
+                    return _currentAnimationName;
+                }
+                set
+                {
+                    _currentAnimationName = value;
+                    _currentAnimation = GetAnimation(_currentAnimationName);
+                }
+            }
+
+            public string _currentAnimationName = "";
 
             public WindowAnimation currentAnimation
             {
@@ -204,12 +219,16 @@ namespace DredPack.UI
                     return list;
                 }
             }
-
-            public WindowAnimation[] allAnimations = new WindowAnimation[]
+            private WindowAnimation[] allAnimations => new WindowAnimation[]
             {
-                new Fade(), new Instantly()
+                fade, instantly, animator
             };
 
+            [SerializeReference, SerializeField]Fade fade = new Fade();
+            [SerializeReference, SerializeField] Instantly instantly = new Instantly();
+            [SerializeReference, SerializeField] WindowAnimations.Animator animator = new WindowAnimations.Animator();
+            
+            
             public WindowAnimation GetAnimation(string name)
             {
                 for (int i = 0; i < allAnimations.Length; i++)

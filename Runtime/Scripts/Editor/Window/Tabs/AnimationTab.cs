@@ -17,10 +17,10 @@ namespace DredPack.WindowEditor
             {
                 _selected = sel;
                 window.T.Animation.currentAnimationName = window.T.Animation.allAnimationNames[_selected];
-                //Debug.Log(window.T.Animation.allAnimationNames[_selected]);
             }
-            EditorGUILayout.Space();
-            window.T.Animation.currentAnimation.DrawInspector(window.serializedObject,tabProperty.FindPropertyRelative("_currentAnimation"));
+            DredpackEditor.DredInspectorEditorTemplates.DrawLabel(window.T.Animation.currentAnimationName);
+            EditorGUILayout.Space(-20);
+            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("_currentAnimation"),true);
         }
     }
 }

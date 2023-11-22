@@ -3,13 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using DredPack.DredpackEditor;
-using DredPack.WindowEditor;
-using UnityEditor;
-using UnityEditor.UIElements;
-#endif
-
 namespace DredPack.UI.WindowAnimations
 {
     [Serializable]
@@ -54,24 +47,5 @@ namespace DredPack.UI.WindowAnimations
             launchedCoroutines.Add(cor);
         }
         
-        #region EDITOR
-#if UNITY_EDITOR
-        public virtual bool useCustomInspector => false;
-
-        public void DrawInspector(SerializedObject obj,SerializedProperty animationProperty)
-        {
-            if(useCustomInspector) DrawCustomInspector(obj,animationProperty);
-            else DrawDefaultInspector(obj,animationProperty);
-        }
-
-        private void DrawDefaultInspector(SerializedObject obj,SerializedProperty animationProperty) => EditorGUILayout.PropertyField(animationProperty);
-        public virtual void DrawCustomInspector(SerializedObject obj,SerializedProperty animationProperty)
-        {
-            DredInspectorEditorTemplates.DrawLabel(Name);
-            if(animationProperty.FindPropertyRelative("Speed") != null)
-                EditorGUILayout.PropertyField(animationProperty.FindPropertyRelative("Speed"));
-        }
-#endif
-        #endregion
     }
 }

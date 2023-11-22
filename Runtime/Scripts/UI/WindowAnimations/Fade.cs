@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 
 namespace DredPack.UI.WindowAnimations
@@ -10,7 +7,6 @@ namespace DredPack.UI.WindowAnimations
     [Serializable]
     public class Fade : WindowAnimation
     {
-        [SerializeReference]
         public AnimationCurve Curve = new AnimationCurve(new []{new Keyframe(0,0), new Keyframe(1f,1f)});
 
         public override IEnumerator UpdateOpen()
@@ -35,19 +31,5 @@ namespace DredPack.UI.WindowAnimations
         }
         
         
-        #region EDITOR
-        
-#if UNITY_EDITOR
-        public override bool useCustomInspector => true;
-        public override void DrawCustomInspector(SerializedObject obj, SerializedProperty animationProperty)
-        {
-            base.DrawCustomInspector(obj,animationProperty);
-            if(animationProperty.FindPropertyRelative("Curve") != null)
-                EditorGUILayout.PropertyField(animationProperty.FindPropertyRelative("Curve"),true);
-            obj.ApplyModifiedProperties();
-
-        }
-#endif
-        #endregion
     }
 }
