@@ -71,9 +71,8 @@ namespace DredPack
         {
             if ((Selection.activeObject is GameObject gm))
             {
-                //TODO: uncomment
-                //if (gm.TryGetComponent(out Window window))
-                    //window.SwitchState();
+                if (gm.TryGetComponent(out Window window))
+                    window.Switch("Instantly");
             }
         }
 

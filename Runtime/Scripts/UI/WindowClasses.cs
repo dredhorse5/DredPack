@@ -26,14 +26,28 @@ namespace DredPack.UI
         
         public interface IWindow
         {
-            public Coroutine OpenCor();
-            public Coroutine CloseCor();
-            public Coroutine SwitchCor();
-            public Coroutine SwitchCor(bool state);
             public void Open();
+            public void Open(string animName);
+            public void Open(AnimationParameters parameters);
+            public Coroutine OpenCor(string animName, AnimationParameters parameters);
+            
+            
             public void Close();
+            public void Close(string animName);
+            public void Close(AnimationParameters parameters);
+            public Coroutine CloseCor(string animName, AnimationParameters parameters);
+            
+            
             public void Switch();
+            public void Switch(string animName);
+            public void Switch(AnimationParameters parameters);
+            public Coroutine SwitchCor(string animName, AnimationParameters parameters);
+            
+            
             public void Switch(bool state);
+            public void Switch(bool state, string animName);
+            public void Switch(bool state, AnimationParameters parameters);
+            public Coroutine SwitchCor(bool state,string animName, AnimationParameters parameters);
         }
         
         [Serializable]
@@ -61,6 +75,7 @@ namespace DredPack.UI
         {
             public StatesRead CurrentState;
             public StatesAwakeMethod StateOnAwakeMethod;
+            public string AnimationOnAwake = "Instantly";
             public StatesAwake StateOnAwake;
 
             //Buttons
@@ -78,9 +93,9 @@ namespace DredPack.UI
             public override void Init(Window owner)
             {
                 base.Init(owner);
-                if(CloseButton) CloseButton.onClick.AddListener(() => window.CloseCor());
-                if(OpenButton) OpenButton.onClick.AddListener(() =>window.OpenCor());
-                if(SwitchButton) SwitchButton.onClick.AddListener(() =>window.SwitchCor());
+                if(CloseButton) CloseButton.onClick.AddListener(window.Close);
+                if(OpenButton) OpenButton.onClick.AddListener(window.Open);
+                if(SwitchButton) SwitchButton.onClick.AddListener(window.Switch);
             }
 
             public void OnStartOpen()
@@ -231,13 +246,21 @@ namespace DredPack.UI
             
             public WindowAnimation GetAnimation(string name)
             {
+                //finding needed animation
                 for (int i = 0; i < allAnimations.Length; i++)
                 {
                     if (allAnimations[i].Name == name)
                         return allAnimations[i];
                 }
-
-                //Debug.LogError($"Cant find anim with name: {name}");
+                
+                // if nothing, finding now animation
+                for (int i = 0; i < allAnimations.Length; i++)
+                {
+                    if (allAnimations[i].Name == currentAnimationName)
+                        return allAnimations[i];
+                }
+                
+                // or returns first animation
                 return allAnimations[0];
             }
             
@@ -312,9 +335,11 @@ namespace DredPack.UI
         //возможность выбирать, когда вызывать StatesAwake
         //вызывать ли его вообще
         //вызывать ли ивенты при старте
+        //задержки анимаций
         //возможность вызвать определенную анимацию
         //возможность задать направление анимации
         //новая анимация - список трансформов, которые можно как угодно двигать, скейлить и вращать
         //загрузка профилей
+        //запуск совершенно разных анимаций через передачу их как параметр
     }
 }

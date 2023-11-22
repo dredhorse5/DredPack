@@ -18,12 +18,12 @@ namespace DredPack.UI.WindowAnimations
             window = owner;
         }
 
-        public virtual IEnumerator UpdateOpen()
+        public virtual IEnumerator UpdateOpen(AnimationParameters parameters)
         {
             yield return null;
         }
         
-        public virtual IEnumerator UpdateClose()
+        public virtual IEnumerator UpdateClose(AnimationParameters parameters)
         {
             yield return null;
         }
@@ -46,6 +46,10 @@ namespace DredPack.UI.WindowAnimations
             var cor = window.StartCoroutine(coroutine);
             launchedCoroutines.Add(cor);
         }
-        
+    }
+
+    public class AnimationParameters
+    {
+        public readonly float CustomSpeed = 1f;
     }
 }

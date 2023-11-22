@@ -27,89 +27,167 @@ namespace DredPack.UI
         
 
         private Coroutine switchCor;
+        private WindowClasses.IWindow _windowImplementation;
+        [NonSerialized]
+        private bool switchedOnce = false;
 
         private void Awake()
         {
             General.Init(this);
             Events.Init(this);
             Audio.Init(this);
+            
+            if(General.StateOnAwakeMethod == WindowClasses.StatesAwakeMethod.Awake && !switchedOnce)
+            {
+                Switch(General.StateOnAwake != WindowClasses.StatesAwake.Open, "Instantly");
+                Switch(General.StateOnAwake == WindowClasses.StatesAwake.Open, General.AnimationOnAwake);
+            }
             RegisterCallback(new WindowClasses.IWindowCallback[]{General,Events,Audio});
         }
 
-        
-        public void Open() => OpenCor();
-        public Coroutine OpenCor()
+        private void Start()
         {
+            if(General.StateOnAwakeMethod == WindowClasses.StatesAwakeMethod.Start && !switchedOnce)
+            {
+                Switch(General.StateOnAwake != WindowClasses.StatesAwake.Open, "Instantly");
+                Switch(General.StateOnAwake == WindowClasses.StatesAwake.Open, General.AnimationOnAwake);
+            }
+        }
+
+        private void OnEnable()
+        {
+            if(General.StateOnAwakeMethod == WindowClasses.StatesAwakeMethod.OnEnable && !switchedOnce)
+            {
+                Switch(General.StateOnAwake != WindowClasses.StatesAwake.Open, "Instantly");
+                Switch(General.StateOnAwake == WindowClasses.StatesAwake.Open, General.AnimationOnAwake);
+            }
+        }
+
+        
+        
+        private void ChangeState(WindowClasses.StatesRead state)
+        {
+            General.CurrentState = state;
+            OnStateChanged(General.CurrentState);
+        }
+        
+        
+        #region External Contol
+
+
+        public void Open() => OpenCor("", new AnimationParameters());
+        public void Open(string animName) => OpenCor(animName,new AnimationParameters());
+        public void Open(AnimationParameters parameters) => OpenCor("", parameters);
+        public Coroutine OpenCor(string animName, AnimationParameters parameters)
+        {
+            if (General.CurrentState == WindowClasses.StatesRead.Opened ||
+                General.CurrentState == WindowClasses.StatesRead.Opening)
+                return null;
             if(switchCor != null)
                 StopCoroutine(switchCor);
-            switchCor = StartCoroutine(OpenIE());
+            switchCor = StartCoroutine(OpenIE(animName, parameters));
             return switchCor;
         }
 
         
-        public void Close() => CloseCor();
-        public Coroutine CloseCor()
+        public void Close() => CloseCor("", new AnimationParameters());
+        public void Close(string animName) => CloseCor(animName,new AnimationParameters());
+        public void Close(AnimationParameters parameters) => CloseCor("", parameters);
+        public Coroutine CloseCor(string animName, AnimationParameters parameters)
         {
+            if (General.CurrentState == WindowClasses.StatesRead.Closed ||
+                General.CurrentState == WindowClasses.StatesRead.Closing)
+                return null;
             if (switchCor != null)
                 StopCoroutine(switchCor);
-            switchCor = StartCoroutine(CloseIE());
+            switchCor = StartCoroutine(CloseIE(animName, parameters));
             return switchCor;
         }
 
         
-        public void Switch() => SwitchCor();
-        public Coroutine SwitchCor()
+        public void Switch() => SwitchCor("", new AnimationParameters());
+        public void Switch(string animName) => SwitchCor(animName,new AnimationParameters());
+        public void Switch(AnimationParameters parameters) => SwitchCor("", parameters);
+        public Coroutine SwitchCor(string animName, AnimationParameters parameters)
         {
-            if(General.CurrentState == WindowClasses.StatesRead.Closed || General.CurrentState == WindowClasses.StatesRead.Closing)
-                return OpenCor();
-            return CloseCor();
+            if (General.CurrentState == WindowClasses.StatesRead.Closed ||
+                General.CurrentState == WindowClasses.StatesRead.Closing)
+                return OpenCor(animName, parameters);
+            return CloseCor(animName, parameters);
+        }
+
+
+        public void Switch(bool state) => SwitchCor(state, "", new AnimationParameters());
+        public void Switch(bool state,string animName) => SwitchCor(state, animName, new AnimationParameters());
+        public void Switch(bool state, AnimationParameters parameters) => SwitchCor(state, "", parameters);
+        public Coroutine SwitchCor(bool state,string animName, AnimationParameters parameters)
+        {
+            if(state) return OpenCor(animName, parameters);
+            return CloseCor(animName, parameters);
         }
 
         
-        public void Switch(bool state) => SwitchCor(state);
-        public Coroutine SwitchCor(bool state)
-        {
-            if(state) return OpenCor();
-            return CloseCor();
-        }
 
-        
-
-        private IEnumerator OpenIE()
+        private IEnumerator OpenIE(string animName, AnimationParameters parameters)
         {
-            Animation.currentAnimation.Init(this);
-            Animation.currentAnimation?.StopAllCoroutines();
+            switchedOnce = true;
+            var curAnim = Animation.GetAnimation(string.IsNullOrEmpty(animName) ? Animation.currentAnimationName : animName);
+            curAnim.Init(this);
+            curAnim.StopAllCoroutines();
+            
             ChangeState(WindowClasses.StatesRead.Opening);
             OnStartOpen();
             OnStartSwitch(true);
             
-            yield return Animation.currentAnimation.UpdateOpen();
+            yield return StartCoroutine(curAnim.UpdateOpen(parameters));
             
             ChangeState(WindowClasses.StatesRead.Opened);
             OnEndOpen();
             OnEndSwitch(true);
         }
-        private IEnumerator CloseIE()
+        private IEnumerator CloseIE(string animName, AnimationParameters parameters)
         {
-            Animation.currentAnimation.Init(this);
-            Animation.currentAnimation?.StopAllCoroutines();
+            switchedOnce = true;
+            var curAnim = Animation.GetAnimation(string.IsNullOrEmpty(animName) ? Animation.currentAnimationName : animName);
+            curAnim.Init(this);
+            curAnim.StopAllCoroutines();
+            
             ChangeState(WindowClasses.StatesRead.Closing);
             OnStartClose();
             OnStartSwitch(false);
             
-            yield return Animation.currentAnimation.UpdateClose();
+            yield return StartCoroutine(curAnim.UpdateClose(parameters));
             
             OnEndClose();
             ChangeState(WindowClasses.StatesRead.Closed);
             OnEndSwitch(false);
         }
 
-        private void ChangeState(WindowClasses.StatesRead state)
+        /*
+        private IEnumerator Cor1()
         {
-            General.CurrentState = state;
-            OnStateChanged(General.CurrentState);
+            yield return Cor2();
+            yield return Cor2();
+            yield return Cor2();
+            yield return Cor2();
+            yield return Cor2();
+            yield return Cor2();
+            yield return Cor2();
+            yield return Cor2();
+            yield return Cor2();
+            yield return Cor2();
         }
 
+        private IEnumerator Cor2()
+        {
+            if(false)
+                yield return null;
+            // не ждем ничего, сразу выходим
+        }*/
+
+
+        #endregion
+        
 
         #region Callbacks
 
@@ -177,10 +255,12 @@ namespace DredPack.UI
         
         
         #endregion
+        
 
+        #region Editor
 
         
-        
+
         #if UNITY_EDITOR
         private void Reset() => InitComponents();
         private void OnValidate() => InitComponents();
@@ -219,6 +299,8 @@ namespace DredPack.UI
             EditorUtility.SetDirty(this);
         }
         #endif
+        
+        #endregion
     }
 
 }

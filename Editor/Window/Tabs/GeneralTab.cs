@@ -12,11 +12,18 @@ namespace DredPack.WindowEditor
         public override void Draw()
         {
             base.Draw();
+            
+            
             window.DrawLabel(" States");
-            EditorGUILayout.LabelField("Current",
-                tabProperty.FindPropertyRelative("CurrentState").enumDisplayNames.First());
-            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("StateOnAwakeMethod"),
-                new GUIContent("Awake Method"), true);
+            
+            
+            var curStateProp = tabProperty.FindPropertyRelative("CurrentState");
+            EditorGUILayout.LabelField("Current", curStateProp.enumDisplayNames[curStateProp.enumValueIndex]);
+            
+            
+            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("StateOnAwakeMethod"), new GUIContent("Awake Method"), true);
+            
+            
             if (window.T.General.StateOnAwakeMethod != WindowClasses.StatesAwakeMethod.Nothing)
             {
                 string propName = "OnAwake";
@@ -32,17 +39,27 @@ namespace DredPack.WindowEditor
                         propName = "OnEnable";
                         break;
                 }
-
                 EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("StateOnAwake"),
                     new GUIContent("Set State " + propName), true);
+
+
+                var nowVal = window.T.Animation.allAnimationNames.ToList().IndexOf(window.T.General.AnimationOnAwake);
+                var nextVal = EditorGUILayout.Popup("Animation", nowVal, window.T.Animation.allAnimationNames);
+ 
+                if (EditorGUI.EndChangeCheck() && nowVal != nextVal)
+                {
+                    window.T.General.AnimationOnAwake = window.T.Animation.allAnimationNames[nextVal];
+                    EditorUtility.SetDirty(window.T);
+                }
+                //EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("AnimationOnAwake"),true);
             }
 
 
             if (GUILayout.Button("Switch State (alt + shift + Q)"))
-                Debug.Log("Switch state!"); //window.T.SwitchState();
+                window.T.Switch("Instantly");
             GUI.enabled = Application.isPlaying;
             if (GUILayout.Button("Switch with animation"))
-                Debug.Log("Switch with animation!");
+                window.T.Switch();
             GUI.enabled = true;
 
 
