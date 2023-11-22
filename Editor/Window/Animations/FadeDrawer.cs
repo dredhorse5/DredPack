@@ -9,7 +9,7 @@ namespace DredPack.WindowEditor.Animations
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            base.OnGUI(position, property, label);
+            DrawLabel(position, property, label);//base.OnGUI(position, property, label);
             EditorGUILayout.PropertyField(property.FindPropertyRelative("Curve"));
         }
         
