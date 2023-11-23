@@ -26,6 +26,7 @@ namespace DredPack.WindowEditor
             
             if (window.T.General.StateOnAwakeMethod != WindowClasses.StatesAwakeMethod.Nothing)
             {
+                EditorGUI.indentLevel++;
                 string propName = "OnAwake";
                 switch (window.T.General.StateOnAwakeMethod)
                 {
@@ -51,7 +52,7 @@ namespace DredPack.WindowEditor
                     window.T.General.AnimationOnAwake = window.T.Animation.allAnimationNames[nextVal];
                     EditorUtility.SetDirty(window.T);
                 }
-                //EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("AnimationOnAwake"),true);
+                EditorGUI.indentLevel--;
             }
 
 

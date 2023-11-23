@@ -13,10 +13,16 @@ namespace DredPack.UI.WindowAnimations
         protected Window window;
         private List<Coroutine> launchedCoroutines = new List<Coroutine>();
 
-        public virtual void Init(Window owner)
+        public void Init(Window owner)
         {
-            window = owner;
+            if (!window)
+            {
+                window = owner;
+                OnInit(owner);
+            }
         }
+
+        public virtual void OnInit(Window owner) { }
 
         public virtual IEnumerator UpdateOpen(AnimationParameters parameters)
         {

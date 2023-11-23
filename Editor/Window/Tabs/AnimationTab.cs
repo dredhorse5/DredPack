@@ -25,6 +25,7 @@ namespace DredPack.WindowEditor
                 window.T.Animation.currentAnimationName = window.T.Animation.allAnimationNames[_selected];
                 EditorUtility.SetDirty(window.T);
             }
+            
             DredpackEditor.DredInspectorEditorTemplates.DrawLabel(window.T.Animation.currentAnimationName);
             EditorGUILayout.Space(-20);
             EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("_currentAnimation"),true);

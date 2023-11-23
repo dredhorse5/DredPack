@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using NaughtyAttributes;
+using UnityEngine;
 
 namespace DredPack.UI.WindowAnimations
 {
@@ -7,44 +9,45 @@ namespace DredPack.UI.WindowAnimations
     public class Animator : WindowAnimation
     {
         public UnityEngine.Animator animator;
-        
-        public Types SwitchType = Types.Trigger;
-        public enum Types { Trigger, BoolSwap, AnimationNames }
-        
-        //type = = Trigger
-        public string OpenTrigger;
-        public string CloseTrigger;
-        
-        //type = = BoolSwap
-        public string BoolName;
-        
-        //type = = AnimationNames
-        public string OpenAnimationName;
-        public string CloseAnimationName;
-        
 
-        
-        
-        public override IEnumerator UpdateOpen(AnimationParameters parameters)
+        //TODO: make custom drawer
+        public string OpenAnimationName = "Open";
+        public string CloseAnimationName = "Close";
+
+
+        private AnimationClip openClip;
+        private AnimationClip closeClip;
+        public override void OnInit(Window owner)
         {
-            yield break;
-            switch (SwitchType)
+            foreach (var clip in animator.runtimeAnimatorController.animationClips)
             {
-                default: case Types.Trigger: break;
-                case Types.BoolSwap: break;
-                case Types.AnimationNames: break;
+                if (clip.name == OpenAnimationName && !openClip)
+                    openClip = clip;
+                else if (clip.name == CloseAnimationName && !closeClip)
+                    closeClip = clip;
+                
+
+                if (openClip && closeClip)
+                    break;
             }
+
+            if (!closeClip)
+                Debug.LogError(
+                    $"Cant find Open animation in Animator in window: <{window.name}>, with name <{OpenAnimationName}>");
+            if (!openClip)
+                Debug.LogError(
+                    $"Cant find Close animation in Animator in window: <{window.name}>, with name <{CloseAnimationName}>");
         }
 
+        public override IEnumerator UpdateOpen(AnimationParameters parameters)
+        {
+            animator.Play(OpenAnimationName);
+            yield return new WaitForSeconds(openClip.length);
+        }
         public override IEnumerator UpdateClose(AnimationParameters parameters)
         {
-            yield break;
-            switch (SwitchType)
-            {
-                default: case Types.Trigger: break;
-                case Types.BoolSwap: break;
-                case Types.AnimationNames: break;
-            }
+            animator.Play(CloseAnimationName);
+            yield return new WaitForSeconds(closeClip.length);
         }
     }
 }
