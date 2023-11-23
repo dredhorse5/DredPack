@@ -88,6 +88,8 @@ namespace DredPack.UI
             public bool EnableableCanvas = false;
             public bool EnableableRaycaster = true;
             public bool CloseIfAnyWindowOpen;
+            public CloseIfAnyWindowOpenTypes CloseIfAnyWindowOpenType;
+            public enum CloseIfAnyWindowOpenTypes { OnStart, OnEnd }
             public bool CloseOnOutsideClick;
 
             public override void Init(Window owner)
@@ -158,6 +160,9 @@ namespace DredPack.UI
             public UnityEvent<bool> EndSwitch;
 
             public UnityEvent<StatesRead> StateChanged;
+
+            public static UnityEvent<Window, bool> StartSwitchStatic = new UnityEvent<Window, bool>();
+            public static UnityEvent<Window, bool> EndSwitchStatic = new UnityEvent<Window, bool>();
 
             public void OnStartOpen() => StartOpen?.Invoke();
             public void OnStartClose() => StartClose?.Invoke();

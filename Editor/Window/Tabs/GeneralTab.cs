@@ -75,29 +75,27 @@ namespace DredPack.WindowEditor
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("Disableable"), true);
-            if (window.T.General.Disableable)
-                EditorGUILayout.PropertyField(componentsProperty.FindPropertyRelative("DisableableObject"),
-                    GUIContent.none);
+            if (window.T.General.Disableable) EditorGUILayout.PropertyField(componentsProperty.FindPropertyRelative("DisableableObject"), GUIContent.none);
             EditorGUILayout.EndHorizontal();
 
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("EnableableCanvas"),
-                new GUIContent("Enableable Canvas"));
-            if (window.T.General.EnableableCanvas)
-                EditorGUILayout.PropertyField(componentsProperty.FindPropertyRelative("Canvas"), GUIContent.none);
+            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("EnableableCanvas"), new GUIContent("Enableable Canvas"));
+            if (window.T.General.EnableableCanvas) EditorGUILayout.PropertyField(componentsProperty.FindPropertyRelative("Canvas"), GUIContent.none);
             EditorGUILayout.EndHorizontal();
 
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("EnableableRaycaster"),
-                new GUIContent("Enableable Raycaster"));
-            if (window.T.General.EnableableRaycaster)
-                EditorGUILayout.PropertyField(componentsProperty.FindPropertyRelative("Raycaster"), GUIContent.none);
+            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("EnableableRaycaster"), new GUIContent("Enableable Raycaster"));
+            if (window.T.General.EnableableRaycaster) EditorGUILayout.PropertyField(componentsProperty.FindPropertyRelative("Raycaster"), GUIContent.none);
             EditorGUILayout.EndHorizontal();
 
 
-            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("CloseIfAnyWindowOpen"), true);
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("CloseIfAnyWindowOpen"), new GUIContent("Close If Any Window Open"),true);
+            if (window.T.General.CloseIfAnyWindowOpen) EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("CloseIfAnyWindowOpenType"), GUIContent.none);
+            EditorGUILayout.EndHorizontal();
+            
             EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("CloseOnOutsideClick"), true);
         }
     }

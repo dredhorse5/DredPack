@@ -61,10 +61,17 @@ namespace DredPack.UI
                 Switch(General.StateOnAwake != WindowClasses.StatesAwake.Open, "Instantly");
                 Switch(General.StateOnAwake == WindowClasses.StatesAwake.Open, General.AnimationOnAwake);
             }
+            WindowClasses.EventsTab.StartSwitchStatic.AddListener(OnStartSwitchStatic);
+            WindowClasses.EventsTab.EndSwitchStatic.AddListener(OnEndSwitchStatic);
         }
 
-        
-        
+        private void OnDisable()
+        {
+            WindowClasses.EventsTab.StartSwitchStatic.RemoveListener(OnStartSwitchStatic);
+            WindowClasses.EventsTab.EndSwitchStatic.RemoveListener(OnEndSwitchStatic);
+        }
+
+
         private void ChangeState(WindowClasses.StatesRead state)
         {
             General.CurrentState = state;
@@ -163,29 +170,6 @@ namespace DredPack.UI
             OnEndSwitch(false);
         }
 
-        /*
-        private IEnumerator Cor1()
-        {
-            yield return Cor2();
-            yield return Cor2();
-            yield return Cor2();
-            yield return Cor2();
-            yield return Cor2();
-            yield return Cor2();
-            yield return Cor2();
-            yield return Cor2();
-            yield return Cor2();
-            yield return Cor2();
-        }
-
-        private IEnumerator Cor2()
-        {
-            if(false)
-                yield return null;
-            // не ждем ничего, сразу выходим
-        }*/
-
-
         #endregion
         
 
@@ -226,6 +210,7 @@ namespace DredPack.UI
         {
             foreach (var cl in callbacks)
                 cl?.OnStartSwitch(state);
+            WindowClasses.EventsTab.StartSwitchStatic?.Invoke(this, state);
         }
 
         public void OnEndOpen()
@@ -244,6 +229,7 @@ namespace DredPack.UI
         {
             foreach (var cl in callbacks)
                 cl?.OnEndSwitch(state);
+            WindowClasses.EventsTab.EndSwitchStatic?.Invoke(this, state);
         }
 
         public void OnStateChanged(WindowClasses.StatesRead state)
@@ -251,7 +237,25 @@ namespace DredPack.UI
             foreach (var cl in callbacks)
                 cl?.OnStateChanged(state);
         }
-        
+
+
+        private void OnStartSwitchStatic(Window window, bool state)
+        {
+            if (General.CloseIfAnyWindowOpen && state && window != this)
+            {
+                if(General.CloseIfAnyWindowOpenType == WindowClasses.GeneralTab.CloseIfAnyWindowOpenTypes.OnStart)
+                    Close();
+            }
+        }
+
+        private void OnEndSwitchStatic(Window window, bool state)
+        {
+            if (General.CloseIfAnyWindowOpen && state && window != this)
+            {
+                if(General.CloseIfAnyWindowOpenType == WindowClasses.GeneralTab.CloseIfAnyWindowOpenTypes.OnEnd)
+                    Close();
+            }
+        }
         
         
         #endregion
