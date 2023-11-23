@@ -96,7 +96,18 @@ namespace DredPack.WindowEditor
             if (window.T.General.CloseIfAnyWindowOpen) EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("CloseIfAnyWindowOpenType"), GUIContent.none);
             EditorGUILayout.EndHorizontal();
             
+            
+            EditorGUILayout.BeginHorizontal();
+            bool canCloseOnOutsideClick = window.T.Components.Canvas &&
+                                          window.T.Components.Canvas.renderMode == RenderMode.ScreenSpaceCamera &&
+                                          window.T.Components.Canvas.worldCamera;
+            GUI.enabled = canCloseOnOutsideClick;
             EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("CloseOnOutsideClick"), true);
+            if(!canCloseOnOutsideClick)
+                EditorGUILayout.LabelField("Do not active, because Canvas.renderMode must be Screen Space - Camera, and Camera must be attached", EditorStyles.helpBox);
+            GUI.enabled = true;
+            EditorGUILayout.EndHorizontal();
+            
         }
     }
 }

@@ -58,6 +58,7 @@ namespace DredPack.UI
             public GraphicRaycaster Raycaster;
             public Graphic BackgroundImage;
             public CanvasGroup CanvasGroup;
+            public UnityEngine.Camera CanvasCamera => Canvas.worldCamera;
         }
         
 
@@ -91,6 +92,11 @@ namespace DredPack.UI
             public CloseIfAnyWindowOpenTypes CloseIfAnyWindowOpenType;
             public enum CloseIfAnyWindowOpenTypes { OnStart, OnEnd }
             public bool CloseOnOutsideClick;
+
+            public bool CanCloseOnOutsideClick => (window.Components.Canvas &&
+                                                   window.Components.Canvas.renderMode == RenderMode.ScreenSpaceCamera &&
+                                                   window.Components.Canvas.worldCamera);
+
 
             public override void Init(Window owner)
             {
@@ -144,6 +150,25 @@ namespace DredPack.UI
             public void OnEndSwitch(bool state) { }
 
             public void OnStateChanged(StatesRead state) { }
+            
+            public void CheckOutsideClick()
+            {
+                if (CloseOnOutsideClick && CurrentState == StatesRead.Opened && CanCloseOnOutsideClick)
+                {
+                    // Проверяем, было ли касание на экране
+                    if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+                        CheckWindow(Input.GetTouch(0).position);
+                    else if(Input.GetMouseButtonUp(0))
+                        CheckWindow(Input.mousePosition);
+                    void CheckWindow(Vector2 touchPosition)
+                    {
+                        // Проверяем, если окно активно и касание было вне его области, закрываем окно
+                        if (!RectTransformUtility.RectangleContainsScreenPoint((window.transform as RectTransform), touchPosition, window.Components.CanvasCamera))
+                            window.Close();
+                    }
+                }
+            
+            }
         }
 
         

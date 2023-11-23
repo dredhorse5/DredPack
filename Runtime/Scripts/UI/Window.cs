@@ -71,6 +71,10 @@ namespace DredPack.UI
             WindowClasses.EventsTab.EndSwitchStatic.RemoveListener(OnEndSwitchStatic);
         }
 
+        private void Update()
+        {
+            General.CheckOutsideClick();
+        }
 
         private void ChangeState(WindowClasses.StatesRead state)
         {
@@ -300,6 +304,9 @@ namespace DredPack.UI
                 Components.BackgroundImage = GetComponent<Image>();
             if(Components.CanvasGroup == null)
                 Components.CanvasGroup = GetComponent<CanvasGroup>();
+            
+            if(Components.Canvas.worldCamera)
+            
             EditorUtility.SetDirty(this);
         }
         #endif
