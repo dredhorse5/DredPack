@@ -19,7 +19,7 @@ namespace DredPack.WindowEditor
             base.Draw();
             var sel = EditorGUILayout.Popup("Animation Type", _selected, window.T.Animation.allAnimationNames);
  
-            if (EditorGUI.EndChangeCheck() && sel != _selected)
+            if (sel != _selected)
             {
                 _selected = sel;
                 window.T.Animation.currentAnimationName = window.T.Animation.allAnimationNames[_selected];

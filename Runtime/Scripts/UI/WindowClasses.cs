@@ -88,6 +88,10 @@ namespace DredPack.UI
             public bool Disableable = false;
             public bool EnableableCanvas = false;
             public bool EnableableRaycaster = true;
+            public bool EnableableCanvasGroupInteractable = true;
+            public bool EnableableCanvasGroupRaycasts = true;
+            
+            
             public bool CloseIfAnyWindowOpen;
             public CloseIfAnyWindowOpenTypes CloseIfAnyWindowOpenType;
             public enum CloseIfAnyWindowOpenTypes { OnStart, OnEnd }
@@ -121,8 +125,10 @@ namespace DredPack.UI
                 
                 if (window.Components.CanvasGroup)
                 {
-                    window.Components.CanvasGroup.interactable = false;
-                    window.Components.CanvasGroup.blocksRaycasts = false;
+                    if(EnableableCanvasGroupInteractable)
+                        window.Components.CanvasGroup.interactable = false;
+                    if(EnableableCanvasGroupRaycasts)
+                        window.Components.CanvasGroup.blocksRaycasts = false;
                 }
             }
 
@@ -134,8 +140,10 @@ namespace DredPack.UI
                     window.Components.Raycaster.enabled = true;
                 if (window.Components.CanvasGroup)
                 {
-                    window.Components.CanvasGroup.interactable = true;
-                    window.Components.CanvasGroup.blocksRaycasts = true;
+                    if(EnableableCanvasGroupInteractable)
+                        window.Components.CanvasGroup.interactable = true;
+                    if(EnableableCanvasGroupRaycasts)
+                        window.Components.CanvasGroup.blocksRaycasts = true;
                 }
             }
 

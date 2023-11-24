@@ -15,6 +15,7 @@ namespace DredPack.WindowEditor
             componentsProperty = this.window.serializedObject.FindProperty("Components");
         }
 
+        
         public virtual void Draw()
         {
             EditorGUI.indentLevel++;
