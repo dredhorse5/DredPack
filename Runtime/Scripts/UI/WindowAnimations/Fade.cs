@@ -16,7 +16,7 @@ namespace DredPack.UI.WindowAnimations
                 window.Components.CanvasGroup.alpha = Curve.Evaluate(i);
                 yield return null;
             }
-            window.Components.CanvasGroup.alpha = 1f;
+            window.Components.CanvasGroup.alpha = Curve.Evaluate(1f);
         }
 
         public override IEnumerator UpdateClose(AnimationParameters parameters)
@@ -27,7 +27,7 @@ namespace DredPack.UI.WindowAnimations
                 yield return null;
             }
 
-            window.Components.CanvasGroup.alpha = 0f;
+            window.Components.CanvasGroup.alpha = Curve.Evaluate(0);
         }
         
         

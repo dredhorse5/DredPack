@@ -37,12 +37,13 @@ namespace DredPack.UI
             Events.Init(this);
             Audio.Init(this);
             
+            RegisterCallback(new WindowClasses.IWindowCallback[]{General,Events,Audio});
+            
             if(General.StateOnAwakeMethod == WindowClasses.StatesAwakeMethod.Awake && !switchedOnce)
             {
                 Switch(General.StateOnAwake != WindowClasses.StatesAwake.Open, "Instantly");
                 Switch(General.StateOnAwake == WindowClasses.StatesAwake.Open, General.AnimationOnAwake);
             }
-            RegisterCallback(new WindowClasses.IWindowCallback[]{General,Events,Audio});
         }
 
         private void Start()

@@ -25,6 +25,8 @@ namespace DredPack.WindowEditor
         private SerializedProperty closeIfAnyWindowOpenProperty;
         private SerializedProperty closeIfAnyWindowOpenTypeProperty;
         private SerializedProperty closeOnOutsideClickProperty; 
+        private SerializedProperty autoCloseProperty; 
+        private SerializedProperty autoCloseDelayProperty; 
 
         public GeneralTab(WindowEditor window, string tabName) : base(window, tabName)
         {
@@ -46,6 +48,8 @@ namespace DredPack.WindowEditor
             closeIfAnyWindowOpenProperty = tabProperty.FindPropertyRelative("CloseIfAnyWindowOpen");
             closeIfAnyWindowOpenTypeProperty = tabProperty.FindPropertyRelative("CloseIfAnyWindowOpenType");
             closeOnOutsideClickProperty = tabProperty.FindPropertyRelative("CloseOnOutsideClick");
+            autoCloseProperty = tabProperty.FindPropertyRelative("AutoClose");
+            autoCloseDelayProperty = tabProperty.FindPropertyRelative("AutoCloseDelay");
         }
 
         public override void Draw()
@@ -101,11 +105,19 @@ namespace DredPack.WindowEditor
 
             
             window.DrawLabel(" Some");
+            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PropertyField(autoCloseProperty);
+            if (window.T.General.AutoClose)
+            {
+                EditorGUILayout.LabelField("After Open Delay", GUILayout.MaxWidth(120));
+                EditorGUILayout.PropertyField(autoCloseDelayProperty, GUIContent.none);
+            }
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(disableableProperty, true);
             if (window.T.General.Disableable) EditorGUILayout.PropertyField(disableableObjectProperty, GUIContent.none);
-            var sadasd = GUILayoutUtility.GetLastRect();
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

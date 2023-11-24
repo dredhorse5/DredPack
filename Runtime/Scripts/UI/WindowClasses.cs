@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using DredPack.Audio;
 using DredPack.UI.WindowAnimations;
@@ -85,6 +86,8 @@ namespace DredPack.UI
             public Button SwitchButton;
             
             //Some
+            public bool AutoClose = false;
+            public float AutoCloseDelay = 2;
             public bool Disableable = false;
             public bool EnableableCanvas = false;
             public bool EnableableRaycaster = true;
@@ -110,6 +113,10 @@ namespace DredPack.UI
                 if(SwitchButton) SwitchButton.onClick.AddListener(window.Switch);
             }
 
+            #region Callbacks
+
+            
+
             public void OnStartOpen()
             {
                 if(Disableable && window.Components.DisableableObject)
@@ -132,7 +139,10 @@ namespace DredPack.UI
                 }
             }
 
-            public void OnStartSwitch(bool state) { }
+            public void OnStartSwitch(bool state)
+            {
+                StopAutoClose();
+            }
 
             public void OnEndOpen()
             {
@@ -145,6 +155,8 @@ namespace DredPack.UI
                     if(EnableableCanvasGroupRaycasts)
                         window.Components.CanvasGroup.blocksRaycasts = true;
                 }
+
+                RunAutoClose();
             }
 
             public void OnEndClose()
@@ -158,6 +170,10 @@ namespace DredPack.UI
             public void OnEndSwitch(bool state) { }
 
             public void OnStateChanged(StatesRead state) { }
+            
+            
+            
+            #endregion
             
             public void CheckOutsideClick()
             {
@@ -175,8 +191,28 @@ namespace DredPack.UI
                             window.Close();
                     }
                 }
-            
             }
+
+            private Coroutine autoCloseCor;
+
+            private void StopAutoClose()
+            {
+                if(AutoClose && autoCloseCor != null)
+                    window.StopCoroutine(autoCloseCor);
+            }
+            private void RunAutoClose()
+            {
+                if(!AutoClose)
+                    return;
+                StopAutoClose();
+                autoCloseCor = window.StartCoroutine(IE());
+                IEnumerator IE()
+                {
+                    yield return new WaitForSeconds(AutoCloseDelay);
+                    window.Close();
+                }
+            }
+            
         }
 
         
