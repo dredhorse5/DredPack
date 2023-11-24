@@ -133,17 +133,19 @@ namespace DredPack.WindowEditor
             
             EditorGUILayout.BeginHorizontal();
             
-            EditorGUILayout.LabelField("CanvasGroup Control:");
+
+
+            EditorGUILayout.LabelField("");
             var rect = GUILayoutUtility.GetLastRect();
-            var dataRect = new Rect(rect.x + 150, rect.y, rect.width - 150, rect.height);
-            var leftRect = new Rect(dataRect.x - 10, dataRect.y, 100, dataRect.height);
-            var rightRect = new Rect(dataRect.x + 90, dataRect.y, 100, dataRect.height);
+            var dataRect = EditorGUI.PrefixLabel(rect, new GUIContent("CanvasGroup Control :"));
+            var leftRect  =new Rect(dataRect.x - 14, dataRect.y, dataRect.width / 2f + 7f, dataRect.height);
+            var rightRect = new Rect(dataRect.x + dataRect.width / 2f - 14, dataRect.y, dataRect.width / 2f + 14f, dataRect.height);
             GUI.Box(dataRect,GUIContent.none,GUI.skin.box);
             GUI.Box(dataRect,GUIContent.none,GUI.skin.box);
             EditorGUI.LabelField(leftRect,"Interactable", EditorStyles.boldLabel);
             EditorGUI.LabelField(rightRect,"Raycasts", EditorStyles.boldLabel);
-            var toggle1Rect = new Rect(leftRect.x + 76, leftRect.y, leftRect.height, leftRect.height);
-            var toggle2Rect = new Rect(rightRect.x + 60, rightRect.y, rightRect.height, rightRect.height);
+            var toggle1Rect = new Rect(leftRect.x + 76, leftRect.y, leftRect.width - 76, leftRect.height);
+            var toggle2Rect = new Rect(rightRect.x + 60, rightRect.y, rightRect.width - 60, rightRect.height);
             EditorGUI.PropertyField(toggle1Rect, enableableCanvasGroupInteractable, GUIContent.none);
             EditorGUI.PropertyField(toggle2Rect, enableableCanvasGroupRaycasts, GUIContent.none);
             

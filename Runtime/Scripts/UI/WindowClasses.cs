@@ -310,12 +310,13 @@ namespace DredPack.UI
             }
             private WindowAnimation[] allAnimations => new WindowAnimation[]
             {
-                fade, instantly, animator
+                fade, instantly, animator, scaledPopUp
             };
 
-            [SerializeReference, SerializeField]Fade fade = new Fade();
+            [SerializeReference, SerializeField] Fade fade = new Fade();
             [SerializeReference, SerializeField] Instantly instantly = new Instantly();
             [SerializeReference, SerializeField] WindowAnimations.Animator animator = new WindowAnimations.Animator();
+            [SerializeReference, SerializeField] ScaledPopUp scaledPopUp = new ScaledPopUp();
             
             
             public WindowAnimation GetAnimation(string name)

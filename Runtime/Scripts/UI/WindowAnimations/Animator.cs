@@ -17,6 +17,7 @@ namespace DredPack.UI.WindowAnimations
 
         private AnimationClip openClip;
         private AnimationClip closeClip;
+        private bool hasSpeedParameter;
         public override void OnInit(Window owner)
         {
             foreach (var clip in animator.runtimeAnimatorController.animationClips)
@@ -37,16 +38,30 @@ namespace DredPack.UI.WindowAnimations
             if (!openClip)
                 Debug.LogError(
                     $"Cant find Close animation in Animator in window: <{window.name}>, with name <{CloseAnimationName}>");
+            foreach (var par in animator.parameters)
+            {
+                if (par.name == "Speed")
+                {
+                    hasSpeedParameter = true;
+                    break;
+                }
+            }
         }
 
         public override IEnumerator UpdateOpen(AnimationParameters parameters)
         {
+            base.UpdateOpen(parameters);
             animator.Play(OpenAnimationName);
+            if(hasSpeedParameter)
+                animator.SetFloat("Speed",Speed);
             yield return new WaitForSeconds(openClip.length);
         }
         public override IEnumerator UpdateClose(AnimationParameters parameters)
         {
+            base.UpdateClose(parameters);
             animator.Play(CloseAnimationName);
+            if(hasSpeedParameter)
+                animator.SetFloat("Speed",Speed);
             yield return new WaitForSeconds(closeClip.length);
         }
     }

@@ -11,6 +11,7 @@ namespace DredPack.UI.WindowAnimations
 
         public override IEnumerator UpdateOpen(AnimationParameters parameters)
         {
+            base.UpdateOpen(parameters);
             for (float i = 0; i < 1f; i += Time.deltaTime * Speed * parameters.CustomSpeed)
             {
                 window.Components.CanvasGroup.alpha = Curve.Evaluate(i);
@@ -21,6 +22,7 @@ namespace DredPack.UI.WindowAnimations
 
         public override IEnumerator UpdateClose(AnimationParameters parameters)
         {
+            base.UpdateClose(parameters);
             for (float i = 0; i < 1f; i += Time.deltaTime * Speed * parameters.CustomSpeed)
             {
                 window.Components.CanvasGroup.alpha = Curve.Evaluate(1f - i);

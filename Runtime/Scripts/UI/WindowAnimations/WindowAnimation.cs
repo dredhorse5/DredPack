@@ -8,11 +8,16 @@ namespace DredPack.UI.WindowAnimations
     [Serializable]
     public class WindowAnimation
     {
-        public virtual string Name => this.GetType().Name;
         public float Speed = 1f;
+        public SwitchDelay SwitchDelay;
+        
+        
+        
         protected Window window;
         private List<Coroutine> launchedCoroutines = new List<Coroutine>();
 
+        public virtual string Name => this.GetType().Name;
+        
         public void Init(Window owner)
         {
             if (!window)
@@ -26,11 +31,15 @@ namespace DredPack.UI.WindowAnimations
 
         public virtual IEnumerator UpdateOpen(AnimationParameters parameters)
         {
+            if (SwitchDelay.Open > 0.001f)
+                yield return new WaitForSeconds(SwitchDelay.Open);
             yield return null;
         }
         
         public virtual IEnumerator UpdateClose(AnimationParameters parameters)
         {
+            if (SwitchDelay.Close > 0.001f)
+                yield return new WaitForSeconds(SwitchDelay.Close);
             yield return null;
         }
 
@@ -54,8 +63,16 @@ namespace DredPack.UI.WindowAnimations
         }
     }
 
+    [Serializable]
     public class AnimationParameters
     {
         public readonly float CustomSpeed = 1f;
+    }
+
+    [Serializable]
+    public struct SwitchDelay
+    {
+        public float Open;
+        public float Close;
     }
 }

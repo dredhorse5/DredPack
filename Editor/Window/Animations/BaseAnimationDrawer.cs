@@ -12,9 +12,8 @@ namespace DredPack.WindowEditor.Animations
         
         protected void DrawDefaultFields(Rect position, SerializedProperty property, GUIContent label)
         {
-            var attr = property.FindPropertyRelative("Speed");
-            if(attr != null)
-                EditorGUILayout.PropertyField(attr);
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("Speed"));
+            EditorGUILayout.PropertyField(property.FindPropertyRelative("SwitchDelay"));
         }
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
