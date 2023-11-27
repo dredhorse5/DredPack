@@ -50,7 +50,7 @@ namespace DredPack.UI.WindowAnimations
 
         public override IEnumerator UpdateOpen(AnimationParameters parameters)
         {
-            base.UpdateOpen(parameters);
+            yield return StartCoroutine(base.UpdateOpen(parameters));
             animator.Play(OpenAnimationName);
             if(hasSpeedParameter)
                 animator.SetFloat("Speed",Speed);
@@ -58,7 +58,7 @@ namespace DredPack.UI.WindowAnimations
         }
         public override IEnumerator UpdateClose(AnimationParameters parameters)
         {
-            base.UpdateClose(parameters);
+            yield return StartCoroutine(base.UpdateClose(parameters));
             animator.Play(CloseAnimationName);
             if(hasSpeedParameter)
                 animator.SetFloat("Speed",Speed);

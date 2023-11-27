@@ -9,16 +9,26 @@ namespace DredPack.UI.WindowAnimations
         //public override string Name => "Instantly";
         public override IEnumerator UpdateOpen(AnimationParameters parameters)
         {
-            window.Components.CanvasGroup.alpha = 1f;
+            SetOpenTime(1f, parameters);
             yield break;
         }
 
+        public override void SetOpenTime(float time, AnimationParameters parameters)
+        {
+            window.Components.CanvasGroup.alpha = 1f;
+        }
+
+
         public override IEnumerator UpdateClose(AnimationParameters parameters)
         {
-            window.Components.CanvasGroup.alpha = 0f;
+            SetCloseTime(0f, parameters);
             yield break;
         }
         
+        public override void SetCloseTime(float time, AnimationParameters parameters)
+        {
+            window.Components.CanvasGroup.alpha = 0f;
+        }
         
     }
 }

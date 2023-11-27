@@ -11,25 +11,35 @@ namespace DredPack.UI.WindowAnimations
 
         public override IEnumerator UpdateOpen(AnimationParameters parameters)
         {
-            base.UpdateOpen(parameters);
+            yield return StartCoroutine(base.UpdateOpen(parameters));
             for (float i = 0; i < 1f; i += Time.deltaTime * Speed * parameters.CustomSpeed)
             {
-                window.Components.CanvasGroup.alpha = Curve.Evaluate(i);
+                SetOpenTime(i, parameters);
                 yield return null;
             }
-            window.Components.CanvasGroup.alpha = Curve.Evaluate(1f);
+            SetOpenTime(1f, parameters);
+        }
+
+        public override void SetOpenTime(float time, AnimationParameters parameters)
+        {
+            window.Components.CanvasGroup.alpha = Curve.Evaluate(time);
         }
 
         public override IEnumerator UpdateClose(AnimationParameters parameters)
         {
-            base.UpdateClose(parameters);
+            yield return StartCoroutine(base.UpdateClose(parameters));
             for (float i = 0; i < 1f; i += Time.deltaTime * Speed * parameters.CustomSpeed)
             {
-                window.Components.CanvasGroup.alpha = Curve.Evaluate(1f - i);
+                SetCloseTime(i, parameters);
                 yield return null;
             }
 
-            window.Components.CanvasGroup.alpha = Curve.Evaluate(0);
+            SetCloseTime(1f, parameters);
+        }
+        
+        public override void SetCloseTime(float time, AnimationParameters parameters)
+        {
+            window.Components.CanvasGroup.alpha = Curve.Evaluate(1f - time);
         }
         
         
