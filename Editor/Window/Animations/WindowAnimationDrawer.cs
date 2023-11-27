@@ -7,7 +7,7 @@ using UnityEngine;
 namespace DredPack.WindowEditor.Animations
 {
     [CustomPropertyDrawer(typeof(WindowAnimation))]
-    public class BaseAnimationDrawer : PropertyDrawer
+    public class WindowAnimationDrawer : PropertyDrawer
     {
         
         protected void DrawDefaultFields(Rect position, SerializedProperty property, GUIContent label)

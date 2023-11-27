@@ -5,7 +5,7 @@ using UnityEngine;
 namespace DredPack.WindowEditor.Animations
 {
     [CustomPropertyDrawer(typeof(Instantly))]
-    public class InstantlyDrawer : BaseAnimationDrawer
+    public class InstantlyDrawer : WindowAnimationDrawer
     {
         
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
