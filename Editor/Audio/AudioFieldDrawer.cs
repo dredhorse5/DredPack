@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 namespace DredPack.DredpackEditor.Audio
 {
-    [CustomPropertyDrawer(typeof(AudioField))]
+    [CustomPropertyDrawer(typeof(AudioField), true)]
     public class AudioFieldDrawer : PropertyDrawer
     {
         private SerializedProperty localVolumeProp;
@@ -16,10 +16,7 @@ namespace DredPack.DredpackEditor.Audio
         private SerializedProperty groupIDProp;
         private SerializedProperty advancedIDProp;
         
-        private bool expanded;
         
-        private float savedY;
-        private float height;
         public override void OnGUI(Rect position, SerializedProperty property,
             GUIContent label)
         {
@@ -30,14 +27,18 @@ namespace DredPack.DredpackEditor.Audio
             groupIDProp = property.FindPropertyRelative("GroupID");
             advancedIDProp = property.FindPropertyRelative("Advanced");
 
-            savedY = position.y;
-            EditorGUI.DrawRect(position, new Color(0,0,0,.15f));
+            var rect1 = new Rect(position);
+            rect1.height = EditorGUIUtility.singleLineHeight;
+            EditorGUI.DrawRect(rect1, new Color(0,0,0,.15f));
+            var rect = new Rect(position);
+            rect.height -= 2;
+            EditorGUI.DrawRect(rect, new Color(0,0,0,.15f));
             
             position.height = EditorGUIUtility.singleLineHeight;
             EditorGUI.BeginProperty(position, label, property);
 
             DrawPrefix(position, property, label);
-            if(expanded)
+            if(property.isExpanded)
                 DrawExpand(position, property, label);
 
             EditorGUI.EndProperty();
@@ -67,7 +68,7 @@ namespace DredPack.DredpackEditor.Audio
             }
             
             
-            expanded = EditorGUI.Foldout(position, expanded, new GUIContent(""),true);
+            property.isExpanded = EditorGUI.Foldout(position, property.isExpanded, new GUIContent(""),true);
         }
 
         SerializedProperty GetFirstAudioProperty(SerializedProperty array)
@@ -103,14 +104,18 @@ namespace DredPack.DredpackEditor.Audio
             EditorGUI.PropertyField(position, advancedIDProp,true);
             position.y += EditorGUI.GetPropertyHeight(advancedIDProp,true);
 
-            height = position.y - savedY;
             EditorGUI.indentLevel--;
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            if (expanded)
-                return height + 10;//20 * 12;
+            if (property.isExpanded)
+            {
+                float offset = 60;
+                if (property.FindPropertyRelative("FindAudioMethod").enumValueIndex == 0)
+                    offset = 40;
+                return EditorGUI.GetPropertyHeight(property) - offset;//20 * 12;
+            }
             return 18;
         }
     }

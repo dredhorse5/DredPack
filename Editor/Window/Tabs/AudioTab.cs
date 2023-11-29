@@ -51,12 +51,14 @@ namespace DredPack.WindowEditor
 
                 Rect callbackRect = GUILayoutUtility.GetLastRect();
 
-                Rect removeButtonPos = new Rect(callbackRect.xMax - removeButtonSize.x - 8, callbackRect.y + 5, removeButtonSize.x, removeButtonSize.y);
+                Rect removeButtonPos = new Rect(callbackRect.xMax - removeButtonSize.x, callbackRect.y +1, removeButtonSize.x, removeButtonSize.y);
                 if (GUI.Button(removeButtonPos, iconToolbarMinus, GUIStyle.none))
                     toBeRemovedEntry = i;
-                
-                EditorGUILayout.PropertyField(audio, eventIDName);
+                callbackRect.width -= 20; 
+                EditorGUI.PropertyField(callbackRect, audio, eventIDName, true);
+                //EditorGUILayout.PropertyField(audio, eventIDName);
 
+                EditorGUILayout.Space(EditorGUI.GetPropertyHeight(audio));
                 EditorGUILayout.Space(0);
             }
 
