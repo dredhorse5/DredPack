@@ -18,16 +18,15 @@ namespace DredPack.Audio
     public class AudioField
     {
         public AudioManager.AudioTypes Type;
+        [Range(0,1f)]
         public float LocalVolume = 1f;
         public FindAudioMethods FindAudioMethod;
-        [ShowIf(nameof(FindAudioMethod), FindAudioMethods.Name)][AllowNesting]
         public string GroupID;
-        [ShowIf(nameof(FindAudioMethod), FindAudioMethods.Clips)][AllowNesting]
         public List<AudioClip> Clip;
         [AllowNesting]
         public AdvancedSettings Advanced = new AdvancedSettings(); 
         
-        public enum FindAudioMethods { Clips, Name }
+        public enum FindAudioMethods { Clips, GroupID }
 
         public AudioManager.AudioByType audioByType { get; private set; }
         private float globalVolume = 1f;
@@ -36,8 +35,6 @@ namespace DredPack.Audio
         private MonoBehaviour owner;
         [NonSerialized] 
         private bool isInited = false;
-
-        private int properties;
 
         public AudioField()
         {
@@ -79,7 +76,7 @@ namespace DredPack.Audio
 
         public AudioClip GetClip(int index = -1)
         {
-            if (FindAudioMethod == FindAudioMethods.Name)
+            if (FindAudioMethod == FindAudioMethods.GroupID)
                 return AudioManager.Instance.GetClipFromGroup(GroupID);
             var audioClips = Clip.FindAll(_ => _ != null);
             if (index < 0)
