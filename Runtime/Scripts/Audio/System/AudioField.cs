@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DredPack.Audio.Help;
 using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine;
@@ -17,10 +18,12 @@ namespace DredPack.Audio
     [Serializable]
     public class AudioField
     {
-        public AudioManager.AudioTypes Type;
+        [AudioType]
+        public string Type;
         [Range(0,1f)]
         public float LocalVolume = 1f;
         public FindAudioMethods FindAudioMethod;
+        [AudioGroup]
         public string GroupID;
         public List<AudioClip> Clip;
         [AllowNesting]
@@ -30,7 +33,7 @@ namespace DredPack.Audio
 
         public AudioManager.AudioByType audioByType { get; private set; }
         private float globalVolume = 1f;
-        private bool isMuted = false;
+        private bool isEnabled = false;
 
         private MonoBehaviour owner;
         [NonSerialized] 
@@ -38,12 +41,12 @@ namespace DredPack.Audio
 
         public AudioField()
         {
-            Type = AudioManager.AudioTypes.Audio;
+            Type = "Audio";
             LocalVolume = 1f;
             Advanced.OneShot = true; 
         }
 
-        public AudioField(AudioManager.AudioTypes type, float localVolume = 1f)
+        public AudioField(string type, float localVolume = 1f)
         {
             Type = type;
             LocalVolume = localVolume;
@@ -54,8 +57,8 @@ namespace DredPack.Audio
         {
             if(audioByType != null)
             {
-                if(audioByType.ChangeMuteEvent != null)
-                    audioByType.ChangeMuteEvent.RemoveListener(OnMuteChange);
+                if(audioByType.ChangeEnableEvent != null)
+                    audioByType.ChangeEnableEvent.RemoveListener(OnEnabledChanged);
                 if(audioByType.ChangeVolumeEvent != null)
                     audioByType.ChangeVolumeEvent.RemoveListener(OnGlobalVolumeChange);
             }
@@ -67,7 +70,7 @@ namespace DredPack.Audio
                 return;
             this.owner = owner;
             audioByType = AudioManager.GetAudioType(Type);
-            audioByType.ChangeMuteEvent.AddListener(OnMuteChange);
+            audioByType.ChangeEnableEvent.AddListener(OnEnabledChanged);
             audioByType.ChangeVolumeEvent.AddListener(OnGlobalVolumeChange);
             if (Advanced.CustomAudioSource && !Advanced.LocalAudioSource)
                 Advanced.LocalAudioSource = NewAudioSource(Clip[0].name + "AudioSource", null);
@@ -96,7 +99,7 @@ namespace DredPack.Audio
         {
             if (!isInited)
                 Initialize(null);
-            if (audioByType.Muted)
+            if (!audioByType.Enabled)
                 return;
             if(clip == null)
                 return;
@@ -124,18 +127,18 @@ namespace DredPack.Audio
         }
 
 
-        protected virtual void OnMuteChange(bool state)
+        protected virtual void OnEnabledChanged(bool state)
         {
-            isMuted = state;
+            isEnabled = state;
             if (Advanced.LocalAudioSource)
-                Advanced.LocalAudioSource.volume = (state ? 0f : 1f) * audioByType.Volume * LocalVolume;
+                Advanced.LocalAudioSource.volume = (state ? 1f : 0f) * audioByType.Volume * LocalVolume;
         }
 
         protected virtual void OnGlobalVolumeChange(float volume)
         {
             globalVolume = volume;
             if (Advanced.LocalAudioSource)
-                Advanced.LocalAudioSource.volume = globalVolume * LocalVolume * (isMuted ? 0f : 1f);
+                Advanced.LocalAudioSource.volume = globalVolume * LocalVolume * (isEnabled ? 0f : 1f);
         }
 
 
@@ -180,79 +183,5 @@ namespace DredPack.Audio
             [ShowIf(nameof(CustomAudioSource))][AllowNesting]
             public bool OneShot = true;
         }
-        
-        /*#region EDITOR
-
-#if UNITY_EDITOR
-        [CustomPropertyDrawer(typeof(AudioField)),CanEditMultipleObjects]
-        public class AudioFieldEditor : PropertyDrawer
-        {
-            SerializedProperty Type;
-            SerializedProperty LocalVolume;
-            SerializedProperty GlobalAudioSource;
-            SerializedProperty OneShot;
-            SerializedProperty LocalAudioSource;
-            SerializedProperty Clip;
-            private bool shown;
-            private static float SingleLineHeight => EditorGUIUtility.singleLineHeight + 2f;
-            private static float posX => 10;
-            private int elements;
-            private AudioField target(SerializedProperty property) => fieldInfo.GetValue(property.serializedObject.targetObject) as AudioField;
-
-
-            public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-            {
-                Init(property);
-                EditorGUI.BeginProperty(position, label, property);
-                
-                var indent = EditorGUI.indentLevel;
-                EditorGUI.indentLevel = 0;
-
-                General(position, property, label);
-                
-                EditorGUI.indentLevel = indent;
-                EditorGUI.EndProperty();
-            }
-
-            private void General(Rect position, SerializedProperty property, GUIContent label)
-            {
-                var _t = target(property);
-                position.height = EditorGUIUtility.singleLineHeight;
-                property.isExpanded = EditorGUI.Foldout(position, property.isExpanded, label);
-                if(property.isExpanded)
-                { 
-                    EditorGUI.PropertyField( new Rect(position.x + posX, position.y + SingleLineHeight, position.width - posX, position.height), Type);
-                    EditorGUI.PropertyField(new Rect(position.x + posX, position.y + SingleLineHeight * 2f, position.width - posX, position.height), LocalVolume);
-                    //EditorGUI.PropertyField(new Rect(position.x + posX, position.y + SingleLineHeight * 3f, position.width - posX, position.height), GlobalAudioSource);
-                    //_t.properties = 3;
-                }
-
-            }
-
-            public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-            {
-                if(property.isExpanded)
-                {
-                    var audioField = fieldInfo.GetValue(property.serializedObject.targetObject) as AudioField;
-                    var i = target(property).properties; 
-                    target(property).properties = 0;
-                    return (SingleLineHeight * i) + SingleLineHeight;
-                }
-                return base.GetPropertyHeight(property, label);
-            }
-
-            private void Init(SerializedProperty property)
-            {
-                Type = property.FindPropertyRelative("Type");
-                LocalVolume = property.FindPropertyRelative("LocalVolume");
-                GlobalAudioSource = property.FindPropertyRelative("GlobalAudioSource");
-                OneShot = property.FindPropertyRelative("OneShot");
-                LocalAudioSource = property.FindPropertyRelative("LocalAudioSource");
-                Clip = property.FindPropertyRelative("Clip");
-            }
-        }
-#endif
-
-        #endregion*/
     }
 }

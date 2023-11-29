@@ -19,17 +19,41 @@ namespace DredPack.Audio
     public class AudioManager : GeneralSingleton<AudioManager>
     {
         public List<AudioGroup> AudioGroups;
-        
-        private static List<AudioByType> audioList = new List<AudioByType>();
+        public List<AudioByType> AudioTypes = new List<AudioByType>() { new AudioByType("Audio"), new AudioByType("Music") };
+
+        public string[] audioTypesNames
+        {
+            get
+            {
+                string[] arr = new string[AudioTypes.Count];
+                for (int i = 0; i < AudioTypes.Count; i++)
+                    arr[i] = AudioTypes[i].Type;
+                return arr;
+            }
+        }
+
+        public string[] audioGroupNames
+        {
+            get
+            {
+                string[] arr = new string[AudioGroups.Count];
+                for (int i = 0; i < AudioGroups.Count; i++)
+                    arr[i] = AudioGroups[i].ID;
+                return arr;
+            }
+        }
+
+        private static List<AudioByType> audioList => Instance.AudioTypes;
         private AudioSource _audioSource;
 
         protected override void Awake()
         {
             base.Awake();
             _audioSource = GetComponent<AudioSource>();
+            audioList.ForEach(_ => _.Init());
         }
 
-        public static AudioByType GetAudioType(AudioTypes type)
+        public static AudioByType GetAudioType(string type)
         {
             var audioByType = audioList.Find(_ => _.Type == type);
             if (audioByType != null)
@@ -39,16 +63,16 @@ namespace DredPack.Audio
         }
 
 
-        public static void SetVolume(AudioTypes type, float volume) => GetAudioType(type).SetVolume(volume);
-        public static float GetVolume(AudioTypes type) => GetAudioType(type).Volume;
+        public static void SetVolume(string type, float volume) => GetAudioType(type).SetVolume(volume);
+        public static float GetVolume(string type) => GetAudioType(type).Volume;
         
-        public static void SetMute(AudioTypes type, bool state) => GetAudioType(type).SetMute(state);
-        public static bool GetMute(AudioTypes type) => GetAudioType(type).Muted;
+        public static void SetMute(string type, bool state) => GetAudioType(type).SetEnabled(state);
+        public static bool GetMute(string type) => GetAudioType(type).Enabled;
 
 
         public void PlayOneShot(AudioField audioField, float _volume = 1f)
         {
-            if(audioField.audioByType.Muted)
+            if(!audioField.audioByType.Enabled)
                 return;
             var volume = audioField.audioByType.Volume * audioField.LocalVolume * _volume;
             var audioClip = audioField.GetClip();
@@ -79,67 +103,58 @@ namespace DredPack.Audio
             return audioGroup.GetRandomClip();
         }
 
-
-        public enum AudioTypes
-        {
-            Music,
-            Audio,
-            UI,
-            Environment,
-            Shoot,
-            Some1,
-            Some2,
-            Some3,
-            Some4
-            
-            // Shoot
-            // Environment
-            // voice
-            // and more
-        }
-
         [Serializable]
         public class AudioByType
         {
-            public AudioTypes Type;
-            public float Volume { get; private set; }
-            public bool Muted { get; private set; }
+            public string Type;
+            [Range(0,1f)]
+            public float Volume = 1;
+            public bool Enabled = true;
             
-            private string VOLUME_KEY => $"AudioVolume_{Type.ToString()}";
-            private string MUTE_KEY => $"AudioMute_{Type.ToString()}";
+            private string VOLUME_KEY => $"AudioVolume_{Type}";
+            private string ENABLED_KEY => $"AudioMute_{Type}";
 
-            public UnityEvent<bool> ChangeMuteEvent { get; set; } = new UnityEvent<bool>();
+            public UnityEvent<bool> ChangeEnableEvent { get; set; } = new UnityEvent<bool>();
             public UnityEvent<float> ChangeVolumeEvent { get; set; } = new Scrollbar.ScrollEvent();
 
-            public AudioByType(AudioTypes type)
+
+            public AudioByType(string type)
             {
                 Type = type;
-                Volume = GetVolumePlayerPrefs();
-                Muted = GetMutePlayerPrefs();
             }
 
+            public void Init()
+            {
+                Volume = GetVolumePlayerPrefs();
+                Enabled = GetEnabledPlayerPrefs();
+            }
             
             public void SetVolume(float volume)
             {
                 volume = Mathf.Clamp01(volume);
                 PlayerPrefs.SetFloat(VOLUME_KEY, volume);
-                Volume = volume;
+                this.Volume = volume;
                 ChangeVolumeEvent?.Invoke(volume);
             }
-            private float GetVolumePlayerPrefs() => PlayerPrefs.HasKey(VOLUME_KEY) ? PlayerPrefs.GetFloat(VOLUME_KEY) : 1f;
-
-            public void SetMute(bool state)
+            private float GetVolumePlayerPrefs()
             {
-                PlayerPrefs.SetInt(MUTE_KEY, state ? 1 : 0);
-                Muted = state;
-                ChangeMuteEvent?.Invoke(Muted);
+                if(PlayerPrefs.HasKey(VOLUME_KEY))
+                    return PlayerPrefs.GetFloat(VOLUME_KEY);
+                return Volume;
             }
 
-            private bool GetMutePlayerPrefs()
+            public void SetEnabled(bool state)
             {
-                var hasKey = PlayerPrefs.HasKey(MUTE_KEY);
-                var intPtr = PlayerPrefs.GetInt(MUTE_KEY);
-                return hasKey && intPtr == 1;
+                PlayerPrefs.SetInt(ENABLED_KEY, state ? 1 : 0);
+                Enabled = state;
+                ChangeEnableEvent?.Invoke(Enabled);
+            }
+
+            private bool GetEnabledPlayerPrefs()
+            {
+                if(PlayerPrefs.HasKey(ENABLED_KEY))
+                    return PlayerPrefs.GetInt(ENABLED_KEY) == 1;
+                return Enabled;
             }
         }
         

@@ -17,8 +17,9 @@ namespace DredPack
                     if (!_instance)
                     {
                         GameObject obj = new GameObject();
-                        obj.hideFlags = HideFlags.HideAndDontSave;
+                        //obj.hideFlags = HideFlags.HideAndDontSave;
                         _instance = obj.AddComponent<T>();
+                        obj.name = _instance.GetType().Name;
                     }
                 }
 

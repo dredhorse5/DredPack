@@ -31,8 +31,7 @@ namespace DredPack.DredpackEditor.Audio
             advancedIDProp = property.FindPropertyRelative("Advanced");
 
             savedY = position.y;
-            var backRect = new Rect(position.x - 15, position.y, position.width + 15, position.height);
-            EditorGUI.DrawRect(backRect, new Color(0,0,0,.15f));
+            EditorGUI.DrawRect(position, new Color(0,0,0,.15f));
             
             position.height = EditorGUIUtility.singleLineHeight;
             EditorGUI.BeginProperty(position, label, property);
@@ -59,9 +58,9 @@ namespace DredPack.DredpackEditor.Audio
             {
                 if (clipProp.arraySize < 1)
                     clipProp.arraySize = 1;
-                var firstAudioProp = clipProp.GetArrayElementAtIndex(0);
-                EditorGUI.ObjectField(prefixRect, firstAudioProp, new GUIContent(""));
-            }
+                var audioProp = GetFirstAudioProperty(clipProp);
+                EditorGUI.ObjectField(prefixRect, audioProp, new GUIContent(""));
+            } 
             else
             {
                 EditorGUI.PropertyField(prefixRect, groupIDProp, GUIContent.none);
@@ -69,6 +68,18 @@ namespace DredPack.DredpackEditor.Audio
             
             
             expanded = EditorGUI.Foldout(position, expanded, new GUIContent(""),true);
+        }
+
+        SerializedProperty GetFirstAudioProperty(SerializedProperty array)
+        {
+            for (int i = 0; i < array.arraySize; i++)
+            {
+                var el = array.GetArrayElementAtIndex(i);
+                if (el != null && el.objectReferenceValue != null)
+                    return el;
+            }
+
+            return array.GetArrayElementAtIndex(0);
         }
 
         private void DrawExpand(Rect position, SerializedProperty property, GUIContent label)
@@ -85,8 +96,10 @@ namespace DredPack.DredpackEditor.Audio
             {
                 position.y += 20;
                 EditorGUI.PropertyField(position, clipProp);
+                position.y += EditorGUI.GetPropertyHeight(clipProp,true) ;
             }
-            position.y += EditorGUI.GetPropertyHeight(clipProp,true);
+            else
+                position.y += 20;
             EditorGUI.PropertyField(position, advancedIDProp,true);
             position.y += EditorGUI.GetPropertyHeight(advancedIDProp,true);
 

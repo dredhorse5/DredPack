@@ -1,4 +1,5 @@
 using System;
+using DredPack.Audio.Help;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,8 @@ namespace DredPack.Audio
     ///==========================================
     public class AudioSettings : MonoBehaviour
     {
-        public AudioManager.AudioTypes Type;
+        [AudioType]
+        public string Type;
         [Space]
         public Toggle MuteToggle;
         public DredPack.UI.Switcher MuteSwitcher;
@@ -26,13 +28,13 @@ namespace DredPack.Audio
             if (MuteSwitcher)
             {
                 MuteSwitcher.SwitchEvent.AddListener(SetMute);
-                audioByType.ChangeMuteEvent.AddListener(UpdateSwitcher);
+                audioByType.ChangeEnableEvent.AddListener(UpdateSwitcher);
                 UpdateSwitcher();
             }
             if(MuteToggle)
             {
                 MuteToggle.onValueChanged.AddListener(SetMute);
-                audioByType.ChangeMuteEvent.AddListener(UpdateToggle);
+                audioByType.ChangeEnableEvent.AddListener(UpdateToggle);
                 UpdateToggle();
             }
             if(VolumeSlider)
@@ -45,7 +47,7 @@ namespace DredPack.Audio
 
         public void SetMute(bool state)
         {
-            audioByType.SetMute(state);
+            audioByType.SetEnabled(state);
             UpdateToggle();
             UpdateSwitcher();
         }
@@ -59,13 +61,13 @@ namespace DredPack.Audio
         public void UpdateToggle(bool _ = false)
         {
             if(MuteToggle)
-                MuteToggle.SetIsOnWithoutNotify(audioByType.Muted);
+                MuteToggle.SetIsOnWithoutNotify(audioByType.Enabled);
         }
 
         public void UpdateSwitcher(bool _ = false)
         {
             if(MuteSwitcher)
-                MuteSwitcher.SwitchWithoutNotification(audioByType.Muted);
+                MuteSwitcher.SwitchWithoutNotification(audioByType.Enabled);
         }
 
         public void UpdateSlider(float _ = 1f)
