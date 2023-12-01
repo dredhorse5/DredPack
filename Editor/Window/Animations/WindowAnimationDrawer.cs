@@ -20,7 +20,7 @@ namespace DredPack.WindowEditor.Animations
             EditorGUILayout.Space(-23);
             EditorGUI.indentLevel--;
             property.isExpanded = true;
-            EditorGUILayout.PropertyField(property,true);
+            EditorGUILayout.PropertyField(property,GUIContent.none,true);
             EditorGUI.indentLevel++;
         }
 
