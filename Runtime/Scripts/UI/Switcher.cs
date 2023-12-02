@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using DredPack.Help;
+using NaughtyAttributes;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -8,12 +10,17 @@ using UnityEngine.UI;
 namespace DredPack.UI
 {
     [RequireComponent(typeof(Button))]
-    public class Switcher : MonoBehaviour
+    public sealed class Switcher : MonoBehaviour
     {
         public bool StateOnStart = true;
-        public bool Reverse = false;
         public float SwitchSpeed = 5f;
+        
+        [Header("Graphic")] 
+        public bool ReversedGraphic = false;
+        
+        [Header("Handler")] 
         public RectTransform Handler;
+        public AnimationCurve HandlerMoveCurve = new AnimationCurve(new []{new Keyframe(0f,0f), new Keyframe(1f,1f)});
 
         [Header("Colors")] 
         public Color BackgroundColorOn = Color.green;
@@ -24,17 +31,19 @@ namespace DredPack.UI
 
         [Header("Saveable")] 
         public bool Saveable = false;
+        [ShowIf(nameof(Saveable))]
         public string ID;
-        [Button("SetRandomID")] public bool btntosetid;
-        public void SetRandomID() => ID = Guid.NewGuid().ToString();
-        [Button(nameof(ResetSave))] public bool deleteKeyInMemory;
+        [Help.Button(nameof(SetRandomID))][ShowIf(nameof(Saveable))]
+        public bool btn1;
+        [Help.Button(nameof(ResetSave))][ShowIf(nameof(Saveable))]
+        public bool btn2;
 
-        [Header("Events")] public UnityEvent OnEvent;
+        [Header("Events")]
+        public UnityEvent OnEvent;
         public UnityEvent OffEvent;
         public UnityEvent<bool> SwitchEvent;
 
         [Header("Debug")] [ReadOnly] public bool CurrentState;
-        public bool DebugMode;
 
 
 
@@ -45,7 +54,6 @@ namespace DredPack.UI
         public Button Button => _button ??= GetComponent<Button>();
         private Button _button;
 
-        private Coroutine switchCor;
         private Vector2 handlerPos;
 
 
@@ -77,13 +85,22 @@ namespace DredPack.UI
 
         #region Saveable
 
-        public virtual void ResetSave()
+#if UNITY_EDITOR
+        public void SetRandomID()
+        {
+            if(Application.isPlaying)
+                return;
+            ID = Guid.NewGuid().ToString();
+            EditorUtility.SetDirty(this);
+        }
+#endif
+        public void ResetSave()
         {
             Debug.Log("Key '" + ID + "' on the object '" + gameObject.name + "' was deleted");
             PlayerPrefs.DeleteKey(ID);
         }
 
-        public virtual void SetSave(bool state)
+        public void SetSave(bool state)
         {
             if (!Saveable || ID == "") return;
             PlayerPrefs.SetInt(ID, state ? 1 : -1);
@@ -139,13 +156,8 @@ namespace DredPack.UI
 
         public void SwitchOnWithoutNotification(float speedMult = 1f)
         {
-            if (DebugMode)
-                Debug.Log("switching to on");
-
             CurrentState = true;
-            if (switchCor != null)
-                StopCoroutine(switchCor);
-            switchCor = StartCoroutine(SwitchOnIE(speedMult));
+            SwitchGraphic(speedMult);
             SetSave(true);
         }
 
@@ -159,60 +171,50 @@ namespace DredPack.UI
 
         public void SwitchOffWithoutNotification(float speedMult = 1f)
         {
-            if (DebugMode)
-                Debug.Log("switching to off");
-
             CurrentState = false;
-            if (switchCor != null)
-                StopCoroutine(switchCor);
-            switchCor = StartCoroutine(SwitchOffIE(speedMult));
+            SwitchGraphic(speedMult);
             SetSave(false);
         }
 
-
-        private IEnumerator SwitchOnIE(float speedMult = 1f)
+        private Coroutine switchCor;
+        private void SwitchGraphic(float speed)
         {
-            if (speedMult < 0)
+            if (switchCor != null)
+                StopCoroutine(switchCor);
+            switchCor = StartCoroutine(IE());
+            IEnumerator IE()
             {
-                SetVisualValue(1f);
-                yield break;
-            }
+                bool state = CurrentState;
+                if(speed <= 0)
+                {
+                    SetValue(1f, state);
+                    yield break;
+                }
 
-            for (float i = 0f; i < 1; i += Time.deltaTime * speedMult * SwitchSpeed)
+                var startVal = Handler.anchoredPosition.InverseLerp(-handlerPos, handlerPos);
+                startVal = state ? startVal : 1f - startVal;
+                for (float i = startVal; i < 1f; i += Time.deltaTime * speed * SwitchSpeed)
+                {
+                    SetValue(i, state);
+                    yield return null;
+                }
+                SetValue(1f, state);
+            }
+            void SetValue(float value, bool state)
             {
-                SetVisualValue(i);
-                yield return null;
+                var stateVal = state ? value : 1f - value;
+                stateVal = ReversedGraphic ? 1f - stateVal : stateVal;
+
+                var curvedValue = HandlerMoveCurve.Evaluate(value);
+                curvedValue = state ? curvedValue : 1f - curvedValue;
+                curvedValue = ReversedGraphic ? 1f - curvedValue : curvedValue;
+                
+
+                Handler.anchoredPosition = Vector2.LerpUnclamped(-handlerPos, handlerPos, curvedValue);
+
+                Image.color = Color.Lerp(BackgroundColorOff, BackgroundColorOn, stateVal);
+                HandlerImage.color = Color.Lerp(HandlerColorOff, HandlerColorOn, stateVal);
             }
-
-            SetVisualValue(1f);
-        }
-
-        private IEnumerator SwitchOffIE(float speedMult = 1f)
-        {
-            if (speedMult < 0)
-            {
-                SetVisualValue(0);
-                yield break;
-            }
-
-            for (float i = 0f; i < 1f; i += Time.deltaTime * speedMult * SwitchSpeed)
-            {
-                SetVisualValue(1f - i);
-                yield return null;
-            }
-
-            SetVisualValue(0);
-        }
-
-        /// <param name="value">0 - off, 1 - on</param>
-        private void SetVisualValue(float value)
-        {
-            value = Mathf.Clamp01(value);
-            value = Reverse ? 1f - value : value;
-            Handler.anchoredPosition = Vector2.Lerp(-handlerPos, handlerPos, EasingFunctions.SmoothSquared(value));
-
-            Image.color = Color.Lerp(BackgroundColorOff, BackgroundColorOn, value);
-            HandlerImage.color = Color.Lerp(HandlerColorOff, HandlerColorOn, value);
         }
 
         #endregion
