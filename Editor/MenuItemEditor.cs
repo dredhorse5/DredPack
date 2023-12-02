@@ -97,6 +97,7 @@ namespace DredPack
             var rectTransform = go.AddComponent<RectTransform>();
 
             go.transform.localPosition = Vector3.zero;
+            go.transform.localScale = Vector3.one;
 
 
             return rectTransform;
@@ -127,14 +128,16 @@ namespace DredPack
         private static GameObject InstantiateUiPrefab(string path, MenuCommand menuCommand, Vector3 pos = new Vector3(), bool unpack = true)
         {
             var prefab = Resources.Load(path) as GameObject;
-            var switcher = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            var gameobject = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
             if(unpack)
-                PrefabUtility.UnpackPrefabInstance(switcher,PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+                PrefabUtility.UnpackPrefabInstance(gameobject,PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
 
             
-            switcher.transform.SetParent(GetContextCanvasParent(menuCommand));
-            switcher.transform.localPosition = pos;
-            return switcher;
+            gameobject.transform.SetParent(GetContextCanvasParent(menuCommand));
+            gameobject.transform.localPosition = pos;
+            gameobject.transform.localScale = Vector3.one;
+            
+            return gameobject;
         }
         
 
