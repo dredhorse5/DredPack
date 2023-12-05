@@ -285,7 +285,7 @@ namespace DredPack.UI
 
             public string _currentAnimationName = "";
 
-            public WindowAnimation currentAnimation
+            public WindowAnimationModule currentAnimation
             {
                 get
                 {
@@ -296,7 +296,7 @@ namespace DredPack.UI
                 }
             }
 
-            [SerializeReference][SerializeField] public WindowAnimation _currentAnimation;
+            [SerializeReference][SerializeField] public WindowAnimationModule _currentAnimation;
 
             public string[] allAnimationNames
             {
@@ -308,9 +308,9 @@ namespace DredPack.UI
                     return list;
                 }
             }
-            private WindowAnimation[] allAnimations => new WindowAnimation[]
+            private WindowAnimationModule[] allAnimations => new WindowAnimationModule[]
             {
-                fade, instantly, animator, scaledPopUp, sideAppear
+                fade, instantly, animator, scaledPopUp, sideAppear, external 
             };
 
             [SerializeReference, SerializeField] Fade fade = new Fade();
@@ -318,9 +318,10 @@ namespace DredPack.UI
             [SerializeReference, SerializeField] WindowAnimations.Animator animator = new WindowAnimations.Animator();
             [SerializeReference, SerializeField] ScaledPopUp scaledPopUp = new ScaledPopUp();
             [SerializeReference, SerializeField] SideAppear sideAppear = new SideAppear();
+            [SerializeReference, SerializeField] External external = new External();
             
             
-            public WindowAnimation GetAnimation(string name)
+            public WindowAnimationModule GetAnimation(string name)
             {
                 //finding needed animation
                 for (int i = 0; i < allAnimations.Length; i++)
@@ -408,11 +409,11 @@ namespace DredPack.UI
 
         #endregion
         
-        //возможность выбирать, когда вызывать StatesAwake
-        //вызывать ли его вообще
+        //---возможность выбирать, когда вызывать StatesAwake
+        //---вызывать ли его вообще
         //вызывать ли ивенты при старте
-        //задержки анимаций
-        //возможность вызвать определенную анимацию
+        //---задержки анимаций
+        //---возможность вызвать определенную анимацию
         //возможность задать направление анимации
         //новая анимация - список трансформов, которые можно как угодно двигать, скейлить и вращать
         //загрузка профилей

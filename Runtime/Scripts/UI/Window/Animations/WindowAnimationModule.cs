@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DredPack.UI.WindowAnimations
 {
-    public class BaseWindowAnimation
+    public class WindowAnimationModule : IWindowAnimation
     {
         protected Window window;
         private List<Coroutine> launchedCoroutines = new List<Coroutine>();
@@ -28,7 +28,7 @@ namespace DredPack.UI.WindowAnimations
         public virtual IEnumerator UpdateClose(AnimationParameters parameters) {yield break;}
         public virtual void SetCloseTime(float time, AnimationParameters parameters) { }
 
-        public void StopAllCoroutines()
+        public virtual void StopAllCoroutines()
         {
             foreach (var cor in launchedCoroutines)
             {
@@ -38,7 +38,7 @@ namespace DredPack.UI.WindowAnimations
             launchedCoroutines.Clear();
         }
 
-        protected Coroutine StartCoroutine(IEnumerator coroutine)
+        protected virtual Coroutine StartCoroutine(IEnumerator coroutine)
         {
             if (launchedCoroutines == null || launchedCoroutines.Count == 0)
                 launchedCoroutines = new List<Coroutine>();

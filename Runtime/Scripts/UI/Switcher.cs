@@ -85,15 +85,15 @@ namespace DredPack.UI
 
         #region Saveable
 
-#if UNITY_EDITOR
         public void SetRandomID()
         {
+#if UNITY_EDITOR
             if(Application.isPlaying)
                 return;
             ID = Guid.NewGuid().ToString();
             EditorUtility.SetDirty(this);
-        }
 #endif
+        }
         public void ResetSave()
         {
             Debug.Log("Key '" + ID + "' on the object '" + gameObject.name + "' was deleted");

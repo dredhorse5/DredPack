@@ -6,13 +6,13 @@ using UnityEngine;
 namespace DredPack.UI.WindowAnimations
 {
     [Serializable]
-    public class WindowAnimation : BaseWindowAnimation
+    public class WindowAnimation : WindowAnimationModule
     {
         public float Speed = 1f;
         public SwitchDelay SwitchDelay;
         
 
-        public virtual IEnumerator UpdateOpen(AnimationParameters parameters)
+        public override IEnumerator UpdateOpen(AnimationParameters parameters)
         {
             if (SwitchDelay.Open > 0.001f)
                 yield return new WaitForSeconds(SwitchDelay.Open);
