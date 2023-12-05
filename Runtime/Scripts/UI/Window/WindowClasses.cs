@@ -310,7 +310,7 @@ namespace DredPack.UI
             }
             private WindowAnimationModule[] allAnimations => new WindowAnimationModule[]
             {
-                fade, instantly, animator, scaledPopUp, sideAppear, external 
+                fade, instantly, animator, scaledPopUp, sideAppear, sideAppearOnePanel, external 
             };
 
             [SerializeReference, SerializeField] Fade fade = new Fade();
@@ -319,6 +319,7 @@ namespace DredPack.UI
             [SerializeReference, SerializeField] ScaledPopUp scaledPopUp = new ScaledPopUp();
             [SerializeReference, SerializeField] SideAppear sideAppear = new SideAppear();
             [SerializeReference, SerializeField] External external = new External();
+            [SerializeReference, SerializeField] SideAppearOnePanel sideAppearOnePanel = new SideAppearOnePanel();
             
             
             public WindowAnimationModule GetAnimation(string name)
