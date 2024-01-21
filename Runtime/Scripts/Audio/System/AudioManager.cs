@@ -10,8 +10,7 @@ using Random = UnityEngine.Random;
 namespace DredPack.Audio
 {
     ///==========================================
-    ///         Made in Pair of slippers
-    ///              By dredhorse5
+    ///         Made by dredhorse5
     ///         gmail: dima.titov18@gmail.com
     ///         yandex: dredhorse5@yandex.ru
     ///==========================================
