@@ -99,13 +99,11 @@ namespace DredPack.Audio
         {
             if (!isInited)
                 Initialize(null);
-            if (audioByType.Muted)
-                return;
             if(clip == null)
                 return;
             if (Advanced.LocalAudioSource)
             {
-                var volume = audioByType.Volume * LocalVolume * _volume;
+                var volume = audioByType.Volume * LocalVolume * _volume * (audioByType.Muted ? 0f : 1f);
                 if (Advanced.OneShot)
                     Advanced.LocalAudioSource.PlayOneShot(clip, volume);
                 else
