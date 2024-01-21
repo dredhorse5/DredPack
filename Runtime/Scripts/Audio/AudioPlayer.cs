@@ -13,11 +13,14 @@ namespace DredPack.Audio
     ///==========================================
     public class AudioPlayer : MonoBehaviour
     {
+        public bool PlayOnAwake = false;
         public AudioField Field;
         
         private void Start()
         {
             Field.Initialize(this);
+            if(PlayOnAwake)
+                Play();
         }
 
         public void Play()
