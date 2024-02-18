@@ -2,6 +2,7 @@
 using DredPack.UI;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DredPack.WindowEditor
 {
@@ -27,6 +28,8 @@ namespace DredPack.WindowEditor
         private SerializedProperty closeOnOutsideClickProperty; 
         private SerializedProperty autoCloseProperty; 
         private SerializedProperty autoCloseDelayProperty; 
+        private SerializedProperty selectObjectOnOpenProperty; 
+        private SerializedProperty selectableOnOpenProperty; 
 
         public GeneralTab(WindowEditor window, string tabName) : base(window, tabName)
         {
@@ -50,6 +53,8 @@ namespace DredPack.WindowEditor
             closeOnOutsideClickProperty = tabProperty.FindPropertyRelative("CloseOnOutsideClick");
             autoCloseProperty = tabProperty.FindPropertyRelative("AutoClose");
             autoCloseDelayProperty = tabProperty.FindPropertyRelative("AutoCloseDelay");
+            selectObjectOnOpenProperty = tabProperty.FindPropertyRelative("SelectObjectOnOpen");
+            selectableOnOpenProperty = componentsProperty.FindPropertyRelative("SelectableOnOpen");
         }
 
         public override void Draw()
@@ -105,6 +110,17 @@ namespace DredPack.WindowEditor
 
             
             window.DrawLabel(" Some");
+            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PropertyField(selectObjectOnOpenProperty);
+            if (window.T.General.SelectObjectOnOpen)
+            {
+                EditorGUILayout.PropertyField(selectableOnOpenProperty, GUIContent.none);
+                if (GUILayout.Button("Find"))
+                    window.T.Components.SelectableOnOpen = window.T.gameObject.GetComponentInChildren<Selectable>();
+            }
+            EditorGUILayout.EndHorizontal();
+            
             
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(autoCloseProperty);

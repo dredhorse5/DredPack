@@ -279,6 +279,8 @@ namespace DredPack.UI
         {
             if(Components.DisableableObject == null)
                 Components.DisableableObject = gameObject;
+            if(Components.SelectableOnOpen == null)
+                Components.SelectableOnOpen = GetComponentInChildren<Selectable>();
 
             if(Components.Canvas == null)
             {

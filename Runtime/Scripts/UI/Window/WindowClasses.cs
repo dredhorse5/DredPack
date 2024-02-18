@@ -5,6 +5,7 @@ using DredPack.Audio;
 using DredPack.UI.WindowAnimations;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -59,6 +60,7 @@ namespace DredPack.UI
             public GraphicRaycaster Raycaster;
             public Graphic BackgroundImage;
             public CanvasGroup CanvasGroup;
+            public Selectable SelectableOnOpen;
             public UnityEngine.Camera CanvasCamera => Canvas.worldCamera;
         }
         
@@ -86,6 +88,7 @@ namespace DredPack.UI
             public Button SwitchButton;
             
             //Some
+            public bool SelectObjectOnOpen = false;
             public bool AutoClose = false;
             public float AutoCloseDelay = 2;
             public bool Disableable = false;
@@ -123,6 +126,8 @@ namespace DredPack.UI
                     window.Components.DisableableObject.gameObject.SetActive(true);
                 if (EnableableCanvas && window.Components.Canvas)
                     window.Components.Canvas.enabled = true;
+                if(SelectObjectOnOpen && window.Components.SelectableOnOpen)
+                    EventSystem.current.SetSelectedGameObject(window.Components.SelectableOnOpen.gameObject);
             }
 
             public void OnStartClose()
@@ -212,7 +217,8 @@ namespace DredPack.UI
                     window.Close();
                 }
             }
-            
+
+            //public void FindSelectable() => SelectableObjectOnOpen = window.gameObject.GetComponentInChildren<Selectable>();
         }
 
         
