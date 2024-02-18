@@ -91,6 +91,8 @@ namespace DredPack.WindowEditor
                     SerializedProperty delegateEntry = eventsProperty.GetArrayElementAtIndex(p);
                     SerializedProperty eventProperty = delegateEntry.FindPropertyRelative("State");
                     active = eventProperty.enumValueIndex != i;
+                    if (!active) 
+                        break;
                 }
                 if (active)
                     menu.AddItem(eventTypes[i], false, OnAddNewSelected, i);

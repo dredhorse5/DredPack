@@ -75,7 +75,7 @@ namespace DredPack.UI
         [Serializable]
         public class GeneralTab : Tab, IWindowCallback
         {
-            public StatesRead CurrentState;
+            public StatesRead CurrentState = StatesRead.Closed;
             public StatesAwakeMethod StateOnAwakeMethod;
             public string AnimationOnAwake = "Instantly";
             public StatesAwake StateOnAwake;

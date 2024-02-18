@@ -56,7 +56,13 @@ namespace DredPack.Audio
         {
             var audioByType = audioList.Find(_ => _.Type == type);
             if (audioByType != null)
+            {
+                if (audioByType.ChangeEnableEvent == null)
+                    audioByType.ChangeEnableEvent = new();
+                if (audioByType.ChangeVolumeEvent == null)
+                    audioByType.ChangeVolumeEvent = new();
                 return audioByType;
+            }
             audioList.Add(new AudioByType(type));
             return audioList.Last();
         }
