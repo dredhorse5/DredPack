@@ -308,7 +308,7 @@ namespace DredPack.UI
             if(Components.CanvasGroup == null)
                 Components.CanvasGroup = GetComponent<CanvasGroup>();
             
-            if(Components.Canvas.worldCamera)
+            //if(Components.Canvas.worldCamera)
             
             EditorUtility.SetDirty(this);
         }
