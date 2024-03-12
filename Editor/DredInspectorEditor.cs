@@ -15,6 +15,19 @@ namespace DredPack.DredpackEditor
                 return _t;
             }
         }
+        
+        public W[] Ts
+        {
+            get
+            {
+                W[] targs = new W[targets.Length];
+                for (var i = 0; i < targets.Length; i++)
+                {
+                    targs[i] = (W)targets[i];
+                }
+                return targs;
+            }
+        }
 
         private W _t;
         
