@@ -22,6 +22,12 @@ namespace DredPack.Audio
             if(PlayOnAwake)
                 Play();
         }
+        
+        private void OnEnable()
+        {
+            if(PlayOnAwake)
+                Play();
+        }
 
         public void Play()
         {
