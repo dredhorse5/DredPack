@@ -16,5 +16,12 @@ namespace DredPack
                 return m_Instance;
             }
         }
+        
+        protected virtual void Awake()
+        {
+            if (!Application.isPlaying)
+                return;
+            m_Instance = this;
+        }
     }
 }
