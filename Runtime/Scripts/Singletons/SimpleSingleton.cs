@@ -20,7 +20,7 @@ namespace DredPack
         {
             if (!Application.isPlaying)
                 return;
-            m_Instance = this;
+            m_Instance = this as T;
         }
     }
 }
