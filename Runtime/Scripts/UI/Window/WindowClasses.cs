@@ -279,7 +279,10 @@ namespace DredPack.UI
                 get
                 {
                     if (string.IsNullOrEmpty(_currentAnimationName))
+                    {
                         _currentAnimationName = allAnimations[0].Name;
+                        _currentAnimation = GetAnimation(_currentAnimationName);
+                    }
                     return _currentAnimationName;
                 }
                 set
