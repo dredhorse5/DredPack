@@ -1,12 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using DredPack.UI.Animations.Modules;
+using DredPack.UI.Tabs;
 using NaughtyAttributes;
 using UnityEngine;
 
 namespace DredPack.UI.Animations
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+    [InitializeOnLoad]
+#endif
+    [Serializable]
     public class SideAppearOnePanel : WindowAnimation
     {
+        static SideAppearOnePanel() => AnimationTab.RegisterAnimation(typeof(SideAppearOnePanel));
+        public override float SortIndex => 5;
+        public override string Name => "SideAppear - Lite";
         public AnimationCurve OpenCurve = new AnimationCurve(new []{new Keyframe(0,0), new Keyframe(1f,1f)});
         public AnimationCurve CloseCurve = new AnimationCurve(new []{new Keyframe(0,0), new Keyframe(1f,1f)});
         [Space] 

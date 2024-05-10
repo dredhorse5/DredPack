@@ -2,15 +2,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using DredPack.UI.Animations.Modules;
+using DredPack.UI.Tabs;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace DredPack.UI.Animations
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+    [InitializeOnLoad]
+#endif
     [Serializable]
     public class SideAppear : WindowAnimation
     {
+        static SideAppear() => AnimationTab.RegisterAnimation(typeof(SideAppear));
+        public override float SortIndex => 4;
+        
+        
         [Header("Curves")]
         public SwitchCurve Open = new SwitchCurve(SwitchCurve.Types.ConstantBounce,
             new AnimationCurve(new[] {new Keyframe(0, 0,4.57445812f,4.57445812f), new Keyframe(.6f, 1.1f,0f,0f), new Keyframe(1, 1,0f,0f)}), 

@@ -52,8 +52,8 @@ namespace DredPack.UI.Tabs
             
             var inst = (WindowAnimationModule)Activator.CreateInstance(anim);
             RegisteredAnimations.Add(inst);
-            
-            RegisteredAnimations.OrderBy(_ => _.SortIndex);
+             
+            RegisteredAnimations = RegisteredAnimations.OrderBy(_ => _.SortIndex).ToList();
             RegisteredAnimationsNames = (from _ in RegisteredAnimations where _.Name != "" select _.Name).ToList();
         }
         

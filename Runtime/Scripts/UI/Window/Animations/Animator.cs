@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections;
+using DredPack.UI.Tabs;
 using NaughtyAttributes;
 using UnityEngine;
 
 namespace DredPack.UI.Animations
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+    [InitializeOnLoad]
+#endif
     [Serializable]
     public class Animator : WindowAnimation
     {
         public UnityEngine.Animator animator;
 
-        //TODO: make custom drawer
         public string OpenAnimationName = "Open";
         public string CloseAnimationName = "Close";
 
@@ -18,6 +22,10 @@ namespace DredPack.UI.Animations
         private AnimationClip openClip;
         private AnimationClip closeClip;
         private bool hasSpeedParameter;
+        
+        static Animator() => AnimationTab.RegisterAnimation(typeof(Animator));
+        public override float SortIndex => 2;
+        
         public override void OnInit(Window owner)
         {
             foreach (var clip in animator.runtimeAnimatorController.animationClips)

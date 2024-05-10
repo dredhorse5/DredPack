@@ -2,6 +2,7 @@
 using System.Collections;
 using DredPack.UI.Animations;
 using DredPack.UI.Animations.Modules;
+using DredPack.UI.Tabs;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,9 +10,16 @@ using UnityEngine.UI;
 
 namespace DredPack.UI.Animations
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+    [InitializeOnLoad]
+#endif
     [Serializable]
     public class ScaledPopUp : WindowAnimation
     { 
+        static ScaledPopUp() => AnimationTab.RegisterAnimation(typeof(ScaledPopUp));
+        public override float SortIndex => 3;
+        
         [Space]
         public AnimationCurve ScaleOpenCurve = new AnimationCurve(new []{new Keyframe(0,.5f),new Keyframe(0.5f,1.15f), new Keyframe(1f,1f)});
         public AnimationCurve ScaleCloseCurve = new AnimationCurve(new []{new Keyframe(0f,1f), new Keyframe(.6f,.5f)});

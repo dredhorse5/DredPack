@@ -1,6 +1,5 @@
 ﻿using System;
 using DredPack.Audio;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +11,6 @@ namespace DredPack.UI.Some
     public class Components
     {
         public GameObject DisableableObject;
-        [Header("asd")]
         public Canvas Canvas;
         public GraphicRaycaster Raycaster;
         public Graphic BackgroundImage;

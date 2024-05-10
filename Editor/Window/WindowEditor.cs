@@ -5,7 +5,6 @@ using DredPack.DredpackEditor;
 using DredPack.UI;
 using DredPack.UI.Some;
 using DredPack.UI.Tabs;
-using Sirenix.Utilities;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
