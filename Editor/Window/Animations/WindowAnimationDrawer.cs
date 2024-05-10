@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using DredPack.UI.WindowAnimations;
+using DredPack.UI.Animations;
 using NaughtyAttributes.Test;
 using UnityEditor;
 using UnityEngine;

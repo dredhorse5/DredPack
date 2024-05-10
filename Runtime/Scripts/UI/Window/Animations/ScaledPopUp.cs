@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections;
-using DredPack.UI.WindowAnimations;
-using DredPack.UI.WindowAnimations.Modules;
+using DredPack.UI.Animations;
+using DredPack.UI.Animations.Modules;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
     [Serializable]
     public class ScaledPopUp : WindowAnimation

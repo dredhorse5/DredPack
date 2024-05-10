@@ -3,7 +3,7 @@ using System.Collections;
 using NaughtyAttributes;
 using UnityEngine;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
     [Serializable]
     public class Animator : WindowAnimation

@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using DredPack.UI;
+using DredPack.UI.Some;
+using DredPack.UI.Tabs;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +11,7 @@ namespace DredPack.WindowEditor
 {
     public class GeneralTab : Tab
     {
+        public override Type DrawerOfTab => typeof(DredPack.UI.Tabs.GeneralTab);
         private SerializedProperty currentStateProperty;
         private SerializedProperty stateOnAwakeMethodProperty;
         private SerializedProperty stateOnAwakeProperty;
@@ -31,8 +35,11 @@ namespace DredPack.WindowEditor
         private SerializedProperty selectObjectOnOpenProperty; 
         private SerializedProperty selectableOnOpenProperty; 
 
-        public GeneralTab(WindowEditor window, string tabName) : base(window, tabName)
+       
+
+        public override void Init(WindowEditor window, SerializedProperty tabProperty)
         {
+            base.Init(window, tabProperty);
             currentStateProperty = tabProperty.FindPropertyRelative("CurrentState");
             stateOnAwakeMethodProperty = tabProperty.FindPropertyRelative("StateOnAwakeMethod");
             stateOnAwakeProperty = tabProperty.FindPropertyRelative("StateOnAwake");
@@ -67,30 +74,30 @@ namespace DredPack.WindowEditor
 
             EditorGUILayout.PropertyField(stateOnAwakeMethodProperty, new GUIContent("Awake Method"), true);
 
-            if (window.T.General.StateOnAwakeMethod != WindowClasses.StatesAwakeMethod.Nothing)
+            if (window.T.General.StateOnAwakeMethod != StatesAwakeMethod.Nothing)
             {
                 EditorGUI.indentLevel++;
                 string propName = "OnAwake";
                 switch (window.T.General.StateOnAwakeMethod)
                 {
-                    case WindowClasses.StatesAwakeMethod.Awake:
+                    case StatesAwakeMethod.Awake:
                         propName = "On Awake";
                         break;
-                    case WindowClasses.StatesAwakeMethod.Start:
+                    case StatesAwakeMethod.Start:
                         propName = "On Start";
                         break;
-                    case WindowClasses.StatesAwakeMethod.OnEnable:
+                    case StatesAwakeMethod.OnEnable:
                         propName = "OnEnable";
                         break;
                 }
                 EditorGUILayout.PropertyField(stateOnAwakeProperty, new GUIContent("Set State " + propName), true);
+                
+                var nowVal = UI.Tabs.AnimationTab.RegisteredAnimationsNames.IndexOf(animationOnAwakeProperty.stringValue);
+                var nextVal = EditorGUILayout.Popup("Animation", nowVal, UI.Tabs.AnimationTab.RegisteredAnimationsNames.ToArray());
 
-                var nowVal = window.T.Animation.allAnimationNames.ToList().IndexOf(animationOnAwakeProperty.stringValue);
-                var nextVal = EditorGUILayout.Popup("Animation", nowVal, window.T.Animation.allAnimationNames);
-
-                if (nowVal != nextVal)
+                if (nowVal != nextVal || (nowVal == -1 || nextVal == -1))
                 {
-                    animationOnAwakeProperty.stringValue = window.T.Animation.allAnimationNames[nextVal];
+                    animationOnAwakeProperty.stringValue = UI.Tabs.AnimationTab.RegisteredAnimationsNames[nextVal > -1 ? nextVal : 0];
                     EditorUtility.SetDirty(window.T);
                 }
                 EditorGUI.indentLevel--;

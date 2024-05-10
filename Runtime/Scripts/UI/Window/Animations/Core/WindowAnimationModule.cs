@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
     public class WindowAnimationModule : IWindowAnimation
     {
@@ -10,6 +10,7 @@ namespace DredPack.UI.WindowAnimations
         private List<Coroutine> launchedCoroutines = new List<Coroutine>();
 
         public virtual string Name => this.GetType().Name;
+        public virtual float SortIndex => 100f;
         
         public virtual void Init(Window owner)
         {

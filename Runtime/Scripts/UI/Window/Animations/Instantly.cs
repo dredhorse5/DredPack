@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections;
+using DredPack.UI.Tabs;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+    [InitializeOnLoad]
+#endif
     [Serializable]
     public class Instantly : WindowAnimation
     {
+        static Instantly() => AnimationTab.RegisterAnimation(typeof(Instantly));
+        public override float SortIndex => 1;
         //public override string Name => "Instantly";
         public override IEnumerator UpdateOpen(AnimationParameters parameters)
         {

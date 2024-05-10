@@ -2,74 +2,91 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DredPack.Audio;
-using DredPack.UI.WindowAnimations;
+using DredPack.UI.Some;
+using DredPack.UI.Tabs;
+using DredPack.UI.Animations;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace DredPack.UI
 {
     
     [RequireComponent(typeof(CanvasGroup))]
-    public sealed class Window : MonoBehaviour, WindowClasses.IWindow, WindowClasses.IWindowCallback
+    public sealed class Window : MonoBehaviour, IWindow, IWindowCallback
     {
-        public WindowClasses.GeneralTab General = new WindowClasses.GeneralTab();
-        public WindowClasses.EventsTab Events = new WindowClasses.EventsTab();
-        public WindowClasses.AudioTab Audio = new WindowClasses.AudioTab();
-        [SerializeReference] public WindowClasses.AnimationTab Animation = new WindowClasses.AnimationTab();
+        [SerializeReference] public List<WindowTab> AllTabs = new List<WindowTab>();
+        public GeneralTab General => GetTab<GeneralTab>();
+        public AnimationTab Animation => GetTab<AnimationTab>();
 
-        public WindowClasses.Components Components = new WindowClasses.Components();
+        public Components Components = new Components();
 
-        private HashSet<WindowClasses.IWindowCallback> callbacks = new HashSet<WindowClasses.IWindowCallback>();
+        private HashSet<IWindowCallback> callbacks = new HashSet<IWindowCallback>();
 
         
 
         private Coroutine switchCor;
-        private WindowClasses.IWindow _windowImplementation;
         [NonSerialized]
         private bool switchedOnce = false;
-
+        
         private void Awake()
         {
-            General.Init(this);
-            Events.Init(this);
-            Audio.Init(this);
+            FindAllTabs();
             
-            RegisterCallback(new WindowClasses.IWindowCallback[]{General,Events,Audio});
+            AllTabs.ForEach(_ => _.Init(this));
             
-            if(General.StateOnAwakeMethod == WindowClasses.StatesAwakeMethod.Awake && !switchedOnce)
+            foreach (var tab in AllTabs)
+                if (tab is IWindowCallback callback)
+                    RegisterCallback(callback);
+            
+            
+            if(General.StateOnAwakeMethod == StatesAwakeMethod.Awake && !switchedOnce)
             {
-                Switch(General.StateOnAwake != WindowClasses.StatesAwake.Open, "Instantly");
-                Switch(General.StateOnAwake == WindowClasses.StatesAwake.Open, General.AnimationOnAwake);
+                Switch(General.StateOnAwake != StatesAwake.Open, "Instantly");
+                Switch(General.StateOnAwake == StatesAwake.Open, General.AnimationOnAwake);
             }
+        }
+
+        public void FindAllTabs()
+        { 
+            if(AllTabs != null)
+                AllTabs = AllTabs.FindAll(_ => _ != null);
+            var enumerable = typeof(WindowTab).Assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(WindowTab))).ToList();
+            foreach (var ie in enumerable)
+                if (AllTabs.Find(_ => _.GetType() == ie) == null)
+                    AllTabs.Add((WindowTab)Activator.CreateInstance(ie));
+            AllTabs = AllTabs.OrderBy(_ => _.InspectorDrawSort).ToList();
+        }
+
+        public T GetTab<T>() where T : WindowTab
+        {
+            return AllTabs.Find(_ => _.GetType() == typeof(T)) as T;
         }
 
         private void Start()
         {
-            if(General.StateOnAwakeMethod == WindowClasses.StatesAwakeMethod.Start && !switchedOnce)
+            if(General.StateOnAwakeMethod == StatesAwakeMethod.Start && !switchedOnce)
             {
-                Switch(General.StateOnAwake != WindowClasses.StatesAwake.Open, "Instantly");
-                Switch(General.StateOnAwake == WindowClasses.StatesAwake.Open, General.AnimationOnAwake);
+                Switch(General.StateOnAwake != StatesAwake.Open, "Instantly");
+                Switch(General.StateOnAwake == StatesAwake.Open, General.AnimationOnAwake);
             }
         }
 
         private void OnEnable()
         {
-            if(General.StateOnAwakeMethod == WindowClasses.StatesAwakeMethod.OnEnable && !switchedOnce)
+            if(General.StateOnAwakeMethod == StatesAwakeMethod.OnEnable && !switchedOnce)
             {
-                Switch(General.StateOnAwake != WindowClasses.StatesAwake.Open, "Instantly");
-                Switch(General.StateOnAwake == WindowClasses.StatesAwake.Open, General.AnimationOnAwake);
+                Switch(General.StateOnAwake != StatesAwake.Open, "Instantly");
+                Switch(General.StateOnAwake == StatesAwake.Open, General.AnimationOnAwake);
             }
-            WindowClasses.EventsTab.StartSwitchStatic.AddListener(OnStartSwitchStatic);
-            WindowClasses.EventsTab.EndSwitchStatic.AddListener(OnEndSwitchStatic);
+            EventsTab.StartSwitchStatic.AddListener(OnStartSwitchStatic);
+            EventsTab.EndSwitchStatic.AddListener(OnEndSwitchStatic);
         }
 
         private void OnDisable()
         {
-            WindowClasses.EventsTab.StartSwitchStatic.RemoveListener(OnStartSwitchStatic);
-            WindowClasses.EventsTab.EndSwitchStatic.RemoveListener(OnEndSwitchStatic);
+            EventsTab.StartSwitchStatic.RemoveListener(OnStartSwitchStatic);
+            EventsTab.EndSwitchStatic.RemoveListener(OnEndSwitchStatic);
         }
 
         private void Update()
@@ -77,12 +94,16 @@ namespace DredPack.UI
             General.CheckOutsideClick();
         }
 
-        private void ChangeState(WindowClasses.StatesRead state)
+        private void ChangeState(StatesRead state)
         {
             General.CurrentState = state;
             OnStateChanged(General.CurrentState);
         }
-        
+
+        #region Tabs
+
+
+        #endregion
         
         #region External Contol
 
@@ -92,8 +113,8 @@ namespace DredPack.UI
         public void Open(AnimationParameters parameters) => OpenCor("", parameters);
         public Coroutine OpenCor(string animName, AnimationParameters parameters)
         {
-            if (General.CurrentState == WindowClasses.StatesRead.Opened ||
-                General.CurrentState == WindowClasses.StatesRead.Opening)
+            if (General.CurrentState == StatesRead.Opened ||
+                General.CurrentState == StatesRead.Opening)
                 return null;
             if(switchCor != null)
                 StopCoroutine(switchCor);
@@ -107,8 +128,8 @@ namespace DredPack.UI
         public void Close(AnimationParameters parameters) => CloseCor("", parameters);
         public Coroutine CloseCor(string animName, AnimationParameters parameters)
         {
-            if (General.CurrentState == WindowClasses.StatesRead.Closed ||
-                General.CurrentState == WindowClasses.StatesRead.Closing)
+            if (General.CurrentState == StatesRead.Closed ||
+                General.CurrentState == StatesRead.Closing)
                 return null;
             if (switchCor != null)
                 StopCoroutine(switchCor);
@@ -122,8 +143,8 @@ namespace DredPack.UI
         public void Switch(AnimationParameters parameters) => SwitchCor("", parameters);
         public Coroutine SwitchCor(string animName, AnimationParameters parameters)
         {
-            if (General.CurrentState == WindowClasses.StatesRead.Closed ||
-                General.CurrentState == WindowClasses.StatesRead.Closing)
+            if (General.CurrentState == StatesRead.Closed ||
+                General.CurrentState == StatesRead.Closing)
                 return OpenCor(animName, parameters);
             return CloseCor(animName, parameters);
         }
@@ -143,35 +164,35 @@ namespace DredPack.UI
         private IEnumerator OpenIE(string animName, AnimationParameters parameters)
         {
             switchedOnce = true;
-            var curAnim = Animation.GetAnimation(string.IsNullOrEmpty(animName) ? Animation.currentAnimationName : animName);
+            var curAnim = Animation.GetAnimation(string.IsNullOrEmpty(animName) ? Animation.CurrentAnimationName : animName);
             curAnim.Init(this);
             curAnim.StopAllCoroutines();
             
-            ChangeState(WindowClasses.StatesRead.Opening);
+            ChangeState(StatesRead.Opening);
             OnStartOpen();
             OnStartSwitch(true);
             
             yield return StartCoroutine(curAnim.UpdateOpen(parameters));
             
-            ChangeState(WindowClasses.StatesRead.Opened);
+            ChangeState(StatesRead.Opened);
             OnEndOpen();
             OnEndSwitch(true);
         }
         private IEnumerator CloseIE(string animName, AnimationParameters parameters)
         {
             switchedOnce = true;
-            var curAnim = Animation.GetAnimation(string.IsNullOrEmpty(animName) ? Animation.currentAnimationName : animName);
+            var curAnim = Animation.GetAnimation(string.IsNullOrEmpty(animName) ? Animation.CurrentAnimationName : animName);
             curAnim.Init(this);
             curAnim.StopAllCoroutines();
             
-            ChangeState(WindowClasses.StatesRead.Closing);
+            ChangeState(StatesRead.Closing);
             OnStartClose();
             OnStartSwitch(false);
             
             yield return StartCoroutine(curAnim.UpdateClose(parameters));
             
             OnEndClose();
-            ChangeState(WindowClasses.StatesRead.Closed);
+            ChangeState(StatesRead.Closed);
             OnEndSwitch(false);
         }
 
@@ -181,21 +202,21 @@ namespace DredPack.UI
         #region Callbacks
 
 
-        public void RegisterCallback(WindowClasses.IWindowCallback[] _callbacks)
+        public void RegisterCallback(IWindowCallback[] _callbacks)
         {
             foreach (var cl in _callbacks)
                 if(cl != null)
                     RegisterCallback(cl);
         }
-        public void RegisterCallback(WindowClasses.IWindowCallback callback) => callbacks.Add(callback);
+        public void RegisterCallback(IWindowCallback callback) => callbacks.Add(callback);
         
-        public void RemoveCallback(WindowClasses.IWindowCallback[] _callbacks)
+        public void RemoveCallback(IWindowCallback[] _callbacks)
         {
             foreach (var cl in _callbacks)
                 if(cl != null)
                     RemoveCallback(cl);
         }
-        public void RemoveCallback(WindowClasses.IWindowCallback callback) => callbacks.Remove(callback);
+        public void RemoveCallback(IWindowCallback callback) => callbacks.Remove(callback);
         
         
 
@@ -215,7 +236,7 @@ namespace DredPack.UI
         {
             foreach (var cl in callbacks)
                 cl?.OnStartSwitch(state);
-            WindowClasses.EventsTab.StartSwitchStatic?.Invoke(this, state);
+            EventsTab.StartSwitchStatic?.Invoke(this, state);
         }
 
         public void OnEndOpen()
@@ -234,10 +255,10 @@ namespace DredPack.UI
         {
             foreach (var cl in callbacks)
                 cl?.OnEndSwitch(state);
-            WindowClasses.EventsTab.EndSwitchStatic?.Invoke(this, state);
+            EventsTab.EndSwitchStatic?.Invoke(this, state);
         }
 
-        public void OnStateChanged(WindowClasses.StatesRead state)
+        public void OnStateChanged(StatesRead state)
         {
             foreach (var cl in callbacks)
                 cl?.OnStateChanged(state);
@@ -248,7 +269,7 @@ namespace DredPack.UI
         {
             if (General.CloseIfAnyWindowOpen && state && window != this)
             {
-                if(General.CloseIfAnyWindowOpenType == WindowClasses.GeneralTab.CloseIfAnyWindowOpenTypes.OnStart)
+                if(General.CloseIfAnyWindowOpenType == GeneralTab.CloseIfAnyWindowOpenTypes.OnStart)
                     Close();
             }
         }
@@ -257,7 +278,7 @@ namespace DredPack.UI
         {
             if (General.CloseIfAnyWindowOpen && state && window != this)
             {
-                if(General.CloseIfAnyWindowOpenType == WindowClasses.GeneralTab.CloseIfAnyWindowOpenTypes.OnEnd)
+                if(General.CloseIfAnyWindowOpenType == GeneralTab.CloseIfAnyWindowOpenTypes.OnEnd)
                     Close();
             }
         }
@@ -277,6 +298,7 @@ namespace DredPack.UI
 
         private void InitComponents()
         {
+            FindAllTabs(); 
             if(Components.DisableableObject == null)
                 Components.DisableableObject = gameObject;
             if(Components.SelectableOnOpen == null)

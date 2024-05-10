@@ -1,5 +1,6 @@
 ﻿using System;
 using DredPack.UI;
+using DredPack.UI.Some;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,9 +15,12 @@ namespace DredPack.WindowEditor
         GUIContent iconToolbarMinus;
         SerializedProperty eventsProperty;
         GUIContent eventIDName;
+        public override Type DrawerOfTab => typeof(DredPack.UI.Tabs.AudioTab); 
 
-        public AudioTab(WindowEditor window, string tabName) : base(window, tabName)
+        
+        public override void Init(WindowEditor window, SerializedProperty tabProperty)
         {
+            base.Init(window, tabProperty);
             addButonContent = EditorGUIUtility.TrTextContent("Add New Audio Type");
             
             eventsProperty = tabProperty.FindPropertyRelative("List");
@@ -26,7 +30,7 @@ namespace DredPack.WindowEditor
             iconToolbarMinus = new GUIContent(EditorGUIUtility.IconContent("Toolbar Minus"));
             iconToolbarMinus.tooltip = "Remove audio in this list.";
             
-            string[] eventNames = Enum.GetNames(typeof(WindowClasses.StatesForChanged));
+            string[] eventNames = Enum.GetNames(typeof(StatesForChanged));
             eventTypes = new GUIContent[eventNames.Length];
             for (int i = 0; i < eventNames.Length; ++i)
                 eventTypes[i] = new GUIContent(eventNames[i]);

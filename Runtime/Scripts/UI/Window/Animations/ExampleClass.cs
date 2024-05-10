@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
     public class ExampleClass : WindowAnimation
     {

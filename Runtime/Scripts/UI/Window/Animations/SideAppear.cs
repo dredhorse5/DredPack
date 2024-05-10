@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using DredPack.UI.WindowAnimations.Modules;
+using DredPack.UI.Animations.Modules;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
     [Serializable]
     public class SideAppear : WindowAnimation

@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using DredPack.UI.WindowAnimations;
+using DredPack.UI.Animations;
 
 namespace DredPack.UI
 {

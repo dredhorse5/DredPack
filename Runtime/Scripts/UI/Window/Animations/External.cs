@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
     public class External : WindowAnimation
     {

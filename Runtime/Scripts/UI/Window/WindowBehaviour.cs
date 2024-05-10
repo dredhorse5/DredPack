@@ -1,12 +1,13 @@
 using System;
 using DredPack.UI;
-using DredPack.UI.WindowAnimations;
+using DredPack.UI.Animations;
+using DredPack.UI.Some;
 using UnityEngine;
 
 namespace DredPack.UI
 {
     [RequireComponent(typeof(Window))]
-    public class WindowBehaviour : MonoBehaviour, WindowClasses.IWindow, WindowClasses.IWindowCallback
+    public class WindowBehaviour : MonoBehaviour, IWindow, IWindowCallback
     {
         public Window Window => _window ??= GetComponent<Window>(); private Window _window;
 
@@ -33,7 +34,7 @@ namespace DredPack.UI
         public virtual void OnEndOpen() { }
         public virtual void OnEndClose() { }
         public virtual void OnEndSwitch(bool state) { }
-        public virtual void OnStateChanged(WindowClasses.StatesRead state) { }
+        public virtual void OnStateChanged(StatesRead state) { }
         
         
         

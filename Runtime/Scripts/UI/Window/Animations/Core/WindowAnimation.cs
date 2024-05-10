@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
     [Serializable]
     public class WindowAnimation : WindowAnimationModule

@@ -1,9 +1,9 @@
 ﻿using System.Collections;
-using DredPack.UI.WindowAnimations.Modules;
+using DredPack.UI.Animations.Modules;
 using NaughtyAttributes;
 using UnityEngine;
 
-namespace DredPack.UI.WindowAnimations
+namespace DredPack.UI.Animations
 {
     public class SideAppearOnePanel : WindowAnimation
     {

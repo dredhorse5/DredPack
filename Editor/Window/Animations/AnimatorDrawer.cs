@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DredPack.WindowEditor.Animations
 {
-    [CustomPropertyDrawer(typeof(DredPack.UI.WindowAnimations.Animator))]
+    [CustomPropertyDrawer(typeof(DredPack.UI.Animations.Animator))]
     public class AnimatorDrawer : WindowAnimationDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DredPack.UI.WindowAnimations.Modules
+namespace DredPack.UI.Animations.Modules
 {
     [Serializable]
     public class GraphicModule : WindowAnimationModule

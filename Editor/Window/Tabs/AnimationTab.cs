@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,27 +10,34 @@ namespace DredPack.WindowEditor
     {
  
         int _selected = 0;
+        public override Type DrawerOfTab => typeof(DredPack.UI.Tabs.AnimationTab);
 
-        public AnimationTab(WindowEditor window, string tabName) : base(window, tabName)
+       
+
+        public override void Init(WindowEditor window, SerializedProperty tabProperty)
         {
-            _selected = window.T.Animation.allAnimationNames.ToList().IndexOf(window.T.Animation.currentAnimationName); 
+            base.Init(window, tabProperty);
+            _selected = UI.Tabs.AnimationTab.RegisteredAnimationsNames.IndexOf(window.T.Animation.CurrentAnimationName);
         }
 
         public override void Draw()
         {
             base.Draw();
-            var sel = EditorGUILayout.Popup("Animation Type", _selected, window.T.Animation.allAnimationNames);
+            
+            var sel = EditorGUILayout.Popup("Animation Type", _selected, UI.Tabs.AnimationTab.RegisteredAnimationsNames.ToArray());
  
             if (sel != _selected)
             {
                 _selected = sel;
-                window.T.Animation.currentAnimationName = window.T.Animation.allAnimationNames[_selected];
+                window.T.Animation.CurrentAnimationName = UI.Tabs.AnimationTab.RegisteredAnimationsNames[_selected];
                 EditorUtility.SetDirty(window.T);
             }
             
-            DredpackEditor.DredInspectorEditorTemplates.DrawLabel(window.T.Animation.currentAnimationName);
+            DredpackEditor.DredInspectorEditorTemplates.DrawLabel(window.T.Animation.CurrentAnimationName);
+            var anim = window.T.Animation.CurrentAnimation;
             EditorGUILayout.Space(-20);
-            EditorGUILayout.PropertyField(tabProperty.FindPropertyRelative("_currentAnimation"),true);
+            SerializedProperty findPropertyRelative = tabProperty.FindPropertyRelative("_currentAnimation");
+            EditorGUILayout.PropertyField(findPropertyRelative,true);
         }
     }
 }

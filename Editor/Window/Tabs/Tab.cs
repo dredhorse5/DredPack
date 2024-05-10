@@ -1,4 +1,6 @@
-﻿using DredPack.UI;
+﻿using System;
+using DredPack.UI;
+using DredPack.UI.Tabs;
 using UnityEditor;
 
 namespace DredPack.WindowEditor
@@ -8,22 +10,19 @@ namespace DredPack.WindowEditor
         protected WindowEditor window;
         protected SerializedProperty tabProperty;
         protected SerializedProperty componentsProperty;
-        public Tab(WindowEditor window, string tabName)
+        public virtual Type DrawerOfTab => null;
+        
+        public virtual void Init(WindowEditor window, SerializedProperty tabProperty)
         {
             this.window = window;
-            tabProperty = this.window.serializedObject.FindProperty(tabName);
+            this.tabProperty = tabProperty;
             componentsProperty = this.window.serializedObject.FindProperty("Components");
         }
 
         
         public virtual void Draw()
         {
-            EditorGUI.indentLevel++;
         }
 
-        public virtual void EndDraw()
-        {
-            EditorGUI.indentLevel--;
-        }
     }
 }

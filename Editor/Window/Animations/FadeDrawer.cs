@@ -1,4 +1,4 @@
-﻿using DredPack.UI.WindowAnimations;
+﻿using DredPack.UI.Animations;
 using UnityEditor;
 using UnityEngine;
 

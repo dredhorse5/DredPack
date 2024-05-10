@@ -15,9 +15,12 @@ namespace DredPack.WindowEditor
         private SerializedProperty endCloseProperty;
         private SerializedProperty endSwitchProperty;
         private SerializedProperty stateChangedProperty;
+        public override Type DrawerOfTab => typeof(DredPack.UI.Tabs.EventsTab);
 
-        public EventsTab(WindowEditor window, string tabName) : base(window, tabName)
+        
+        public override void Init(WindowEditor window, SerializedProperty tabProperty)
         {
+            base.Init(window, tabProperty);
             startOpenProperty = tabProperty.FindPropertyRelative("StartOpen");
             startCloseProperty = tabProperty.FindPropertyRelative("StartClose");
             startSwitchProperty = tabProperty.FindPropertyRelative("StartSwitch");
