@@ -31,13 +31,13 @@ namespace DredPack.UI.Animations
             20f);
         
         [Header("Panels")]
-        public RectTransform[] Up;
-        public RectTransform[] Right;
-        public RectTransform[] Down;
-        public RectTransform[] Left;
+        public RectTransform[] Up = new RectTransform[]{};
+        public RectTransform[] Right= new RectTransform[]{};
+        public RectTransform[] Down= new RectTransform[]{};
+        public RectTransform[] Left= new RectTransform[]{};
 
         [Header("Graphics")]
-        public GraphicModule Graphics;
+        public GraphicModule Graphics = new GraphicModule();
 
 
         private float[] upMaxes;

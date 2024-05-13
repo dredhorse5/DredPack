@@ -21,8 +21,8 @@ namespace DredPack.WindowEditor.Animations
 
             var labelRect = new Rect(animatorRect.x, animatorRect.y + 20, animatorRect.width, EditorGUIUtility.singleLineHeight);
             var namesRect = EditorGUI.PrefixLabel(labelRect, new GUIContent("Animation Names"));
-            var openLabelRect = new Rect(namesRect.x - 14, namesRect.y, namesRect.width / 2f + 7f, namesRect.height);
-            var closeLabelRect = new Rect(namesRect.x + namesRect.width / 2f - 14, namesRect.y, namesRect.width / 2f + 14f, namesRect.height);
+            var openLabelRect = new Rect(namesRect.x, namesRect.y, namesRect.width / 2f - 7f, namesRect.height);
+            var closeLabelRect = new Rect(namesRect.x + namesRect.width / 2f, namesRect.y, namesRect.width / 2f, namesRect.height);
             EditorGUI.LabelField(openLabelRect, "Open");
             EditorGUI.LabelField(closeLabelRect, "Close");
 

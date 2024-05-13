@@ -15,8 +15,8 @@ namespace DredPack.WindowEditor
             var closeProp = property.FindPropertyRelative("Close");
 
             position = EditorGUI.PrefixLabel(position, label);
-            var openRect = new Rect(position.x - 14, position.y, position.width / 2f + 7f, position.height);
-            var closeRect = new Rect(position.x + position.width / 2f - 14, position.y, position.width / 2f + 14f, position.height);
+            var openRect = new Rect(position.x, position.y, position.width / 2f - 7f, position.height);
+            var closeRect = new Rect(position.x + position.width / 2f, position.y, position.width / 2f, position.height);
             EditorGUI.LabelField(openRect, "Open");
             EditorGUI.LabelField(closeRect, "Close");
             

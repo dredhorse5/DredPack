@@ -161,8 +161,8 @@ namespace DredPack.WindowEditor
             EditorGUILayout.LabelField("");
             var rect = GUILayoutUtility.GetLastRect();
             var dataRect = EditorGUI.PrefixLabel(rect, new GUIContent("CanvasGroup Control :"));
-            var leftRect  =new Rect(dataRect.x - 14, dataRect.y, dataRect.width / 2f + 7f, dataRect.height);
-            var rightRect = new Rect(dataRect.x + dataRect.width / 2f - 14, dataRect.y, dataRect.width / 2f + 14f, dataRect.height);
+            var leftRect  =new Rect(dataRect.x, dataRect.y, dataRect.width / 2f + 7f, dataRect.height);
+            var rightRect = new Rect(dataRect.x + dataRect.width / 2f, dataRect.y, dataRect.width / 2f, dataRect.height);
             GUI.Box(dataRect,GUIContent.none,GUI.skin.box);
             GUI.Box(dataRect,GUIContent.none,GUI.skin.box);
             EditorGUI.LabelField(leftRect,"Interactable", EditorStyles.boldLabel);

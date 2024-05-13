@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace DredPack.UI.Animations
 {
+    [Serializable]
     public class WindowAnimationModule : IWindowAnimation
     {
         protected Window window;
@@ -25,9 +27,11 @@ namespace DredPack.UI.Animations
 
         public virtual IEnumerator UpdateOpen(AnimationParameters parameters) {yield break;}
         public virtual void SetOpenTime(float time, AnimationParameters parameters) { }
+        public virtual void SetOpenTime(float time) => SetOpenTime(time, null);
         
         public virtual IEnumerator UpdateClose(AnimationParameters parameters) {yield break;}
         public virtual void SetCloseTime(float time, AnimationParameters parameters) { }
+        public virtual void SetCloseTime(float time) => SetCloseTime(time, null);
 
         public virtual void StopAllCoroutines()
         {

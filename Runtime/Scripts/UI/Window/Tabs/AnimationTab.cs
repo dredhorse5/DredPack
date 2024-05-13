@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DredPack.UI.Animations;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DredPack.UI.Tabs
 {
@@ -11,35 +12,123 @@ namespace DredPack.UI.Tabs
     {
         public override int InspectorDrawSort => 200;
 
+        public bool DualMode = false;
 
-        public string CurrentAnimationName
+        public WindowAnimationModule LastPlayedAnimation;
+
+        #region Open
+
+        
+        //Single mode
+        public string CurrentOpenAnimationName
         {
             get
             {
-                if (string.IsNullOrEmpty(_currentAnimationName))
-                    _currentAnimationName = "Fade";
-                return _currentAnimationName;
+                if (string.IsNullOrEmpty(_currentOpenAnimationName))
+                    _currentOpenAnimationName = "Fade";
+                return _currentOpenAnimationName;
             }
-            set => _currentAnimationName = value;
+            set => _currentOpenAnimationName = value;
         }
-
-        private string _currentAnimationName;
-        public WindowAnimationModule CurrentAnimation
+        [SerializeField] private string _currentOpenAnimationName;
+        public WindowAnimationModule CurrentOpenAnimation
         {
             get
             {
-                _currentAnimation = GetAnimation(CurrentAnimationName);
-                return _currentAnimation;
+                _currentOpenAnimation = GetOpenAnimation(CurrentOpenAnimationName);
+                return _currentOpenAnimation;
+            }
+        }
+        [SerializeReference][SerializeField] public WindowAnimationModule _currentOpenAnimation;
+        
+        [SerializeReference][SerializeField] private List<WindowAnimationModule> createdOpenAnimations = new List<WindowAnimationModule>();
+
+        public WindowAnimationModule GetOpenAnimation(string name)
+        {
+            if (createdOpenAnimations == null)
+                createdOpenAnimations = new List<WindowAnimationModule>();
+            var value = createdOpenAnimations.Find(_ => _.Name == name);
+            if (value != null)
+                return value;
+            else
+            {
+                var anim = RegisteredAnimations.Find(_ => _.Name == name);
+                if (anim != null)
+                {
+                    createdOpenAnimations.Add((WindowAnimationModule)Activator.CreateInstance(anim.GetType()));
+                    return createdOpenAnimations.Last();
+                }
+                else
+                {
+                    Debug.LogError($"Cant find animation with name: <{name}>. Will be used Fade animation");
+                    if (name == "Fade")
+                        return null;
+                    return GetOpenAnimation("Fade");
+                }
             }
         }
 
-        [SerializeReference][SerializeField] public WindowAnimationModule _currentAnimation;
-        [SerializeReference] private Dictionary<string, WindowAnimationModule> createdAnimations = new Dictionary<string, WindowAnimationModule>();
+        #endregion
 
+        
+        #region Close
+        
+        //Dual Mode
+        public string CurrentCloseAnimationName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_currentCloseAnimationName))
+                    _currentCloseAnimationName = "Fade";
+                return _currentCloseAnimationName;
+            }
+            set => _currentCloseAnimationName = value;
+        }
+        [SerializeField] private string _currentCloseAnimationName;
+        public WindowAnimationModule CurrentCloseAnimation
+        {
+            get
+            {
+                _currentCloseAnimation = GetCloseAnimation(CurrentCloseAnimationName);
+                return _currentCloseAnimation;
+            }
+        }
+        [SerializeReference][SerializeField] public WindowAnimationModule _currentCloseAnimation;
 
+        [SerializeReference][SerializeField] private List<WindowAnimationModule> createdCloseAnimations = new List<WindowAnimationModule>();
 
+        public WindowAnimationModule GetCloseAnimation(string name)
+        {
+            if (createdCloseAnimations == null)
+                createdCloseAnimations = new List<WindowAnimationModule>();
+            var value = createdCloseAnimations.Find(_ => _.Name == name);
+            if (value != null)
+                return value;
+            else
+            {
+                var anim = RegisteredAnimations.Find(_ => _.Name == name);
+                if (anim != null)
+                {
+                    createdCloseAnimations.Add((WindowAnimationModule)Activator.CreateInstance(anim.GetType()));
+                    return createdCloseAnimations.Last();
+                }
+                else
+                {
+                    Debug.LogError($"Cant find animation with name: <{name}>. Will be used Fade animation");
+                    if (name == "Fade")
+                        return null;
+                    return GetCloseAnimation("Fade");
+                }
+            }
+        }
 
+        #endregion
 
+        
+        
+        #region Static Members
+
+        
 
         [SerializeReference]
         public static List<WindowAnimationModule> RegisteredAnimations = new List<WindowAnimationModule>();
@@ -58,32 +147,6 @@ namespace DredPack.UI.Tabs
         }
         
         
-        
-
-
-        public WindowAnimationModule GetAnimation(string name)
-        {
-            if (createdAnimations == null)
-                createdAnimations = new Dictionary<string, WindowAnimationModule>();
-            if (createdAnimations.TryGetValue(name, out var value))
-                return value;
-            else
-            {
-                var anim = RegisteredAnimations.Find(_ => _.Name == name);
-                if (anim != null)
-                {
-                    createdAnimations.Add(name, (WindowAnimationModule)Activator.CreateInstance(anim.GetType()));
-                    return createdAnimations[name];
-                }
-                else
-                {
-                    Debug.LogError($"Cant find animation with name: <{name}>. Will be used Fade animation");
-                    if (name == "Fade")
-                        return null;
-                    return GetAnimation("Fade");
-                }
-            }
-        }
-
+        #endregion
     }
 }

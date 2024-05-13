@@ -9,8 +9,8 @@ namespace DredPack.UI.Animations.Modules
     public class GraphicModule : WindowAnimationModule
     {
         public AnimationCurve Curve = new AnimationCurve(new []{new Keyframe(0,0), new Keyframe(1f,1f)});
-        public Graphic[] Graphics;
-        public CanvasGroup[] CanvasGroups;
+        public Graphic[] Graphics = new Graphic[]{};
+        public CanvasGroup[] CanvasGroups = new CanvasGroup[]{};
 
         
         private float[] graphicAlphas;

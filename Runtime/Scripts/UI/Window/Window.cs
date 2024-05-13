@@ -99,11 +99,6 @@ namespace DredPack.UI
             General.CurrentState = state;
             OnStateChanged(General.CurrentState);
         }
-
-        #region Tabs
-
-
-        #endregion
         
         #region External Contol
 
@@ -164,16 +159,19 @@ namespace DredPack.UI
         private IEnumerator OpenIE(string animName, AnimationParameters parameters)
         {
             switchedOnce = true;
-            var curAnim = Animation.GetAnimation(string.IsNullOrEmpty(animName) ? Animation.CurrentAnimationName : animName);
+            var curAnim = Animation.GetOpenAnimation(string.IsNullOrEmpty(animName) ? Animation.CurrentOpenAnimationName : animName);
             curAnim.Init(this);
             curAnim.StopAllCoroutines();
             
             ChangeState(StatesRead.Opening);
             OnStartOpen();
             OnStartSwitch(true);
+            Animation.LastPlayedAnimation?.SetOpenTime(1f);
+            curAnim?.SetCloseTime(1f);
+            Animation.LastPlayedAnimation = curAnim;
             
             yield return StartCoroutine(curAnim.UpdateOpen(parameters));
-            
+             
             ChangeState(StatesRead.Opened);
             OnEndOpen();
             OnEndSwitch(true);
@@ -181,13 +179,25 @@ namespace DredPack.UI
         private IEnumerator CloseIE(string animName, AnimationParameters parameters)
         {
             switchedOnce = true;
-            var curAnim = Animation.GetAnimation(string.IsNullOrEmpty(animName) ? Animation.CurrentAnimationName : animName);
+            WindowAnimationModule curAnim = null;
+            if(Animation.DualMode)
+            {
+                
+                curAnim = Animation.GetCloseAnimation(string.IsNullOrEmpty(animName)
+                    ? Animation.CurrentCloseAnimationName
+                    : animName);
+            }
+            else
+                curAnim = Animation.GetOpenAnimation(string.IsNullOrEmpty(animName) ? Animation.CurrentOpenAnimationName : animName);
             curAnim.Init(this);
             curAnim.StopAllCoroutines();
             
             ChangeState(StatesRead.Closing);
             OnStartClose();
             OnStartSwitch(false);
+            Animation.LastPlayedAnimation?.SetOpenTime(1f);
+            curAnim?.SetOpenTime(1f);
+            Animation.LastPlayedAnimation = curAnim;
             
             yield return StartCoroutine(curAnim.UpdateClose(parameters));
             

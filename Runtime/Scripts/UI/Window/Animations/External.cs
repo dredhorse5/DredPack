@@ -1,11 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using DredPack.UI.Tabs;
 
 namespace DredPack.UI.Animations
 {
+#if UNITY_EDITOR
+    using UnityEditor;
+    [InitializeOnLoad]
+#endif
+    [Serializable]
     public class External : WindowAnimation
     {
         public WindowAnimationBehaviour Component;
-
+        static External() => AnimationTab.RegisterAnimation(typeof(External));
+        public override float SortIndex => 6;
         public override void Init(Window owner)
         {
             if (!window)

@@ -23,7 +23,7 @@ namespace DredPack.WindowEditor
             EditorGUI.PrefixLabel(position, label);
             position = new Rect(position.x + 60, position.y, position.width - 60, position.height);
             var leftRect = new Rect(position.x - 14, position.y, position.width / (3f) + 7f, position.height);
-            var rightRect = new Rect(position.x - 14 + position.width/3f, position.y, (2f * position.width / (3f)) + 7f, position.height);
+            var rightRect = new Rect(position.x + position.width/3f, position.y, (2f * position.width / (3f)) , position.height);
             
             EditorGUI.PropertyField(leftRect, typeProp,GUIContent.none);
             
@@ -34,7 +34,7 @@ namespace DredPack.WindowEditor
             else
             {
                 float ratioValue = .7f;
-                var timeRect = new Rect(rightRect.x, rightRect.y, rightRect.width * ratioValue + 10, rightRect.height);
+                var timeRect = new Rect(rightRect.x + 1, rightRect.y, rightRect.width * ratioValue - 8, rightRect.height);
                 var valRect = new Rect(rightRect.x + (rightRect.width * ratioValue), rightRect.y, rightRect.width * (1f - ratioValue), rightRect.height);
                 EditorGUI.PropertyField(timeRect, timeProp, GUIContent.none);
                 EditorGUI.PropertyField(valRect, valueProp, GUIContent.none);
