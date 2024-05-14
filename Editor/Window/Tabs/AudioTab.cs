@@ -60,7 +60,6 @@ namespace DredPack.WindowEditor
                     toBeRemovedEntry = i;
                 callbackRect.width -= 20; 
                 EditorGUI.PropertyField(callbackRect, audio, eventIDName, true);
-                //EditorGUILayout.PropertyField(audio, eventIDName);
 
                 EditorGUILayout.Space(EditorGUI.GetPropertyHeight(audio));
                 EditorGUILayout.Space(0);

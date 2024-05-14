@@ -29,10 +29,10 @@ namespace DredPack.DredpackEditor.Audio
 
             var rect1 = new Rect(position);
             rect1.height = EditorGUIUtility.singleLineHeight;
-            EditorGUI.DrawRect(rect1, new Color(0,0,0,.15f));
+            //EditorGUI.DrawRect(rect1, new Color(0,0,0,.15f));
             var rect = new Rect(position);
             rect.height -= 2;
-            EditorGUI.DrawRect(rect, new Color(0,0,0,.15f));
+            //EditorGUI.DrawRect(rect, new Color(0,0,0,.15f));
             
             position.height = EditorGUIUtility.singleLineHeight;
             EditorGUI.BeginProperty(position, label, property);
