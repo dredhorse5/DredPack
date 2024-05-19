@@ -1,12 +1,16 @@
 ﻿using System;
-using DredPack.UI.Some;
 
-namespace DredPack.UI.Tabs
+namespace DredPack.UIWindow.Tabs
 {
 
+#if UNITY_EDITOR
+    using UnityEditor;
+    [InitializeOnLoad]
+#endif
     [Serializable]
     public class AudioTab : WindowTab, IWindowCallback
     {
+        static AudioTab() => Window.RegisterTab(typeof(AudioTab));
         public override int InspectorDrawSort => 150;
         public SCPAudio[] List;
 

@@ -1,13 +1,12 @@
 ﻿using System;
-using DredPack.UI;
-using DredPack.UI.Some;
+using DredPack.UIWindow;
+using DredPack.UIWindow.Tabs;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-namespace DredPack.WindowEditor
+namespace DredPack.UIWindowEditor
 {
-    public class AudioTab : Tab
+    public class AudioTabDrawer : TabDrawer
     {
         
         GUIContent addButonContent;
@@ -15,7 +14,7 @@ namespace DredPack.WindowEditor
         GUIContent iconToolbarMinus;
         SerializedProperty eventsProperty;
         GUIContent eventIDName;
-        public override Type DrawerOfTab => typeof(DredPack.UI.Tabs.AudioTab); 
+        public override Type DrawerOfTab => typeof(AudioTab);  
 
         
         public override void Init(WindowEditor window, SerializedProperty tabProperty)
@@ -60,6 +59,7 @@ namespace DredPack.WindowEditor
                     toBeRemovedEntry = i;
                 callbackRect.width -= 20; 
                 EditorGUI.PropertyField(callbackRect, audio, eventIDName, true);
+                //EditorGUILayout.PropertyField(audio, eventIDName);
 
                 EditorGUILayout.Space(EditorGUI.GetPropertyHeight(audio));
                 EditorGUILayout.Space(0);

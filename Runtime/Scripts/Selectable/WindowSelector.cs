@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using DredPack.UI;
+using DredPack.UIWindow;
 using UnityEngine;
 using UnityEngine.Events;
 

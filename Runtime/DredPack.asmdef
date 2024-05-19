@@ -2,7 +2,8 @@
     "name": "DredPack",
     "rootNamespace": "",
     "references": [
-        "GUID:776d03a35f1b52c4a9aed9f56d7b4229"
+        "GUID:776d03a35f1b52c4a9aed9f56d7b4229",
+        "GUID:0c92b95d3c99b09439b008e16cf25e4a"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
