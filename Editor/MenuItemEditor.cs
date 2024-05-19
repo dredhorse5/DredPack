@@ -16,35 +16,6 @@ namespace DredPack
 
 
 
-        [MenuItem("GameObject/DredPackUI/Window", false, 10)]
-        public static void CreateObject_Window(MenuCommand menuCommand)
-        {
-            var rectTransform = CreateUiElement("Window");
-
-
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
-
-            rectTransform.sizeDelta = Vector2.zero;
-
-            rectTransform.anchoredPosition = Vector2.zero;
-
-
-            rectTransform.gameObject.AddComponent<Window>();
-
-
-            var image = rectTransform.gameObject.AddComponent<Image>();
-            image.color = new Color(0, 0, 0, 0.5f);
-
-
-            GameObjectUtility.SetParentAndAlign(rectTransform.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(rectTransform.gameObject, "Create " + rectTransform.gameObject.name);
-
-            Selection.activeObject = rectTransform.gameObject;
-        }
 
         #region Buttons Creator
         
@@ -65,16 +36,6 @@ namespace DredPack
             
             Undo.RegisterCreatedObjectUndo(switcher, "Create " + switcher.name);
             Selection.activeObject = switcher;
-        }
-
-        [MenuItem("Edit/Toggle DredWindow #&q")]
-        static void ToggleSelectedWindow()
-        {
-            if ((Selection.activeObject is GameObject gm))
-            {
-                if (gm.TryGetComponent(out Window window))
-                    window.Switch("Instantly");
-            }
         }
 
         #region Help
