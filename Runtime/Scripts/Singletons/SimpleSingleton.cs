@@ -4,7 +4,7 @@ namespace DredPack
 {
     public class SimpleSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        public static T m_Instance;
+        public static T m_Instance { get; private set; }
 
         public static T Instance
         {
