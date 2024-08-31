@@ -48,6 +48,7 @@ namespace DredPack.SelectableSystem
                 if (Window)
                     Window.Switch(state);
             }
+            [Serializable]
             public struct EventsStruct
             {
                 public UnityEvent SelectedWindowEvent;
