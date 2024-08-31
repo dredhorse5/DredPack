@@ -4,15 +4,15 @@ namespace DredPack
 {
     public class SimpleSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        private static T m_Instance;
+        public static T c_Instance;
 
         public static T Instance
         {
             get
             {
-                if (m_Instance == null)
-                    m_Instance = (T) FindObjectOfType(typeof(T), true);
-                return m_Instance;
+                if (c_Instance == null)
+                    c_Instance = (T) FindObjectOfType(typeof(T), true);
+                return c_Instance;
             }
         }
     }

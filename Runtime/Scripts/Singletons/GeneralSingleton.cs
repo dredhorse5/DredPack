@@ -5,25 +5,24 @@ namespace DredPack
 {
     public class GeneralSingleton<T> : MonoBehaviour where T : Component
     {
-        public static T _instance { get; private set; }
+        public static T c_Instance { get; private set; }
 
         public static T Instance
         {
             get
             {
-                if (!_instance)
+                if (!c_Instance)
                 {
-                    _instance = FindObjectOfType<T>(true);
-                    if (!_instance)
+                    c_Instance = FindObjectOfType<T>(true);
+                    if (!c_Instance)
                     {
                         GameObject obj = new GameObject();
-                        //obj.hideFlags = HideFlags.HideAndDontSave;
-                        _instance = obj.AddComponent<T>();
-                        obj.name = _instance.GetType().Name;
+                        c_Instance = obj.AddComponent<T>();
+                        obj.name = c_Instance.GetType().Name;
                     }
                 }
 
-                return _instance;
+                return c_Instance;
             }
         }
 
@@ -47,8 +46,8 @@ namespace DredPack
 
             DontDestroyOnLoad(this.gameObject);
 
-            if (!_instance)
-                _instance = this as T;
+            if (!c_Instance)
+                c_Instance = this as T;
         }
     }
 
