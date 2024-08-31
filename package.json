@@ -10,6 +10,6 @@
     "url": ""
   },
   "dependencies": {
-    "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#upm"
+    "com.dbrizov.naughtyattributes": "git+https://github.com/dbrizov/NaughtyAttributes.git#upm"
   }
 }
