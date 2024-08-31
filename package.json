@@ -10,6 +10,7 @@
     "url": ""
   },
   "dependencies": {
-    "com.dbrizov.naughtyattributes": "git+https://github.com/dbrizov/NaughtyAttributes.git#upm"
+    "com.coffee.git-dependency-resolver": "https://github.com/mob-sakai/GitDependencyResolverForUnity.git#1.0.0",
+    "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#upm"
   }
 }
