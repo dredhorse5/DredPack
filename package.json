@@ -8,9 +8,5 @@
     "name": "dredhorse5",
     "email": "dima.titov18@gmail.com",
     "url": ""
-  },
-  "dependencies": 
-  {
-    "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#upm"
   }
 }
