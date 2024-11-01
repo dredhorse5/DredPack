@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DredPack.Audio;
 #if UNITY_EDITOR
@@ -5,6 +6,7 @@ using DredPack.DredpackEditor;
 using UnityEditor;
 #endif
 using DredPack.Help;
+using DredPack.Runtime.Scripts.UI;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -28,6 +30,9 @@ namespace DredPack.UI
         #region Inspector Fields
 
         #region General
+        
+        //Register
+        public string RegisterID;
 
         //States
         public WindowStatesAwake stateOnAwake = WindowStatesAwake.Close;
@@ -167,6 +172,16 @@ namespace DredPack.UI
         public UnityEngine.Camera camera;
         
         #endregion
+
+        private void Awake()
+        {
+            WindowsManager.RegisterWindow(this);
+        }
+
+        private void OnDestroy()
+        {
+            WindowsManager.UnRegisterWindow(this);
+        }
 
         private void Start()
         {
@@ -1051,7 +1066,7 @@ namespace DredPack.UI
             {
                 serializedObject.Update();
                 
-                DrawComponentHeader();
+                DrawComponentHeader(!string.IsNullOrEmpty(T.RegisterID) ? T.RegisterID : null);
                 Tabs();
                 EditorGUILayout.BeginVertical(GUI.skin.box);
                 switch (currentWindowTab)
@@ -1092,6 +1107,8 @@ namespace DredPack.UI
             private void Tabs_General()
             {
                 var labelStyle = LabelStyle();
+                
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.RegisterID)), new GUIContent("ID"));
 
                 GUILayout.Label("States", labelStyle);
                 EditorGUI.indentLevel++;
