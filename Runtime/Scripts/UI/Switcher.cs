@@ -16,6 +16,8 @@ namespace DredPack.UI
         public RectTransform Handler;
 
         [Header("Colors")] 
+        [SerializeField,InspectorName("Background")]
+        private Image _image;
         public Color BackgroundColorOn = Color.green;
         public Color BackgroundColorOff = Color.white;
 
@@ -39,7 +41,6 @@ namespace DredPack.UI
 
 
         public Image Image => _image ??= GetComponent<Image>();
-        private Image _image;
         public Image HandlerImage => _circleImage ??= Handler.GetComponent<Image>();
         private Image _circleImage;
         public Button Button => _button ??= GetComponent<Button>();
