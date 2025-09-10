@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using DredPack.Audio;
 #if UNITY_EDITOR
 using DredPack.DredpackEditor;
@@ -56,8 +57,11 @@ namespace DredPack.UI
         public bool CloseOnOutsideClick;
         public bool disableCanvasOnClose = false;
         public bool disableRaycastOnClose = true;
+        public bool disableMasksOnClose = false;
         public Canvas _canvas;
-        public GraphicRaycaster _graphicRaycaster; 
+        public GraphicRaycaster _graphicRaycaster;
+        public List<Mask> _masks;
+        public List<RectMask2D> _rectMasks2d;
 
         #endregion
 
@@ -385,6 +389,54 @@ namespace DredPack.UI
                 Close();
         }
 
+        
+
+        public void FindMasks()
+        {
+            Mask[] masksFound = GetComponentsInChildren<Mask>(true);
+            foreach (var mask in masksFound)
+            {
+                if (!_masks.Contains(mask))
+                {
+                    _masks.Add(mask);
+#if UNITY_EDITOR
+                    EditorUtility.SetDirty(this);
+#endif
+                }
+            }
+
+            RectMask2D[] rectMasksFound = GetComponentsInChildren<RectMask2D>(true);
+            foreach (var rectMask in rectMasksFound)
+            {
+                if (!_rectMasks2d.Contains(rectMask))
+                {
+                    _rectMasks2d.Add(rectMask);
+#if UNITY_EDITOR
+                    EditorUtility.SetDirty(this);
+#endif
+                }
+            }
+        }
+
+        public void ActiveMasks(bool active)
+        {
+            if (_masks != null && _masks.Count > 0)
+            {
+                for (int i = 0; i < _masks.Count; i++)
+                {
+                    if(_masks[i])
+                        _masks[i].enabled = active;
+                }
+            }
+            if (_rectMasks2d != null && _rectMasks2d.Count > 0)
+            {
+                for (int i = 0; i < _rectMasks2d.Count; i++)
+                {
+                    if(_rectMasks2d[i])
+                        _rectMasks2d[i].enabled = active;
+                }
+            }
+        }
 
         #region Open or close visual methods:  Animator
 
@@ -431,6 +483,8 @@ namespace DredPack.UI
                 gameObject.SetActive(true);
             if (disableCanvasOnClose && _canvas && Application.isPlaying)
                 _canvas.enabled = true;
+            if(disableMasksOnClose && Application.isPlaying)
+                ActiveMasks(true);
             if (Close_OpenMethod == PanelOpenCloseMethods.Animator)
             {
                 Open_Animator(true);
@@ -464,6 +518,8 @@ namespace DredPack.UI
                 gameObject.SetActive(false);
             if (disableCanvasOnClose && _canvas && Application.isPlaying)
                 _canvas.enabled = false;
+            if(disableMasksOnClose && Application.isPlaying)
+                ActiveMasks(false);
         }
 
         #endregion
@@ -498,6 +554,9 @@ namespace DredPack.UI
 
             m_canvasGroup.interactable = true;
             m_canvasGroup.blocksRaycasts = true;
+            
+            if(disableMasksOnClose)
+                ActiveMasks(true);
 
             float lastAlpha = m_canvasGroup.alpha;
 
@@ -538,6 +597,8 @@ namespace DredPack.UI
                 gameObject.SetActive(false);
             if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = false;
+            if(disableMasksOnClose)
+                ActiveMasks(false);
             EndCloseEvent?.Invoke();
         }
 
@@ -554,6 +615,8 @@ namespace DredPack.UI
                 gameObject.SetActive(true);
             if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = true;
+            if(disableMasksOnClose)
+                ActiveMasks(true);
             CurrentWindowState = WindowStatesRead.Opening;
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
@@ -692,6 +755,8 @@ namespace DredPack.UI
                     gameObject.SetActive(false);
                 if (disableCanvasOnClose && _canvas)
                     _canvas.enabled = false;
+                if(disableMasksOnClose)
+                    ActiveMasks(false);
                 EndCloseEvent?.Invoke();
             }
         }
@@ -709,6 +774,8 @@ namespace DredPack.UI
                 gameObject.SetActive(true);
             if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = true;
+            if(disableMasksOnClose)
+                ActiveMasks(true);
             CurrentWindowState = WindowStatesRead.Opening;
             SwitchEvent?.Invoke(true);
             OpenEvent?.Invoke();
@@ -879,6 +946,8 @@ namespace DredPack.UI
                     gameObject.SetActive(false);
                 if (disableCanvasOnClose && _canvas)
                     _canvas.enabled = false;
+                if(disableMasksOnClose)
+                    ActiveMasks(false);
                 EndCloseEvent?.Invoke();
             }
         }
@@ -945,6 +1014,8 @@ namespace DredPack.UI
                 gameObject.SetActive(true);
             if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = true;
+            if(disableMasksOnClose)
+                ActiveMasks(true);
             
             m_canvasGroup.interactable = true;
             m_canvasGroup.blocksRaycasts = true;
@@ -1047,6 +1118,8 @@ namespace DredPack.UI
                 gameObject.SetActive(false);
             if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = false;
+            if(disableMasksOnClose)
+                ActiveMasks(false);
             EndCloseEvent?.Invoke();
         }
 
@@ -1167,8 +1240,22 @@ namespace DredPack.UI
                 EditorGUI.indentLevel++;
                 if(T.disableRaycastOnClose)
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T._graphicRaycaster)), new GUIContent("GraphicRaycaster"));
+                
                 EditorGUI.indentLevel--;
                 
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.disableMasksOnClose)));
+                EditorGUI.indentLevel++;
+                if(T.disableMasksOnClose)
+                {
+                    if (GUILayout.Button("Find Masks"))
+                        T.FindMasks();
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T._masks)),
+                        new GUIContent("Masks"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T._rectMasks2d)),
+                        new GUIContent("RectMasks2D"));
+                    
+                }
+                EditorGUI.indentLevel--;
                 
                 EditorGUI.indentLevel--;
                 EditorGUI.indentLevel--;
