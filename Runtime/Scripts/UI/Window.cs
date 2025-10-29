@@ -25,7 +25,7 @@ namespace DredPack.UI
         #region Enums
         public enum PanelOpenCloseMethods { Animator, Instantly, Slowly, SideAppearCurve, SideAppearConstant, ScaledPopUp }
         public enum WindowStatesRead { Opened, Opening, Closed, Closing }
-        public enum WindowStatesAwake { Open, Close }
+        public enum WindowStatesAwake { Open, Close, None }
         #endregion
 
         #region Inspector Fields
