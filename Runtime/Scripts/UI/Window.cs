@@ -62,6 +62,7 @@ namespace DredPack.UI
         public GraphicRaycaster _graphicRaycaster;
         public List<Mask> _masks;
         public List<RectMask2D> _rectMasks2d;
+		public string[] Tags; 
 
         #endregion
 
@@ -1182,6 +1183,7 @@ namespace DredPack.UI
                 var labelStyle = LabelStyle();
                 
                 EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.RegisterID)), new GUIContent("ID"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(T.Tags)));
 
                 GUILayout.Label("States", labelStyle);
                 EditorGUI.indentLevel++;
