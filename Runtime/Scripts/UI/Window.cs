@@ -154,6 +154,8 @@ namespace DredPack.UI
         protected Coroutine closingCoroutine;
         
         public static UnityEvent<Window> windowOpenEventStatic = new UnityEvent<Window>();
+        public static UnityEvent<Window> windowCloseEventStatic = new UnityEvent<Window>();
+        public static UnityEvent<Window, bool> windowSwitchedEventStatic = new UnityEvent<Window, bool>();
 
 
         private float sideAppear_UpDefY;
@@ -300,6 +302,7 @@ namespace DredPack.UI
             if (disableCanvasOnClose && _canvas)
                 _canvas.enabled = true;
             windowOpenEventStatic?.Invoke(this);
+            windowSwitchedEventStatic?.Invoke(this, true);
             switch (Close_OpenMethod)
             {
                 case PanelOpenCloseMethods.Animator:
@@ -328,6 +331,8 @@ namespace DredPack.UI
         /// </summary>
         public virtual void Close()
         {
+            windowCloseEventStatic?.Invoke(this);
+            windowSwitchedEventStatic?.Invoke(this, false);
             switch (Close_OpenMethod)
             {
                 case PanelOpenCloseMethods.Animator:
